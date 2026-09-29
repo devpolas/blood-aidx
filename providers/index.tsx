@@ -7,10 +7,10 @@ import ThemeProvider from "./theme.provider";
 
 export default function Providers({ children }: { children: ReactNode }) {
   return (
-    <QueryProvider>
-      <ThemeProvider>
+    <ThemeProvider>
+      <QueryProvider>
         <TooltipProvider>{children}</TooltipProvider>
-      </ThemeProvider>
-    </QueryProvider>
+      </QueryProvider>
+    </ThemeProvider>
   );
 }

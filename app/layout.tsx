@@ -34,13 +34,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         "font-sans",
         inter.variable,
       )}
+      suppressHydrationWarning
     >
-      <Providers>
-        <body className='flex flex-col min-h-full'>
+      <body className='flex flex-col min-h-full'>
+        <Providers>
           {children}
           <Toaster />
-        </body>
-      </Providers>
+        </Providers>
+      </body>
     </html>
   );
 }
