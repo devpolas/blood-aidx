@@ -52,8 +52,8 @@ export const SignUpSchema = z.object({
 
   email: EmailSchema,
   password: PasswordSchema,
-  gender: GenderSchema.optional(),
-  role: PublicUserRoleSchema.optional().default("donor"),
+  gender: GenderSchema,
+  role: PublicUserRoleSchema,
 });
 
 // Signin
