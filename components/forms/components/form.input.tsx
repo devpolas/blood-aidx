@@ -40,7 +40,7 @@ export function FormInput({
   const inputId = getFieldId(field, id);
   const invalid = isFieldInvalid(field);
   return (
-    <Field data-invalid={invalid} className='space-y-2'>
+    <Field data-invalid={invalid}>
       <FormFieldLabel field={field} label={label} id={inputId} />
       <div className='relative'>
         <Input

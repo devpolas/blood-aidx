@@ -3,12 +3,7 @@
 import type { AnyFieldApi } from "@tanstack/react-form";
 import type { LucideIcon } from "lucide-react";
 
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 
@@ -44,8 +39,8 @@ export function FormRadioGroup({
   const invalid = isFieldInvalid(field);
 
   return (
-    <Field data-invalid={invalid} className='space-y-3'>
-      <div className='space-y-1'>
+    <Field data-invalid={invalid}>
+      <div>
         <FieldLabel className='font-medium text-foreground'>{label}</FieldLabel>
 
         {description && <FieldDescription>{description}</FieldDescription>}
@@ -61,64 +56,56 @@ export function FormRadioGroup({
         aria-invalid={invalid}
         className={cn(
           orientation === "vertical"
-            ? "flex flex-col gap-3"
-            : "flex flex-row flex-wrap gap-6",
+            ? "grid-cols-1"
+            : "grid-cols-[repeat(auto-fit,minmax(75px,max-content))]",
           className,
         )}
       >
-        <FieldGroup
-          className={cn(
-            orientation === "vertical"
-              ? "flex flex-col gap-3"
-              : "flex flex-row flex-wrap gap-6",
-          )}
-        >
-          {options.map((option) => {
-            const itemId = `form-${String(field.name)}-${option.value}`;
-            const Icon = option.icon;
-            const isDisabled = disabled || option.disabled;
+        {options.map((option) => {
+          const itemId = `form-${String(field.name)}-${option.value}`;
+          const Icon = option.icon;
+          const isDisabled = disabled || option.disabled;
 
-            return (
-              <Field
-                key={option.value}
-                orientation='horizontal'
-                data-invalid={invalid}
-                className='items-start gap-3'
-              >
-                <RadioGroupItem
-                  id={itemId}
-                  value={option.value}
-                  disabled={isDisabled}
-                  aria-invalid={invalid}
+          return (
+            <Field
+              key={option.value}
+              orientation='horizontal'
+              data-invalid={invalid}
+              className='items-start'
+            >
+              <RadioGroupItem
+                id={itemId}
+                value={option.value}
+                disabled={isDisabled}
+                aria-invalid={invalid}
+                className={cn(
+                  "mt-0.5",
+                  "data-[state=checked]:border-brand",
+                  "data-[state=checked]:text-brand",
+                )}
+              />
+
+              <div>
+                <FieldLabel
+                  htmlFor={itemId}
                   className={cn(
-                    "mt-0.5",
-                    "data-[state=checked]:border-brand",
-                    "data-[state=checked]:text-brand",
+                    "font-medium text-foreground",
+                    !isDisabled && "cursor-pointer",
                   )}
-                />
+                >
+                  <span className='flex items-center'>
+                    {Icon && <Icon className='size-4' />}
+                    {option.label}
+                  </span>
+                </FieldLabel>
 
-                <div className='gap-1 grid'>
-                  <FieldLabel
-                    htmlFor={itemId}
-                    className={cn(
-                      "font-medium text-foreground",
-                      !isDisabled && "cursor-pointer",
-                    )}
-                  >
-                    <span className='flex items-center gap-2'>
-                      {Icon && <Icon className='size-4' />}
-                      {option.label}
-                    </span>
-                  </FieldLabel>
-
-                  {option.description && (
-                    <FieldDescription>{option.description}</FieldDescription>
-                  )}
-                </div>
-              </Field>
-            );
-          })}
-        </FieldGroup>
+                {option.description && (
+                  <FieldDescription>{option.description}</FieldDescription>
+                )}
+              </div>
+            </Field>
+          );
+        })}
       </RadioGroup>
 
       <FormFieldError field={field} />
