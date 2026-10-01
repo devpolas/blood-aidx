@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { FieldSeparator } from "@/components/ui/field";
 import { APP_NAME } from "@/constraints";
+import SignupForm from "@/components/forms/signup.form";
 
 export const metadata: Metadata = {
   title: "Create Account",
@@ -40,6 +41,7 @@ export default function SignupPage() {
 
       <CardContent className='space-y-4 pt-2'>
         {/* Signup form */}
+        <SignupForm role='donor' />
 
         <p className='text-muted-foreground text-sm text-center'>
           Already have an account?
