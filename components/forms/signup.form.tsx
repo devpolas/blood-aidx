@@ -1,5 +1,9 @@
 "use client";
-import { SignUpInput, SignUpSchema } from "@/validators/auth.validator";
+import {
+  SignUpFormValues,
+  SignUpInput,
+  SignUpSchema,
+} from "@/validators/auth.validator";
 import { useForm } from "@tanstack/react-form";
 import { FormInput } from "./components/form.input";
 import { FormRadioGroup } from "./components/form.radio.group";
@@ -13,7 +17,7 @@ const GENDERS = [
   { label: "Other", value: "other" },
 ];
 
-const DEFAULT_VALUES: SignUpInput = {
+const DEFAULT_VALUES: SignUpFormValues = {
   name: "",
   email: "",
   password: "",

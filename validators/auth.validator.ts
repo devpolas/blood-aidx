@@ -142,6 +142,9 @@ export const LogoutOtherDevicesSchema = z.object({
 export type UserRole = z.input<typeof UserRoleSchema>;
 export type Gender = z.input<typeof GenderSchema>;
 export type SignUpInput = z.input<typeof SignUpSchema>;
+export type SignUpFormValues = Omit<SignUpInput, "gender"> & {
+  gender: Gender | undefined;
+};
 export type SignInInput = z.input<typeof SignInSchema>;
 export type VerifyEmailInput = z.input<typeof VerifyEmailSchema>;
 export type ResendVerificationInput = z.input<typeof ResendVerificationSchema>;
