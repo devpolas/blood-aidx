@@ -15,6 +15,7 @@ import {
 
 import { FieldSeparator } from "@/components/ui/field";
 import { APP_NAME } from "@/constraints";
+import SigninForm from "@/components/forms/signin.form";
 
 export const metadata: Metadata = {
   title: "Sign In",
@@ -52,7 +53,7 @@ export default function SigninPage() {
 
       {/* Form */}
       <CardContent className='space-y-4'>
-        {/* form  */}
+        <SigninForm />
 
         {/* Social Login */}
         <FieldSeparator className='bg-transparent *:data-[slot=field-separator-content]:bg-card'>
