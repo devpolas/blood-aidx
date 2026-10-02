@@ -13,6 +13,7 @@ import {
 import { FieldSeparator } from "@/components/ui/field";
 import { APP_NAME } from "@/constraints";
 import SignupForm from "@/components/forms/auth/signup.form";
+import ContinueWithGoogle from "@/components/auth/social/google";
 
 export const metadata: Metadata = {
   title: "Create Account",
@@ -57,7 +58,9 @@ export default function SignupPage() {
           Or continue with
         </FieldSeparator>
 
-        <div className='pt-2'>{/* Google sign-in button */}</div>
+        <div className='pt-2'>
+          <ContinueWithGoogle />
+        </div>
       </CardContent>
     </Card>
   );

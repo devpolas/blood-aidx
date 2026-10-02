@@ -16,6 +16,7 @@ import {
 import { FieldSeparator } from "@/components/ui/field";
 import { APP_NAME } from "@/constraints";
 import SigninForm from "@/components/forms/auth/signin.form";
+import ContinueWithGoogle from "@/components/auth/social/google";
 
 export const metadata: Metadata = {
   title: "Sign In",
@@ -60,7 +61,9 @@ export default function SigninPage() {
           Or continue with
         </FieldSeparator>
 
-        <div className='pt-4'>{/* google signin button   */}</div>
+        <div className='pt-4'>
+          <ContinueWithGoogle />
+        </div>
       </CardContent>
     </Card>
   );
