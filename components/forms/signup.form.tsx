@@ -10,6 +10,8 @@ import { FormRadioGroup } from "./components/form.radio.group";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "../ui/button";
 import { LoadingSpinner } from "../shared/loading/loading";
+import { useSignup } from "@/hooks/auth";
+import { toast } from "../ui/toast";
 
 const GENDERS = [
   { label: "Male", value: "male" },
@@ -27,6 +29,7 @@ const DEFAULT_VALUES: SignUpFormValues = {
 
 export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
   const isMobile = useIsMobile();
+  const { mutateAsync: signup, isPending: isSignup } = useSignup();
   const form = useForm({
     defaultValues: { ...DEFAULT_VALUES, role },
     validators: {
@@ -34,9 +37,44 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
     },
 
     onSubmit: ({ value }) => {
-      console.log(value);
+      const signupData = {
+        name: value.name,
+        email: value.email,
+        password: value.password,
+        role: value.role,
+        gender: value.gender!,
+      };
+      signup(signupData, {
+        onSuccess: (res) => {
+          if (!res.success) {
+            toast.add({
+              title: "Signup Failed",
+              description:
+                res.message || "Something went wrong. Please try again",
+              type: "error",
+            });
+            return;
+          }
+
+          toast.add({
+            title: "Signup Successful",
+            description: "Please verify your account",
+            type: "success",
+          });
+        },
+
+        onError: (err) => {
+          toast.add({
+            title: "Signup Failed",
+            description:
+              err.message || "Something went wrong. Please try again",
+            type: "error",
+          });
+        },
+      });
     },
   });
+
   return (
     <form
       onSubmit={(e) => {
@@ -52,6 +90,7 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
               label='Full Name'
               field={field}
               id='name'
+              isRequired
               type='text'
               placeholder='Enter Your Full Name'
             />
@@ -64,6 +103,7 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
               label='Email'
               field={field}
               id='email'
+              isRequired
               type='email'
               placeholder='Enter Your Email Address'
             />
@@ -76,6 +116,7 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
               label='Password'
               field={field}
               id='password'
+              isRequired
               type='password'
               placeholder='Enter Your Password'
             />
@@ -88,6 +129,7 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
               label='Gender'
               field={field}
               options={GENDERS}
+              isRequired
               orientation={isMobile ? "vertical" : "horizontal"}
             />
           )}
@@ -98,13 +140,16 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
             "glass-brand text-brand font-medium hover:cursor-pointer hover:bg-brand-foreground"
           }
         >
-          Signup
-          {/* <LoadingSpinner
-            spinnerClassName='text-brand'
-            textClassName='text-brand'
-            text='Signup'
-            shimmer
-          /> */}
+          {isSignup ? (
+            <LoadingSpinner
+              spinnerClassName='text-brand'
+              textClassName='text-brand'
+              text='Signup'
+              shimmer
+            />
+          ) : (
+            "Signup"
+          )}
         </Button>
       </div>
     </form>
