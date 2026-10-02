@@ -4,12 +4,12 @@ import { PUBLIC_NAVIGATION } from "@/config";
 
 export default function NavbarLinks() {
   return (
-    <nav className='hidden md:flex items-center gap-5 lg:gap-10 xl:gap-14'>
+    <nav className='hidden md:flex items-center gap-4 md:gap-6 xl:gap-14'>
       {PUBLIC_NAVIGATION.map((item) => (
         <Link
           key={item.href}
           href={item.href}
-          className='font-medium text-muted-foreground hover:text-brand text-sm md:text-lg lg:text-xl transition-colors'
+          className='font-medium text-muted-foreground md:text-[16px] hover:text-brand text-sm lg:text-xl transition-colors'
         >
           {item.title}
         </Link>
