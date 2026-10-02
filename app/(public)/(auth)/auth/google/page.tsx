@@ -1,9 +1,10 @@
+import { Suspense } from "react";
 import AuthCallback from "./auth-callback";
 
 export default function page() {
   return (
-    <section>
+    <Suspense fallback={null}>
       <AuthCallback />
-    </section>
+    </Suspense>
   );
 }
