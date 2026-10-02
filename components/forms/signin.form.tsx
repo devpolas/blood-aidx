@@ -88,6 +88,7 @@ export default function SigninForm() {
               type='email'
               placeholder='Enter your email address'
               isRequired
+              disabled={isSignin}
             />
           )}
         </form.Field>
@@ -102,6 +103,7 @@ export default function SigninForm() {
               placeholder='Enter your password'
               isRequired
               isForgotPassword
+              disabled={isSignin}
             />
           )}
         </form.Field>

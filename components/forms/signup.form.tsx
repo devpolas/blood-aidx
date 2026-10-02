@@ -98,6 +98,7 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
               isRequired
               type='text'
               placeholder='Enter Your Full Name'
+              disabled={isSignup}
             />
           )}
         </form.Field>
@@ -111,6 +112,7 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
               isRequired
               type='email'
               placeholder='Enter Your Email Address'
+              disabled={isSignup}
             />
           )}
         </form.Field>
@@ -124,6 +126,7 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
               isRequired
               type='password'
               placeholder='Enter Your Password'
+              disabled={isSignup}
             />
           )}
         </form.Field>
@@ -136,6 +139,7 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
               options={GENDERS}
               isRequired
               orientation={isMobile ? "vertical" : "horizontal"}
+              disabled={isSignup}
             />
           )}
         </form.Field>
