@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const themes = [
   {
@@ -33,7 +34,6 @@ const themes = [
 
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
-
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export function ThemeSwitcher() {
       <DropdownMenuTrigger
         render={
           <Button
-            size='icon'
+            size='icon-sm'
             variant='outline'
             className='relative hover:bg-brand/10 border-brand/20 hover:text-brand transition-colors'
           >
