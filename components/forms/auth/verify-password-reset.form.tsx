@@ -1,19 +1,24 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
+
 import { useForgotPassword, useVerifyPasswordReset } from "@/hooks/auth";
+import { useResendCooldown } from "@/hooks/use-resend-cooldown";
+
 import {
   VerifyPasswordResetSchema,
   type VerifyPasswordResetInput,
 } from "@/validators/auth.validator";
+
 import { Time } from "@/utils/time.helper";
+
 import { Button } from "../../ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../ui/input-otp";
 import { toast } from "../../ui/toast";
 import { LoadingSpinner } from "../../shared/loading/loading";
 import { FieldSeparator } from "../../ui/field";
+
 type VerifyPasswordResetFormProps = {
   email?: string;
 };
@@ -26,19 +31,10 @@ const DEFAULT_VALUES: VerifyPasswordResetInput = {
   code: "",
 };
 
-function formatRemainingTime(milliseconds: number) {
-  const totalSeconds = Math.ceil(milliseconds / 1_000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-}
-
 export default function VerifyPasswordResetForm({
   email = "",
 }: VerifyPasswordResetFormProps) {
   const router = useRouter();
-
-  const [remainingTime, setRemainingTime] = useState(0);
 
   const { mutateAsync: verifyPasswordReset, isPending: isVerifying } =
     useVerifyPasswordReset();
@@ -46,80 +42,12 @@ export default function VerifyPasswordResetForm({
   const { mutateAsync: forgotPassword, isPending: isResending } =
     useForgotPassword();
 
-  const storageKey = useMemo(
-    () =>
-      email
-        ? `${RESEND_STORAGE_KEY}:${email.trim().toLowerCase()}`
-        : RESEND_STORAGE_KEY,
-    [email],
-  );
-
-  useEffect(() => {
-    if (!email) {
-      // eslint-disable-next-line
-      setRemainingTime(0);
-      return;
-    }
-
-    const storedValue = localStorage.getItem(storageKey);
-
-    if (!storedValue) {
-      setRemainingTime(0);
-      return;
-    }
-
-    const expiresAt = Number(storedValue);
-
-    if (!Number.isFinite(expiresAt)) {
-      localStorage.removeItem(storageKey);
-      setRemainingTime(0);
-      return;
-    }
-
-    const remaining = Math.max(expiresAt - Date.now(), 0);
-
-    setRemainingTime(remaining);
-
-    if (remaining === 0) {
-      localStorage.removeItem(storageKey);
-    }
-  }, [email, storageKey]);
-
-  useEffect(() => {
-    if (remainingTime <= 0) {
-      return;
-    }
-
-    const timer = window.setInterval(() => {
-      const storedValue = localStorage.getItem(storageKey);
-
-      if (!storedValue) {
-        setRemainingTime(0);
-        return;
-      }
-
-      const expiresAt = Number(storedValue);
-
-      if (!Number.isFinite(expiresAt)) {
-        localStorage.removeItem(storageKey);
-        setRemainingTime(0);
-        return;
-      }
-
-      const remaining = Math.max(expiresAt - Date.now(), 0);
-
-      setRemainingTime(remaining);
-
-      if (remaining === 0) {
-        localStorage.removeItem(storageKey);
-        window.clearInterval(timer);
-      }
-    }, 1_000);
-
-    return () => {
-      window.clearInterval(timer);
-    };
-  }, [remainingTime > 0, storageKey]);
+  const { remainingTime, formattedTime, isCoolingDown, startCooldown } =
+    useResendCooldown({
+      email,
+      storageKey: RESEND_STORAGE_KEY,
+      duration: RESEND_COOLDOWN,
+    });
 
   const form = useForm({
     defaultValues: {
@@ -141,6 +69,7 @@ export default function VerifyPasswordResetForm({
                 res.message || "The verification code is invalid or expired.",
               type: "error",
             });
+
             return;
           }
 
@@ -153,6 +82,7 @@ export default function VerifyPasswordResetForm({
                 "The reset permission was not returned. Please try again.",
               type: "error",
             });
+
             return;
           }
 
@@ -189,14 +119,12 @@ export default function VerifyPasswordResetForm({
   };
 
   const handleResend = async () => {
-    if (!email || remainingTime > 0 || isResending || isVerifying) {
+    if (!email || isCoolingDown || isResending || isVerifying) {
       return;
     }
 
     await forgotPassword(
-      {
-        email,
-      },
+      { email },
       {
         onSuccess: (res) => {
           if (!res.success) {
@@ -209,10 +137,9 @@ export default function VerifyPasswordResetForm({
 
             return;
           }
+
           form.setFieldValue("code", "");
-          const expiresAt = Date.now() + RESEND_COOLDOWN;
-          localStorage.setItem(storageKey, String(expiresAt));
-          setRemainingTime(RESEND_COOLDOWN);
+          startCooldown();
 
           toast.add({
             title: "Code sent",
@@ -235,14 +162,13 @@ export default function VerifyPasswordResetForm({
   };
 
   const isFormBusy = isVerifying || isResending;
-  const isResendDisabled = !email || isFormBusy || remainingTime > 0;
+  const isResendDisabled = !email || isFormBusy || isCoolingDown;
 
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault();
         event.stopPropagation();
-
         void form.handleSubmit();
       }}
     >
@@ -345,8 +271,8 @@ export default function VerifyPasswordResetForm({
                 <LoadingSpinner spinnerClassName='size-3.5 text-brand' />
                 Sending new code...
               </span>
-            ) : remainingTime > 0 ? (
-              `Resend code in ${formatRemainingTime(remainingTime)}`
+            ) : isCoolingDown ? (
+              `Resend code in ${formattedTime}`
             ) : (
               "Resend code"
             )}
