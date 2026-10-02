@@ -3,10 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
 
-import { Button } from "../ui/button";
-import { LoadingSpinner } from "../shared/loading/loading";
-import { toast } from "../ui/toast";
-import { FormInput } from "./components/form.input";
+import { Button } from "../../ui/button";
+import { LoadingSpinner } from "../../shared/loading/loading";
+import { toast } from "../../ui/toast";
+import { FormInput } from "../components/form.input";
 
 import { useSignin } from "@/hooks/auth";
 import { SignInSchema, type SignInInput } from "@/validators/auth.validator";

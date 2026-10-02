@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 import Logo from "@/components/logo/logo";
-import VerifyAccountForm from "@/components/forms/verification.form";
+import VerifyAccountForm from "@/components/forms/auth/verification.form";
 import { Heading4 } from "@/components/typography/typography";
 import {
   Card,

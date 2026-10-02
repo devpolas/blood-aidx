@@ -15,7 +15,7 @@ import {
 
 import { FieldSeparator } from "@/components/ui/field";
 import { APP_NAME } from "@/constraints";
-import SigninForm from "@/components/forms/signin.form";
+import SigninForm from "@/components/forms/auth/signin.form";
 
 export const metadata: Metadata = {
   title: "Sign In",

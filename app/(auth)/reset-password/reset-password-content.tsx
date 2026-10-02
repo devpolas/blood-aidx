@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { APP_NAME } from "@/constraints";
-import ResetPasswordForm from "@/components/forms/reset-password.form";
+import ResetPasswordForm from "@/components/forms/auth/reset-password.form";
 
 export default function ResetPasswordContent() {
   const searchParams = useSearchParams();

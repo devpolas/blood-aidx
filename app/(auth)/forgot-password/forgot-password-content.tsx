@@ -1,5 +1,5 @@
 "use client";
-import ForgotPasswordForm from "@/components/forms/forgot.password.form";
+import ForgotPasswordForm from "@/components/forms/auth/forgot.password.form";
 import Logo from "@/components/logo/logo";
 import { Heading4 } from "@/components/typography/typography";
 

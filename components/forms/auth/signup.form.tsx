@@ -5,13 +5,13 @@ import {
   SignUpSchema,
 } from "@/validators/auth.validator";
 import { useForm } from "@tanstack/react-form";
-import { FormInput } from "./components/form.input";
-import { FormRadioGroup } from "./components/form.radio.group";
+import { FormInput } from "../components/form.input";
+import { FormRadioGroup } from "../components/form.radio.group";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Button } from "../ui/button";
-import { LoadingSpinner } from "../shared/loading/loading";
+import { Button } from "../../ui/button";
+import { LoadingSpinner } from "../../shared/loading/loading";
 import { useSignup } from "@/hooks/auth";
-import { toast } from "../ui/toast";
+import { toast } from "../../ui/toast";
 import { useRouter } from "next/navigation";
 
 const GENDERS = [

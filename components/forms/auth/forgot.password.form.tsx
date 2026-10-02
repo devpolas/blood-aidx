@@ -8,10 +8,10 @@ import {
   ForgotPasswordSchema,
   type ForgotPasswordInput,
 } from "@/validators/auth.validator";
-import { Button } from "../ui/button";
-import { LoadingSpinner } from "../shared/loading/loading";
-import { toast } from "../ui/toast";
-import { FormInput } from "./components/form.input";
+import { toast } from "@/components/ui/toast";
+import { FormInput } from "../components/form.input";
+import { Button } from "@/components/ui/button";
+import { LoadingSpinner } from "@/components/shared/loading/loading";
 
 const DEFAULT_VALUES: ForgotPasswordInput = {
   email: "",

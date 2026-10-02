@@ -3,13 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
 import { useResetPassword } from "@/hooks/auth";
-import {
-  ResetPasswordSchema,
-} from "@/validators/auth.validator";
-import { Button } from "../ui/button";
-import { LoadingSpinner } from "../shared/loading/loading";
-import { toast } from "../ui/toast";
-import { FormInput } from "./components/form.input";
+import { ResetPasswordSchema } from "@/validators/auth.validator";
+import { Button } from "../../ui/button";
+import { LoadingSpinner } from "../../shared/loading/loading";
+import { toast } from "../../ui/toast";
+import { FormInput } from "../components/form.input";
 type ResetPasswordFormProps = {
   resetToken: string;
 };

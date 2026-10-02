@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { FieldSeparator } from "@/components/ui/field";
 import { APP_NAME } from "@/constraints";
-import SignupForm from "@/components/forms/signup.form";
+import SignupForm from "@/components/forms/auth/signup.form";
 
 export const metadata: Metadata = {
   title: "Create Account",

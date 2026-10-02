@@ -3,28 +3,25 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
-
-import { useResendVerification, useVerifyEmail } from "@/hooks/auth";
+import { useForgotPassword, useVerifyPasswordReset } from "@/hooks/auth";
 import {
-  VerifyEmailSchema,
-  type VerifyEmailInput,
+  VerifyPasswordResetSchema,
+  type VerifyPasswordResetInput,
 } from "@/validators/auth.validator";
 import { Time } from "@/utils/time.helper";
-
-import { Button } from "../ui/button";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp";
-import { toast } from "../ui/toast";
-import { LoadingSpinner } from "../shared/loading/loading";
-import { FieldSeparator } from "../ui/field";
-
-type VerifyAccountFormProps = {
+import { Button } from "../../ui/button";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../ui/input-otp";
+import { toast } from "../../ui/toast";
+import { LoadingSpinner } from "../../shared/loading/loading";
+import { FieldSeparator } from "../../ui/field";
+type VerifyPasswordResetFormProps = {
   email?: string;
 };
 
 const RESEND_COOLDOWN = Time.minute(2);
-const RESEND_STORAGE_KEY = "blood-aidx:verification-resend";
+const RESEND_STORAGE_KEY = "blood-aidx:password-reset-resend";
 
-const DEFAULT_VALUES: VerifyEmailInput = {
+const DEFAULT_VALUES: VerifyPasswordResetInput = {
   email: "",
   code: "",
 };
@@ -33,21 +30,21 @@ function formatRemainingTime(milliseconds: number) {
   const totalSeconds = Math.ceil(milliseconds / 1_000);
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
-
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
-export default function VerifyAccountForm({
+export default function VerifyPasswordResetForm({
   email = "",
-}: VerifyAccountFormProps) {
+}: VerifyPasswordResetFormProps) {
   const router = useRouter();
 
   const [remainingTime, setRemainingTime] = useState(0);
 
-  const { mutateAsync: verifyEmail, isPending: isVerifying } = useVerifyEmail();
+  const { mutateAsync: verifyPasswordReset, isPending: isVerifying } =
+    useVerifyPasswordReset();
 
-  const { mutateAsync: resendVerification, isPending: isResending } =
-    useResendVerification();
+  const { mutateAsync: forgotPassword, isPending: isResending } =
+    useForgotPassword();
 
   const storageKey = useMemo(
     () =>
@@ -119,7 +116,9 @@ export default function VerifyAccountForm({
       }
     }, 1_000);
 
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearInterval(timer);
+    };
   }, [remainingTime > 0, storageKey]);
 
   const form = useForm({
@@ -127,11 +126,13 @@ export default function VerifyAccountForm({
       ...DEFAULT_VALUES,
       email,
     },
+
     validators: {
-      onSubmit: VerifyEmailSchema,
+      onSubmit: VerifyPasswordResetSchema,
     },
+
     onSubmit: async ({ value }) => {
-      await verifyEmail(value, {
+      await verifyPasswordReset(value, {
         onSuccess: (res) => {
           if (!res.success) {
             toast.add({
@@ -140,17 +141,31 @@ export default function VerifyAccountForm({
                 res.message || "The verification code is invalid or expired.",
               type: "error",
             });
+            return;
+          }
 
+          const resetToken = res.data?.resetToken;
+
+          if (!resetToken) {
+            toast.add({
+              title: "Verification failed",
+              description:
+                "The reset permission was not returned. Please try again.",
+              type: "error",
+            });
             return;
           }
 
           toast.add({
-            title: "Account verified",
-            description: "Your account has been verified successfully.",
+            title: "Code verified",
+            description:
+              "Your identity has been verified. You can now create a new password.",
             type: "success",
           });
 
-          router.push("/signin");
+          router.push(
+            `/reset-password?token=${encodeURIComponent(resetToken)}`,
+          );
         },
 
         onError: (error) => {
@@ -178,7 +193,7 @@ export default function VerifyAccountForm({
       return;
     }
 
-    await resendVerification(
+    await forgotPassword(
       {
         email,
       },
@@ -194,18 +209,15 @@ export default function VerifyAccountForm({
 
             return;
           }
-
           form.setFieldValue("code", "");
-
           const expiresAt = Date.now() + RESEND_COOLDOWN;
-
           localStorage.setItem(storageKey, String(expiresAt));
-
           setRemainingTime(RESEND_COOLDOWN);
 
           toast.add({
             title: "Code sent",
-            description: "A new verification code has been sent to your email.",
+            description:
+              "A new password reset code has been sent to your email.",
             type: "success",
           });
         },
@@ -242,7 +254,7 @@ export default function VerifyAccountForm({
             return (
               <div className='flex flex-col items-center gap-4'>
                 <div className='space-y-1.5 w-full text-center'>
-                  <p className='font-medium text-lg'>Verification code</p>
+                  <p className='font-medium text-lg'>Password reset code</p>
 
                   <p className='text-muted-foreground text-sm leading-relaxed'>
                     Enter the 6-digit code sent to your email.
@@ -250,7 +262,7 @@ export default function VerifyAccountForm({
                 </div>
 
                 <InputOTP
-                  id='verification-code'
+                  id='password-reset-code'
                   maxLength={6}
                   value={field.state.value}
                   onChange={handleCodeChange}
@@ -259,10 +271,10 @@ export default function VerifyAccountForm({
                   inputMode='numeric'
                   pattern='[0-9]*'
                   containerClassName='w-full justify-center'
-                  aria-label='6-digit verification code'
+                  aria-label='6-digit password reset code'
                   aria-invalid={Boolean(error)}
                   aria-describedby={
-                    error ? "verification-code-error" : undefined
+                    error ? "password-reset-code-error" : undefined
                   }
                 >
                   <InputOTPGroup className='w-full max-w-sm'>
@@ -278,7 +290,7 @@ export default function VerifyAccountForm({
 
                 {error ? (
                   <p
-                    id='verification-code-error'
+                    id='password-reset-code-error'
                     className='text-destructive text-sm text-center'
                   >
                     {error}
@@ -306,7 +318,7 @@ export default function VerifyAccountForm({
               shimmer
             />
           ) : (
-            "Verify account"
+            "Verify code"
           )}
         </Button>
 
