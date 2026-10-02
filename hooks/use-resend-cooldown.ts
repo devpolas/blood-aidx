@@ -45,7 +45,6 @@ export function useResendCooldown({
 
   useEffect(() => {
     if (!email) {
-      // eslint-disable-next-line
       setExpiresAt(null);
       setRemainingTime(0);
       return;
@@ -68,7 +67,9 @@ export function useResendCooldown({
       return;
     }
 
-    if (storedExpiresAt <= Date.now()) {
+    const remaining = storedExpiresAt - Date.now();
+
+    if (remaining <= 0) {
       localStorage.removeItem(key);
       setExpiresAt(null);
       setRemainingTime(0);
@@ -76,11 +77,11 @@ export function useResendCooldown({
     }
 
     setExpiresAt(storedExpiresAt);
-    setRemainingTime(Math.max(storedExpiresAt - Date.now(), 0));
+    setRemainingTime(remaining);
   }, [email, key]);
 
   useEffect(() => {
-    if (!expiresAt) {
+    if (expiresAt === null) {
       return;
     }
 
