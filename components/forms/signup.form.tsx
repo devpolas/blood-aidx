@@ -12,6 +12,7 @@ import { Button } from "../ui/button";
 import { LoadingSpinner } from "../shared/loading/loading";
 import { useSignup } from "@/hooks/auth";
 import { toast } from "../ui/toast";
+import { useRouter } from "next/navigation";
 
 const GENDERS = [
   { label: "Male", value: "male" },
@@ -29,6 +30,7 @@ const DEFAULT_VALUES: SignUpFormValues = {
 
 export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
   const isMobile = useIsMobile();
+  const router = useRouter();
   const { mutateAsync: signup, isPending: isSignup } = useSignup();
   const form = useForm({
     defaultValues: { ...DEFAULT_VALUES, role },
@@ -61,6 +63,9 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
             description: "Please verify your account",
             type: "success",
           });
+
+          const params = new URLSearchParams({ email: value.email });
+          router.push(`/verify-account?${params.toString()}`);
         },
 
         onError: (err) => {
