@@ -149,7 +149,7 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
             <LoadingSpinner
               spinnerClassName='text-brand'
               textClassName='text-brand'
-              text='Signup'
+              text='Signing up'
               shimmer
             />
           ) : (
