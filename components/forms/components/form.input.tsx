@@ -12,12 +12,14 @@ import {
   getFieldId,
   isFieldInvalid,
 } from "./form.field";
+import Link from "next/link";
 
 type FormInputProps = {
   field: AnyFieldApi;
   label: string;
   id?: string;
   isRequired?: boolean;
+  isForgotPassword?: boolean;
   placeholder?: string;
   type?: React.HTMLInputTypeAttribute;
   disabled?: boolean;
@@ -30,6 +32,7 @@ export function FormInput({
   label,
   id,
   isRequired,
+  isForgotPassword,
   placeholder,
   type = "text",
   disabled = false,
@@ -43,12 +46,22 @@ export function FormInput({
   const invalid = isFieldInvalid(field);
   return (
     <Field data-invalid={invalid}>
-      <div className='flex items-center gap-0.5'>
-        <FormFieldLabel field={field} label={label} id={inputId} />
-        {isRequired && (
-          <span className='text-destructive' aria-hidden='true'>
-            *
-          </span>
+      <div className='flex justify-between items-center'>
+        <div className='flex items-center gap-0.5'>
+          <FormFieldLabel field={field} label={label} id={inputId} />
+          {isRequired && (
+            <span className='text-destructive' aria-hidden='true'>
+              *
+            </span>
+          )}
+        </div>
+        {isForgotPassword && (
+          <Link
+            href={`/forgot-password`}
+            className='font-medium text-brand text-sm hover:underline underline-offset-4'
+          >
+            Forgot password?
+          </Link>
         )}
       </div>
       <div className='relative'>

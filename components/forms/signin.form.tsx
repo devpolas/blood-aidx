@@ -101,6 +101,7 @@ export default function SigninForm() {
               type='password'
               placeholder='Enter your password'
               isRequired
+              isForgotPassword
             />
           )}
         </form.Field>
