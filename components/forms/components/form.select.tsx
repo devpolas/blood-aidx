@@ -32,6 +32,7 @@ type FormSelectProps = {
   field: AnyFieldApi;
   label: string;
   options: FormSelectOption[];
+  isRequired?: boolean;
   id?: string;
   placeholder?: string;
   createNew?: boolean;
@@ -44,6 +45,7 @@ export function FormSelect({
   field,
   label,
   options,
+  isRequired,
   id,
   placeholder = "Select an option",
   createNew = false,
@@ -56,7 +58,14 @@ export function FormSelect({
   return (
     <Field data-invalid={invalid} className='space-y-2'>
       <div className='flex justify-between items-center gap-3'>
-        <FormFieldLabel field={field} label={label} id={selectId} />
+        <div className='flex items-center gap-0.5'>
+          <FormFieldLabel field={field} label={label} id={selectId} />
+          {isRequired && (
+            <span className='text-destructive' aria-hidden='true'>
+              *
+            </span>
+          )}
+        </div>
         {createNew && onCreateNew && (
           <Badge
             variant='outline'

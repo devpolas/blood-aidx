@@ -17,6 +17,7 @@ type FormFileProps = {
   field: AnyFieldApi;
   label: string;
   id?: string;
+  isRequired?: boolean;
   disabled?: boolean;
   multiple?: boolean;
   accept?: string;
@@ -28,6 +29,7 @@ export function FormFile({
   field,
   label,
   id,
+  isRequired,
   disabled = false,
   multiple = false,
   accept,
@@ -39,7 +41,14 @@ export function FormFile({
 
   return (
     <Field data-invalid={invalid} className='space-y-2'>
-      <FormFieldLabel field={field} label={label} id={inputId} />
+      <div className='flex items-center gap-0.5'>
+        <FormFieldLabel field={field} label={label} id={inputId} />
+        {isRequired && (
+          <span className='text-destructive' aria-hidden='true'>
+            *
+          </span>
+        )}
+      </div>
 
       <Input
         id={inputId}

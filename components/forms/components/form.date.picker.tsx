@@ -21,6 +21,7 @@ type FormDatePickerProps = {
   field: AnyFieldApi;
   label: string;
   id?: string;
+  isRequired?: boolean;
   placeholder?: string;
   disabled?: boolean;
   className?: string;
@@ -37,6 +38,7 @@ export function FormDatePicker({
   field,
   label,
   id,
+  isRequired,
   placeholder = "Select date",
   disabled = false,
   className,
@@ -48,7 +50,14 @@ export function FormDatePicker({
     field.state.value instanceof Date ? field.state.value : undefined;
   return (
     <Field data-invalid={invalid} className='space-y-2'>
-      <FormFieldLabel field={field} label={label} id={inputId} />
+      <div className='flex items-center gap-0.5'>
+        <FormFieldLabel field={field} label={label} id={inputId} />
+        {isRequired && (
+          <span className='text-destructive' aria-hidden='true'>
+            *
+          </span>
+        )}
+      </div>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           render={

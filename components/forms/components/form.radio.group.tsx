@@ -21,6 +21,7 @@ type FormRadioGroupProps = {
   field: AnyFieldApi;
   label: string;
   options: FormRadioGroupOption[];
+  isRequired?: boolean;
   description?: string;
   disabled?: boolean;
   className?: string;
@@ -31,6 +32,7 @@ export function FormRadioGroup({
   field,
   label,
   options,
+  isRequired,
   description,
   disabled = false,
   className,
@@ -41,7 +43,16 @@ export function FormRadioGroup({
   return (
     <Field data-invalid={invalid}>
       <div>
-        <FieldLabel className='font-medium text-foreground'>{label}</FieldLabel>
+        <div className='flex items-center gap-0.5'>
+          <FieldLabel className='font-medium text-foreground'>
+            {label}
+          </FieldLabel>
+          {isRequired && (
+            <span className='text-destructive' aria-hidden='true'>
+              *
+            </span>
+          )}
+        </div>
 
         {description && <FieldDescription>{description}</FieldDescription>}
       </div>

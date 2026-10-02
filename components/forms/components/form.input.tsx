@@ -17,6 +17,7 @@ type FormInputProps = {
   field: AnyFieldApi;
   label: string;
   id?: string;
+  isRequired?: boolean;
   placeholder?: string;
   type?: React.HTMLInputTypeAttribute;
   disabled?: boolean;
@@ -28,6 +29,7 @@ export function FormInput({
   field,
   label,
   id,
+  isRequired,
   placeholder,
   type = "text",
   disabled = false,
@@ -41,7 +43,14 @@ export function FormInput({
   const invalid = isFieldInvalid(field);
   return (
     <Field data-invalid={invalid}>
-      <FormFieldLabel field={field} label={label} id={inputId} />
+      <div className='flex items-center gap-0.5'>
+        <FormFieldLabel field={field} label={label} id={inputId} />
+        {isRequired && (
+          <span className='text-destructive' aria-hidden='true'>
+            *
+          </span>
+        )}
+      </div>
       <div className='relative'>
         <Input
           id={inputId}

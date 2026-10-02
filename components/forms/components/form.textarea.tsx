@@ -13,6 +13,7 @@ import {
 type FormTextareaProps = {
   field: AnyFieldApi;
   label: string;
+  isRequired?: boolean;
   id?: string;
   placeholder?: string;
   disabled?: boolean;
@@ -22,6 +23,7 @@ type FormTextareaProps = {
 export function FormTextarea({
   field,
   label,
+  isRequired,
   id,
   placeholder,
   disabled = false,
@@ -32,7 +34,14 @@ export function FormTextarea({
   const invalid = isFieldInvalid(field);
   return (
     <Field data-invalid={invalid} className='space-y-2'>
-      <FormFieldLabel field={field} label={label} id={textareaId} />
+      <div className='flex items-center gap-0.5'>
+        <FormFieldLabel field={field} label={label} id={textareaId} />
+        {isRequired && (
+          <span className='text-destructive' aria-hidden='true'>
+            *
+          </span>
+        )}
+      </div>
       <Textarea
         id={textareaId}
         name={field.name}

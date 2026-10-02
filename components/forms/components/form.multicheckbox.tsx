@@ -25,6 +25,7 @@ type FormMultiCheckboxProps = {
   label: string;
   options: FormMultiCheckboxOption[];
   id?: string;
+  isRequired?: boolean;
   placeholder?: string;
   createNew?: boolean;
   onCreateNew?: () => void;
@@ -36,6 +37,7 @@ export function FormMultiCheckbox({
   label,
   options,
   id,
+  isRequired,
   placeholder = "Search...",
   createNew = false,
   onCreateNew,
@@ -64,7 +66,14 @@ export function FormMultiCheckbox({
   return (
     <div className='space-y-4'>
       <div className='flex justify-between items-center gap-3'>
-        <FormFieldLabel field={field} label={label} id={inputId} />
+        <div className='flex items-center gap-0.5'>
+          <FormFieldLabel field={field} label={label} id={inputId} />
+          {isRequired && (
+            <span className='text-destructive' aria-hidden='true'>
+              *
+            </span>
+          )}
+        </div>
         {createNew && onCreateNew && (
           <Badge
             variant='outline'

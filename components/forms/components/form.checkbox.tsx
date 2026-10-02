@@ -17,6 +17,7 @@ type FormCheckboxProps = {
   field: AnyFieldApi;
   label: string;
   id?: string;
+  isRequired?: boolean;
   disabled?: boolean;
   className?: string;
 };
@@ -25,6 +26,7 @@ export function FormCheckbox({
   field,
   label,
   id,
+  isRequired,
   disabled = false,
   className,
 }: FormCheckboxProps) {
@@ -53,8 +55,14 @@ export function FormCheckbox({
           className,
         )}
       />
-
-      <FormFieldLabel field={field} label={label} id={checkboxId} />
+      <div className='flex items-center gap-0.5'>
+        <FormFieldLabel field={field} label={label} id={checkboxId} />
+        {isRequired && (
+          <span className='text-destructive' aria-hidden='true'>
+            *
+          </span>
+        )}
+      </div>
 
       <FormFieldError field={field} />
     </Field>
