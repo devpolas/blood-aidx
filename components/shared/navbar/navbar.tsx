@@ -37,7 +37,7 @@ export default function Navbar() {
 
           <NavbarLinks />
 
-          <div className='flex items-center gap-1.5'>
+          <div className='flex items-center gap-1'>
             <ThemeSwitcher />
 
             <div className='hidden md:flex justify-center items-center w-44'>
@@ -82,7 +82,7 @@ export default function Navbar() {
                       aria-label='Log out'
                     >
                       {isLogoutPending ? (
-                        <Loader className='size-4 text-brand' />
+                        <Loader className='text-brand' />
                       ) : (
                         <LogOutIcon className='size-4' />
                       )}

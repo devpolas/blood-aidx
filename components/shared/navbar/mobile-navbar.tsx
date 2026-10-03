@@ -54,19 +54,19 @@ export default function MobileNavbar({
           </SheetTitle>
         </SheetHeader>
 
-        <nav className='flex flex-col flex-1 gap-2 px-4 py-4'>
+        <nav className='flex flex-col flex-1 gap-4 px-4'>
           {PUBLIC_NAVIGATION.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className='hover:bg-brand/10 px-3 py-2.5 rounded-lg font-medium text-brand-muted hover:text-brand text-base transition-colors'
+              className='hover:bg-brand/10 rounded-lg font-medium text-brand-muted hover:text-brand text-base transition-colors'
             >
               {item.title}
             </Link>
           ))}
         </nav>
 
-        <SheetFooter className='bg-background/30 p-4 border-brand/10 border-t'>
+        <SheetFooter className='bg-background/30 border-brand/10 border-t'>
           <div
             key={
               isLoading
