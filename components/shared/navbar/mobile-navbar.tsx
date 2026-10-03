@@ -1,7 +1,6 @@
-"use client";
-
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { LogOutIcon, Menu } from "lucide-react";
+
 import {
   Sheet,
   SheetContent,
@@ -12,12 +11,24 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/logo/logo";
-import { LoadingSpinner } from "../loading/loading";
+import { Loader, LoadingSpinner } from "../loading/loading";
 import { PUBLIC_NAVIGATION } from "@/config";
-import useAuth from "@/hooks/use-auth";
 
-export default function MobileNavbar() {
-  const { isLoading, isAuthenticated, user } = useAuth();
+type MobileNavbarProps = {
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  dashboardHref: string;
+  isLogoutPending: boolean;
+  logoutCurrentUser: () => void;
+};
+
+export default function MobileNavbar({
+  isLoading,
+  isAuthenticated,
+  dashboardHref,
+  isLogoutPending,
+  logoutCurrentUser,
+}: MobileNavbarProps) {
   return (
     <Sheet>
       <SheetTrigger
@@ -32,6 +43,7 @@ export default function MobileNavbar() {
           </Button>
         }
       />
+
       <SheetContent
         side='right'
         className='bg-brand/5 supports-backdrop-filter:bg-background/70 backdrop-blur-xl backdrop-saturate-150 border-brand/15'
@@ -41,34 +53,94 @@ export default function MobileNavbar() {
             <Logo />
           </SheetTitle>
         </SheetHeader>
-        <nav className='flex flex-col gap-2 px-4'>
+
+        <nav className='flex flex-col flex-1 gap-2 px-4 py-4'>
           {PUBLIC_NAVIGATION.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className='font-medium text-brand-muted hover:text-brand text-lg transition-colors'
+              className='hover:bg-brand/10 px-3 py-2.5 rounded-lg font-medium text-brand-muted hover:text-brand text-base transition-colors'
             >
               {item.title}
             </Link>
           ))}
         </nav>
-        <SheetFooter>
-          <Button
-            variant='destructive'
-            className='w-full'
-            nativeButton={false}
-            render={
-              isLoading ? (
-                <LoadingSpinner spinnerClassName='text-brand' />
-              ) : isAuthenticated ? (
-                <Link href={`/dashboard/${user?.role.toLowerCase()}`}>
-                  Go to Dashboard
-                </Link>
-              ) : (
-                <Link href='/signup'>Get Started</Link>
-              )
+
+        <SheetFooter className='bg-background/30 p-4 border-brand/10 border-t'>
+          <div
+            key={
+              isLoading
+                ? "loading"
+                : isAuthenticated
+                  ? "authenticated"
+                  : "guest"
             }
-          />
+            className='slide-in-from-bottom-[2px] w-full animate-in motion-reduce:animate-none duration-200 ease-out fade-in-0'
+          >
+            {isLoading ? (
+              <div className='flex justify-center items-center min-h-10'>
+                <LoadingSpinner
+                  shimmer
+                  spinnerClassName='text-brand'
+                  textClassName='text-brand'
+                  aria-live='polite'
+                  className='font-medium text-sm'
+                >
+                  Authenticating...
+                </LoadingSpinner>
+              </div>
+            ) : isAuthenticated ? (
+              <div className='flex gap-2 w-full'>
+                <Button
+                  variant='destructive'
+                  size='sm'
+                  className='flex-1'
+                  nativeButton={false}
+                  disabled={isLogoutPending}
+                  render={<Link href={dashboardHref}>Go to Dashboard</Link>}
+                >
+                  Go to Dashboard
+                </Button>
+
+                <Button
+                  variant='outline'
+                  size='icon-sm'
+                  className='shrink-0'
+                  disabled={isLogoutPending}
+                  onClick={logoutCurrentUser}
+                  aria-label='Log out'
+                >
+                  {isLogoutPending ? (
+                    <Loader className='text-brand' />
+                  ) : (
+                    <LogOutIcon className='size-4' />
+                  )}
+                </Button>
+              </div>
+            ) : (
+              <div className='flex gap-2 w-full'>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  className='flex-1'
+                  nativeButton={false}
+                  render={<Link href='/signin'>Sign In</Link>}
+                >
+                  Sign In
+                </Button>
+
+                <Button
+                  size='sm'
+                  variant='destructive'
+                  className='flex-1'
+                  nativeButton={false}
+                  render={<Link href='/signup'>Get Started</Link>}
+                >
+                  Get Started
+                </Button>
+              </div>
+            )}
+          </div>
         </SheetFooter>
       </SheetContent>
     </Sheet>
