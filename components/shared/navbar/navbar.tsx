@@ -41,16 +41,7 @@ export default function Navbar() {
             <ThemeSwitcher />
 
             <div className='hidden md:flex justify-center items-center w-44'>
-              <div
-                key={
-                  isLoading
-                    ? "loading"
-                    : isAuthenticated
-                      ? "authenticated"
-                      : "guest"
-                }
-                className='slide-in-from-bottom-[2px] animate-in motion-reduce:animate-none duration-200 ease-out fade-in-0'
-              >
+              <div className='slide-in-from-bottom-[2px] animate-in motion-reduce:animate-none duration-200 ease-out fade-in-0'>
                 {isLoading ? (
                   <LoadingSpinner
                     shimmer
