@@ -2,8 +2,8 @@ import { ReactNode } from "react";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className='flex justify-center items-center min-h-screen'>
+    <main className='flex justify-center items-center min-h-screen'>
       {children}
-    </div>
+    </main>
   );
 }
