@@ -32,7 +32,7 @@ export default function Navbar() {
   return (
     <header className='top-0 z-50 sticky w-full'>
       <nav className='bg-brand/5 supports-backdrop-filter:bg-brand/5 border-brand/15 border-b glass'>
-        <div className='flex justify-between items-center gap-2 mx-auto px-4 w-full lg:max-w-11/12 h-12 md:h-14'>
+        <div className='flex justify-between items-center gap-2 mx-auto px-4 w-full lg:max-w-11/12 h-12 lg:h-14'>
           <Logo />
 
           <NavbarLinks />
@@ -40,7 +40,7 @@ export default function Navbar() {
           <div className='flex items-center gap-1'>
             <ThemeSwitcher />
 
-            <div className='hidden md:flex justify-center items-center w-44'>
+            <div className='hidden lg:flex justify-center items-center w-44'>
               <div className='slide-in-from-bottom-[2px] animate-in motion-reduce:animate-none duration-200 ease-out fade-in-0'>
                 {isLoading ? (
                   <LoadingSpinner

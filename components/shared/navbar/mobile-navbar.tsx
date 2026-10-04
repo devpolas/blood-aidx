@@ -36,7 +36,7 @@ export default function MobileNavbar({
           <Button
             variant='ghost'
             size='icon'
-            className='md:hidden hover:bg-brand/10'
+            className='lg:hidden hover:bg-brand/10'
           >
             <Menu className='size-6' />
             <span className='sr-only'>Open navigation menu</span>
@@ -67,16 +67,7 @@ export default function MobileNavbar({
         </nav>
 
         <SheetFooter className='bg-background/30 border-brand/10 border-t'>
-          <div
-            key={
-              isLoading
-                ? "loading"
-                : isAuthenticated
-                  ? "authenticated"
-                  : "guest"
-            }
-            className='slide-in-from-bottom-[2px] w-full animate-in motion-reduce:animate-none duration-200 ease-out fade-in-0'
-          >
+          <div className='slide-in-from-bottom-[2px] w-full animate-in motion-reduce:animate-none duration-200 ease-out fade-in-0'>
             {isLoading ? (
               <div className='flex justify-center items-center min-h-10'>
                 <LoadingSpinner

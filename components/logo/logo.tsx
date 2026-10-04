@@ -15,7 +15,7 @@ export default function Logo({ className }: Props) {
       aria-label={`${APP_NAME} home`}
       className={cn("inline-flex select-none shrink-0", className)}
     >
-      <span className='inline-flex items-center font-extrabold text-xl lg:text-2xl leading-none tracking-tight'>
+      <span className='inline-flex items-center font-extrabold text-xl xl:text-2xl leading-none tracking-tight'>
         <span className='mt-1 text-brand'>Blood</span>
         <span
           className={`inline-block relative ${isMobile ? "size-4" : "size-5"} translate-y-px shrink-0`}

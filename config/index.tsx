@@ -10,12 +10,12 @@ export const PUBLIC_NAVIGATION = [
     href: "/donors",
   },
   {
-    title: "Organizations",
-    href: "/organizations",
+    title: "Blood Requests",
+    href: "/blood-requests",
   },
   {
-    title: "About",
-    href: "/about",
+    title: "Organizations",
+    href: "/organizations",
   },
 ];
 

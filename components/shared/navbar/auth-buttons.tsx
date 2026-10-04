@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 export default function AuthButtons() {
   return (
-    <div className='hidden md:flex items-center gap-2'>
+    <div className='hidden lg:flex items-center gap-1'>
       <Button
         size='sm'
         variant='outline'
