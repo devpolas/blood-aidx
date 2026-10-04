@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-
+import ContinueWithGoogle from "@/components/auth/social/google";
+import SignupForm from "@/components/forms/auth/signup.form";
 import Logo from "@/components/logo/logo";
 import { Heading4 } from "@/components/typography/typography";
+import { APP_NAME } from "@/constraints";
 import {
   Card,
   CardContent,
@@ -11,44 +13,68 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FieldSeparator } from "@/components/ui/field";
-import { APP_NAME } from "@/constraints";
-import SignupForm from "@/components/forms/auth/signup.form";
-import ContinueWithGoogle from "@/components/auth/social/google";
 
 export const metadata: Metadata = {
-  title: "Create Account",
-  description: `Create your Blood ${APP_NAME} to find blood donors, respond to requests, and help save lives.`,
+  title: "Become a Blood Donor",
+  description: `Create your ${APP_NAME} donor account to donate blood, manage your availability, and help people in need.`,
 };
+
+const SIGNUP_ROUTES = [
+  { label: "Recipient", href: "/signup/recipient" },
+  { label: "Volunteer", href: "/signup/volunteer" },
+  { label: "Hospital", href: "/signup/hospital" },
+  { label: "Blood Bank", href: "/signup/blood-bank" },
+] as const;
 
 export default function SignupPage() {
   return (
-    <Card className='shadow-lg py-6 border-brand/10 w-full max-w-md'>
+    <Card className='shadow-lg border-brand/10 w-full max-w-md'>
       <div className='flex flex-col items-center gap-2'>
         <Logo />
 
         <Heading4 className='text-brand text-center'>
-          Create your {APP_NAME} account
+          Become a Blood Donor
         </Heading4>
       </div>
 
-      <CardHeader className='space-y-2'>
-        <CardTitle className='text-xl'>Get started</CardTitle>
+      <CardHeader>
+        <CardTitle className='text-xl'>Join the donor community</CardTitle>
 
-        <CardDescription>
-          Create an account to find blood donors, respond to requests, and make
-          a difference.
+        <CardDescription className='pb-1'>
+          Create your donor account to manage your availability, respond to
+          blood requests, and help people in need.
         </CardDescription>
+
+        <div className='pt-1 border-t'>
+          <p className='text-muted-foreground text-sm'>
+            Looking to join as a different account type?
+          </p>
+
+          <nav
+            aria-label='Other signup options'
+            className='flex flex-wrap gap-3 mt-1'
+          >
+            {SIGNUP_ROUTES.map((route) => (
+              <Link
+                key={route.href}
+                href={route.href}
+                className='font-medium text-brand text-sm hover:underline'
+              >
+                {route.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
       </CardHeader>
 
-      <CardContent className='space-y-4 pt-2'>
-        {/* Signup form */}
+      <CardContent>
         <SignupForm role='donor' />
 
         <p className='text-muted-foreground text-sm text-center'>
           Already have an account?
           <Link
             href='/signin'
-            className='m-1 font-medium text-brand hover:underline'
+            className='ml-1 font-medium text-brand hover:underline'
           >
             Sign in
           </Link>
@@ -58,9 +84,7 @@ export default function SignupPage() {
           Or continue with
         </FieldSeparator>
 
-        <div className='pt-2'>
-          <ContinueWithGoogle />
-        </div>
+        <ContinueWithGoogle />
       </CardContent>
     </Card>
   );

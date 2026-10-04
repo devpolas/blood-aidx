@@ -20,7 +20,7 @@ type FormRadioGroupOption = {
 type FormRadioGroupProps = {
   field: AnyFieldApi;
   label: string;
-  options: FormRadioGroupOption[];
+  options: readonly FormRadioGroupOption[];
   isRequired?: boolean;
   description?: string;
   disabled?: boolean;
