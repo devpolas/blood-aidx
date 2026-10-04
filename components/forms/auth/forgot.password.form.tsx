@@ -44,7 +44,9 @@ export default function ForgotPasswordForm() {
 
           toast.add({
             title: "Code sent",
-            description: "A password reset code has been sent to your email.",
+            description:
+              res.message ??
+              "A password reset code has been sent to your email.",
             type: "success",
           });
 

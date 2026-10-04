@@ -40,7 +40,6 @@ export default function VerifyAccountContent() {
           ) : (
             "your email"
           )}
-          .
         </CardDescription>
 
         <CardAction>

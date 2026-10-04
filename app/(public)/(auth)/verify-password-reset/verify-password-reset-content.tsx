@@ -40,7 +40,6 @@ export default function VerifyPasswordResetContent() {
           ) : (
             "your email"
           )}
-          .
         </CardDescription>
 
         <CardAction>
