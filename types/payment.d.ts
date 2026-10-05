@@ -5,7 +5,7 @@ import {
   PaymentProvider,
   PaymentStatus,
   PaymentType,
-} from "./enums";
+} from "./enum";
 
 export interface Payment {
   id: ID;

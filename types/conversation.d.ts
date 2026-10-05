@@ -1,4 +1,4 @@
-import { ConversationType, ID, ISODateString } from "./enums";
+import { ConversationType, ID, ISODateString } from "./enum";
 
 export interface Conversation {
   id: ID;

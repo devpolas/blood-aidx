@@ -1,4 +1,4 @@
-import { ID, ISODateString, ReviewStatus } from "./enums";
+import { ID, ISODateString, ReviewStatus } from "./enum";
 
 export interface Review {
   id: ID;

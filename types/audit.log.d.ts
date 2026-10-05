@@ -1,4 +1,4 @@
-import { AuditAction, ID, ISODateString, JsonValue } from "./enums";
+import { AuditAction, ID, ISODateString, JsonValue } from "./enum";
 
 export interface AuditLog {
   id: ID;

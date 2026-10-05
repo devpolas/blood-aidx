@@ -1,4 +1,4 @@
-import { ID, ISODateString } from "./enums";
+import { ID, ISODateString } from "./enum";
 
 export interface Location {
   id: ID;

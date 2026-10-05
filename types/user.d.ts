@@ -1,4 +1,4 @@
-import { Gender, ID, ISODateString, UserRole } from "./enums";
+import { Gender, ID, ISODateString, UserRole } from "./enum";
 
 export interface User {
   id: ID;

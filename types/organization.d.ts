@@ -3,7 +3,7 @@ import {
   ISODateString,
   OrganizationStatus,
   OrganizationType,
-} from "./enums";
+} from "./enum";
 
 export interface Organization {
   id: ID;

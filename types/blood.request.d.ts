@@ -4,7 +4,7 @@ import {
   ID,
   ISODateString,
   Priority,
-} from "./enums";
+} from "./enum";
 
 export interface BloodRequest {
   id: ID;

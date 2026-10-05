@@ -1,4 +1,4 @@
-import { BloodGroup, DonorAvailability, ID, ISODateString } from "./enums";
+import { BloodGroup, DonorAvailability, ID, ISODateString } from "./enum";
 
 export interface DonorProfile {
   id: ID;

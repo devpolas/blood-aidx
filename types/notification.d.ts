@@ -1,4 +1,4 @@
-import { ID, ISODateString, JsonValue, NotificationType } from "./enums";
+import { ID, ISODateString, JsonValue, NotificationType } from "./enum";
 
 export interface Notification {
   id: ID;
