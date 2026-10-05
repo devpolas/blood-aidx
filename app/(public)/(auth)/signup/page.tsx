@@ -15,16 +15,9 @@ import {
 import { FieldSeparator } from "@/components/ui/field";
 
 export const metadata: Metadata = {
-  title: "Become a Blood Donor",
-  description: `Create your ${APP_NAME} donor account to donate blood, manage your availability, and help people in need.`,
+  title: "Create an Account",
+  description: `Create your ${APP_NAME} account to donate blood, request blood, manage your availability, and help people in need.`,
 };
-
-const SIGNUP_ROUTES = [
-  { label: "Recipient", href: "/signup/recipient" },
-  { label: "Volunteer", href: "/signup/volunteer" },
-  { label: "Hospital", href: "/signup/hospital" },
-  { label: "Blood Bank", href: "/signup/blood-bank" },
-] as const;
 
 export default function SignupPage() {
   return (
@@ -33,44 +26,23 @@ export default function SignupPage() {
         <Logo />
 
         <Heading4 className='text-brand text-center'>
-          Become a Blood Donor
+          Create your {APP_NAME} account
         </Heading4>
       </div>
 
       <CardHeader>
-        <CardTitle className='text-xl'>Join the donor community</CardTitle>
+        <CardTitle className='text-xl'>Join the {APP_NAME} community</CardTitle>
 
         <CardDescription className='pb-1'>
-          Create your donor account to manage your availability, respond to
-          blood requests, and help people in need.
+          Create an account to donate blood, request blood, manage your
+          availability, and help people in need.
         </CardDescription>
-
-        <div className='pt-1 border-t'>
-          <p className='text-muted-foreground text-sm'>
-            Looking to join as a different account type?
-          </p>
-
-          <nav
-            aria-label='Other signup options'
-            className='flex flex-wrap gap-3 mt-1'
-          >
-            {SIGNUP_ROUTES.map((route) => (
-              <Link
-                key={route.href}
-                href={route.href}
-                className='font-medium text-brand text-sm hover:underline'
-              >
-                {route.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
       </CardHeader>
 
       <CardContent>
-        <SignupForm role='donor' />
+        <SignupForm />
 
-        <p className='text-muted-foreground text-sm text-center'>
+        <p className='pt-2 text-muted-foreground text-sm text-center'>
           Already have an account?
           <Link
             href='/signin'
@@ -80,11 +52,15 @@ export default function SignupPage() {
           </Link>
         </p>
 
-        <FieldSeparator className='bg-transparent *:data-[slot=field-separator-content]:bg-card'>
-          Or continue with
-        </FieldSeparator>
+        <div className='pt-2'>
+          <FieldSeparator className='bg-transparent *:data-[slot=field-separator-content]:bg-card'>
+            Or continue with
+          </FieldSeparator>
+        </div>
 
-        <ContinueWithGoogle />
+        <div className='pt-2'>
+          <ContinueWithGoogle />
+        </div>
       </CardContent>
     </Card>
   );

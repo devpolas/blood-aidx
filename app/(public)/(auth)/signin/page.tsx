@@ -25,8 +25,8 @@ export const metadata: Metadata = {
 
 export default function SigninPage() {
   return (
-    <Card className='shadow-lg py-6 border-border/60 w-full max-w-md'>
-      <div className='flex flex-col items-center gap-4'>
+    <Card className='shadow-lg border-border/60 w-full max-w-md'>
+      <div className='flex flex-col items-center gap-2'>
         <Logo />
 
         <Heading4 className='text-brand text-center'>
@@ -34,7 +34,7 @@ export default function SigninPage() {
         </Heading4>
       </div>
 
-      <CardHeader className='space-y-2'>
+      <CardHeader>
         <CardTitle className='text-xl'>Sign in to your account</CardTitle>
 
         <CardDescription>
@@ -52,16 +52,16 @@ export default function SigninPage() {
         </CardAction>
       </CardHeader>
 
-      {/* Form */}
-      <CardContent className='space-y-4'>
+      <CardContent>
         <SigninForm />
 
-        {/* Social Login */}
-        <FieldSeparator className='bg-transparent *:data-[slot=field-separator-content]:bg-card'>
-          Or continue with
-        </FieldSeparator>
+        <div className='pt-2'>
+          <FieldSeparator className='bg-transparent *:data-[slot=field-separator-content]:bg-card'>
+            Or continue with
+          </FieldSeparator>
+        </div>
 
-        <div className='pt-4'>
+        <div className='pt-2'>
           <ContinueWithGoogle />
         </div>
       </CardContent>

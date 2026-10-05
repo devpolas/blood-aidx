@@ -78,7 +78,7 @@ export default function SigninForm() {
         void form.handleSubmit();
       }}
     >
-      <div className='flex flex-col gap-5'>
+      <div className='flex flex-col gap-3'>
         <form.Field name='email'>
           {(field) => (
             <FormInput
@@ -111,7 +111,7 @@ export default function SigninForm() {
         <Button
           type='submit'
           disabled={isSignin}
-          className='hover:bg-brand-foreground font-medium text-brand hover:cursor-pointer glass-brand'
+          className='hover:bg-brand-foreground mt-2 font-medium text-brand hover:cursor-pointer glass-brand'
         >
           {isSignin ? (
             <LoadingSpinner

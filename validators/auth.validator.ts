@@ -1,27 +1,13 @@
 import * as z from "zod";
 
 // Enums
-export const UserRoleSchema = z.enum([
-  "donor",
-  "recipient",
-  "volunteer",
-  "hospital",
-  "blood_bank",
-  "moderator",
-  "admin",
-]);
+export const UserRoleSchema = z.enum(["user", "moderator", "admin"]);
 
 export const GenderSchema = z.enum(["male", "female", "other"]);
 
 // Public Signup Roles
 // Admin and moderator should not be selectable during signup
-export const PublicUserRoleSchema = z.enum([
-  "donor",
-  "recipient",
-  "volunteer",
-  "hospital",
-  "blood_bank",
-]);
+export const PublicUserRoleSchema = z.enum(["user"]);
 
 // Common
 export const EmailSchema = z
@@ -48,12 +34,7 @@ export const SignUpSchema = z
     role: PublicUserRoleSchema,
   })
   .superRefine((data, ctx) => {
-    const requiresGender =
-      data.role === "donor" ||
-      data.role === "recipient" ||
-      data.role === "volunteer";
-
-    if (requiresGender && !data.gender) {
+    if (!data.gender) {
       ctx.addIssue({
         code: "custom",
         path: ["gender"],

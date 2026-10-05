@@ -1,70 +1,55 @@
 "use client";
 
-import type {
-  SignUpFormValues,
-  SignUpInput,
-} from "@/validators/auth.validator";
-import { SignUpSchema } from "@/validators/auth.validator";
+import type { SignUpFormValues } from "@/validators/auth.validator";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
+import { GENDERS } from "@/config";
+import { useSignup } from "@/hooks/auth";
+import { SignUpSchema } from "@/validators/auth.validator";
 import { FormInput } from "../components/form.input";
 import { FormRadioGroup } from "../components/form.radio.group";
 import { Button } from "../../ui/button";
+import { toast } from "../../ui/toast";
 import { LoadingSpinner } from "../../shared/loading/loading";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useSignup } from "@/hooks/auth";
-import { toast } from "../../ui/toast";
-import { GENDERS, ROLE_CONFIG } from "@/config";
 
 const DEFAULT_VALUES: SignUpFormValues = {
   name: "",
   email: "",
   password: "",
   gender: undefined,
-  role: "donor",
+  role: "user",
 };
 
-const INDIVIDUAL_ROLES = ["donor", "recipient", "volunteer"] as const;
-
-export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
-  const isMobile = useIsMobile();
+export default function SignupForm() {
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   const { mutateAsync: signup, isPending: isSignup } = useSignup();
 
-  const config = ROLE_CONFIG[role];
-
-  const requiresGender = INDIVIDUAL_ROLES.includes(
-    role as (typeof INDIVIDUAL_ROLES)[number],
-  );
-
   const form = useForm({
-    defaultValues: {
-      ...DEFAULT_VALUES,
-      role,
-    },
+    defaultValues: DEFAULT_VALUES,
 
     validators: {
       onSubmit: SignUpSchema,
     },
 
     onSubmit: async ({ value }) => {
-      const signupData = {
-        name: value.name,
-        email: value.email,
-        password: value.password,
-        role: value.role,
-        gender: value.gender,
-      };
-
       try {
-        const res = await signup(signupData);
+        const response = await signup({
+          name: value.name,
+          email: value.email,
+          password: value.password,
+          gender: value.gender,
+          role: value.role,
+        });
 
-        if (!res.success) {
+        if (!response.success) {
           toast.add({
-            title: "Signup Failed",
+            title: "Signup failed",
             description:
-              res.message || "Something went wrong. Please try again.",
+              response.message ||
+              "Unable to create your account. Please try again.",
             type: "error",
           });
 
@@ -72,7 +57,7 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
         }
 
         toast.add({
-          title: "Signup Successful",
+          title: "Account created",
           description: "Please verify your email address to continue.",
           type: "success",
         });
@@ -84,11 +69,11 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
         router.push(`/verify-account?${params.toString()}`);
       } catch (error) {
         toast.add({
-          title: "Signup Failed",
+          title: "Signup failed",
           description:
             error instanceof Error
               ? error.message
-              : "Something went wrong. Please try again.",
+              : "Unable to create your account. Please try again.",
           type: "error",
         });
       }
@@ -98,6 +83,7 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
   return (
     <form
       aria-busy={isSignup}
+      noValidate
       onSubmit={(event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -105,16 +91,15 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
         void form.handleSubmit();
       }}
     >
-      <div className='flex flex-col gap-5'>
-        {/* Name */}
+      <div className='flex flex-col gap-3'>
         <form.Field name='name'>
           {(field) => (
             <FormInput
               id='name'
               type='text'
               field={field}
-              label={config.nameLabel}
-              placeholder={config.namePlaceholder}
+              label='Full Name'
+              placeholder='Enter your full name'
               isRequired
               disabled={isSignup}
               autoComplete='name'
@@ -152,25 +137,23 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
           )}
         </form.Field>
 
-        {requiresGender && (
-          <form.Field name='gender'>
-            {(field) => (
-              <FormRadioGroup
-                label='Gender'
-                field={field}
-                options={GENDERS}
-                isRequired
-                orientation={isMobile ? "vertical" : "horizontal"}
-                disabled={isSignup}
-              />
-            )}
-          </form.Field>
-        )}
+        <form.Field name='gender'>
+          {(field) => (
+            <FormRadioGroup
+              label='Gender'
+              field={field}
+              options={GENDERS}
+              isRequired
+              orientation={isMobile ? "vertical" : "horizontal"}
+              disabled={isSignup}
+            />
+          )}
+        </form.Field>
 
         <Button
           type='submit'
           disabled={isSignup}
-          className='hover:bg-brand-foreground w-full font-medium text-brand hover:cursor-pointer glass-brand'
+          className='hover:bg-brand-foreground mt-2 font-medium text-brand hover:cursor-pointer glass-brand'
         >
           {isSignup ? (
             <LoadingSpinner
@@ -180,7 +163,7 @@ export default function SignupForm({ role }: { role: SignUpInput["role"] }) {
               shimmer
             />
           ) : (
-            config.submitLabel
+            "Create Account"
           )}
         </Button>
       </div>

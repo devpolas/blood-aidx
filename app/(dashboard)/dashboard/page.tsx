@@ -1,3 +1,3 @@
 export default function page() {
-  return <section>donor</section>;
+  return <section>user</section>;
 }
