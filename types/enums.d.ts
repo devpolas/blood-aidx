@@ -3,11 +3,7 @@ export type ISODateString = string;
 export type JsonValue = unknown;
 
 export const UserRole = {
-  DONOR: "donor",
-  RECIPIENT: "recipient",
-  VOLUNTEER: "volunteer",
-  HOSPITAL: "hospital",
-  BLOOD_BANK: "blood_bank",
+  USER: "user",
   MODERATOR: "moderator",
   ADMIN: "admin",
 } as const;
