@@ -42,19 +42,16 @@ export function AppSidebar({ menu, user, ...props }: AppSidebarProps) {
     <Sidebar collapsible='offcanvas' {...props}>
       <SidebarHeader>
         <SidebarMenu>
-          <SidebarMenuItem className='flex flex-row justify-between'>
-            <SidebarMenuButton
-              className='data-[slot=sidebar-menu-button]:p-1.5!'
-              render={<Logo />}
-            />
-            <SidebarMenuButton
-              className='data-[slot=sidebar-menu-button]:p-1.5!'
-              render={<ThemeSwitcher />}
-            />
+          <SidebarMenuItem className='flex items-center'>
+            <div className='flex-1 min-w-0'>
+              <Logo />
+            </div>
+
+            <ThemeSwitcher />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className='py-4'>
         <NavMain items={menu.navMain} />
         <NavSecondary items={menu.navSecondary} className='mt-auto' />
       </SidebarContent>

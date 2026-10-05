@@ -19,15 +19,16 @@ export function NavMain({
 }) {
   return (
     <SidebarGroup>
-      <SidebarGroupContent className='flex flex-col gap-2'>
+      <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
+                className='font-medium text-base'
                 render={
                   <Link href={item.url}>
-                    {item.icon}
-                    <span>{item.title}</span>
+                    <span className='text-brand'>{item.icon}</span>
+                    <span className='text-muted-foreground'>{item.title}</span>
                   </Link>
                 }
               />
