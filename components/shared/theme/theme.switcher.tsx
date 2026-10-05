@@ -60,7 +60,7 @@ export function ThemeSwitcher() {
           <Button
             size='icon-sm'
             variant='outline'
-            className='relative hover:bg-brand/10 border-brand/20 hover:text-brand transition-colors'
+            className='relative hover:bg-brand/10 border-brand/20 hover:text-brand transition-colors hover:cursor-pointer'
           >
             <Sun className='w-5 h-5 rotate-0 dark:-rotate-90 scale-100 dark:scale-0 transition-all' />
             <Moon className='absolute w-5 h-5 rotate-90 dark:rotate-0 scale-0 dark:scale-100 transition-all' />
