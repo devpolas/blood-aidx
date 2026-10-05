@@ -1,9 +1,9 @@
-import { ReactNode } from "react";
+import DashboardShell from "@/components/dashboards/components/dashboard-shell";
 
-export default function layout({ children }: { children: ReactNode }) {
-  return (
-    <main className='flex flex-col bg-background w-full h-full min-h-screen'>
-      {children}
-    </main>
-  );
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <DashboardShell>{children}</DashboardShell>;
 }
