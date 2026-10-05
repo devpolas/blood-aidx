@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import Logo from "@/components/logo/logo";
 import { Loader, LoadingSpinner } from "../loading/loading";
 import { PUBLIC_NAVIGATION } from "@/config";
+import { useRouter } from "next/navigation";
 
 type MobileNavbarProps = {
   isLoading: boolean;
@@ -29,6 +30,8 @@ export default function MobileNavbar({
   isLogoutPending,
   logoutCurrentUser,
 }: MobileNavbarProps) {
+  const router = useRouter();
+
   return (
     <Sheet>
       <SheetTrigger
@@ -85,10 +88,13 @@ export default function MobileNavbar({
                 <Button
                   variant='destructive'
                   size='sm'
-                  className='flex-1'
-                  nativeButton={false}
                   disabled={isLogoutPending}
-                  render={<Link href={dashboardHref}>Go to Dashboard</Link>}
+                  className={"hover:cursor-pointer"}
+                  onClick={() => {
+                    if (!isLogoutPending) {
+                      router.replace(dashboardHref);
+                    }
+                  }}
                 >
                   Go to Dashboard
                 </Button>

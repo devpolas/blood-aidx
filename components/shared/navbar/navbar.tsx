@@ -11,8 +11,10 @@ import MobileNavbar from "./mobile-navbar";
 import { ThemeSwitcher } from "../theme/theme.switcher";
 import useAuth from "@/hooks/use-auth";
 import { Loader, LoadingSpinner } from "../loading/loading";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
+  const router = useRouter();
   const {
     isAuthenticated,
     isLoading,
@@ -22,7 +24,11 @@ export default function Navbar() {
     refreshUser,
   } = useAuth();
 
-  const dashboardHref = user ? `/dashboard/${user.role.toLowerCase()}` : "#";
+  const dashboardHref = user
+    ? user.role === "user"
+      ? "/dashboard"
+      : `/dashboard/${user.role.toLocaleLowerCase()}`
+    : "#";
 
   async function logoutCurrentUser() {
     await logout();
@@ -57,9 +63,13 @@ export default function Navbar() {
                     <Button
                       variant='destructive'
                       size='sm'
-                      nativeButton={false}
                       disabled={isLogoutPending}
-                      render={<Link href={dashboardHref}>Go to Dashboard</Link>}
+                      className={"hover:cursor-pointer"}
+                      onClick={() => {
+                        if (!isLogoutPending) {
+                          router.replace(dashboardHref);
+                        }
+                      }}
                     >
                       Go to Dashboard
                     </Button>
