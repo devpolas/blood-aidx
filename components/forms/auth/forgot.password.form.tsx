@@ -42,6 +42,9 @@ export default function ForgotPasswordForm() {
             return;
           }
 
+          // Clear the form immediately after successful signup.
+          form.reset();
+
           toast.add({
             title: "Code sent",
             description:
@@ -51,8 +54,7 @@ export default function ForgotPasswordForm() {
           });
 
           const email = encodeURIComponent(value.email.trim().toLowerCase());
-
-          router.push(`/verify-password-reset?email=${email}`);
+          router.replace(`/verify-password-reset?email=${email}`);
         },
 
         onError: (error) => {

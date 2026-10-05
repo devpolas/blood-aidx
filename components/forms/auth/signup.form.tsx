@@ -56,6 +56,9 @@ export default function SignupForm() {
           return;
         }
 
+        // Clear the form immediately after successful signup.
+        form.reset();
+
         toast.add({
           title: "Account created",
           description: "Please verify your email address to continue.",
@@ -66,7 +69,7 @@ export default function SignupForm() {
           email: value.email,
         });
 
-        router.push(`/verify-account?${params.toString()}`);
+        router.replace(`/verify-account?${params.toString()}`);
       } catch (error) {
         toast.add({
           title: "Signup failed",

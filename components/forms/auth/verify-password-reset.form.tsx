@@ -86,6 +86,9 @@ export default function VerifyPasswordResetForm({
             return;
           }
 
+          // Clear the form immediately after successful signup.
+          form.reset();
+
           toast.add({
             title: "Code verified",
             description:
@@ -93,7 +96,7 @@ export default function VerifyPasswordResetForm({
             type: "success",
           });
 
-          router.push(
+          router.replace(
             `/reset-password?token=${encodeURIComponent(resetToken)}`,
           );
         },

@@ -36,7 +36,7 @@ export default function SigninForm() {
               const params = new URLSearchParams({
                 email: value.email,
               });
-              router.push(`/verify-account?${params.toString()}`);
+              router.replace(`/verify-account?${params.toString()}`);
               return;
             }
 
@@ -49,6 +49,9 @@ export default function SigninForm() {
 
             return;
           }
+
+          // Clear the form immediately after successful signup.
+          form.reset();
 
           toast.add({
             title: "Signin Successful",

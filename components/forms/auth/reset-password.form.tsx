@@ -43,6 +43,9 @@ export default function ResetPasswordForm({
             return;
           }
 
+          // Clear the form immediately after successful signup.
+          form.reset();
+
           toast.add({
             title: "Password changed",
             description:

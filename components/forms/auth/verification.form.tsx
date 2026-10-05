@@ -72,6 +72,9 @@ export default function VerifyAccountForm({
             return;
           }
 
+          // Clear the form immediately after successful signup.
+          form.reset();
+
           toast.add({
             title: "Account verified",
             description: "Your account has been verified successfully.",
