@@ -169,11 +169,6 @@ const moderatorDashboard: DashboardSidebar = {
       icon: <LayoutDashboard />,
     },
     {
-      title: "Users",
-      url: "/dashboard/moderator/users",
-      icon: <FaPeopleGroup />,
-    },
-    {
       title: "Donors",
       url: "/dashboard/moderator/donors",
       icon: <Heart />,
@@ -225,11 +220,7 @@ const adminDashboard: DashboardSidebar = {
       url: "/dashboard/admin",
       icon: <LayoutDashboard />,
     },
-    {
-      title: "Users",
-      url: "/dashboard/admin/users",
-      icon: <Users />,
-    },
+
     {
       title: "Donors",
       url: "/dashboard/admin/donors",
@@ -290,3 +281,9 @@ export const dashboardMenu: Record<UserRole, DashboardSidebar> = {
   [UserRole.MODERATOR]: moderatorDashboard,
   [UserRole.ADMIN]: adminDashboard,
 };
+
+export function getDashboardMenu(
+  role: keyof typeof dashboardMenu,
+): DashboardSidebar {
+  return dashboardMenu[role];
+}

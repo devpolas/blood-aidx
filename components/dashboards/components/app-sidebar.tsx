@@ -1,43 +1,32 @@
 "use client";
+
 import * as React from "react";
+
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { NavMain } from "./nav-main";
-import { NavSecondary } from "./nav-secondary";
-import { NavUser } from "./nav-user";
+
 import Logo from "@/components/logo/logo";
 import { ThemeSwitcher } from "@/components/shared/theme/theme.switcher";
 
-interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  menu: {
-    navMain: {
-      title: string;
-      url: string;
-      icon: React.ReactNode;
-    }[];
+import useAuth from "@/hooks/use-auth";
+import { getDashboardMenu } from "@/config";
 
-    navSecondary: {
-      title: string;
-      url: string;
-      icon: React.ReactNode;
-    }[];
-  };
+import { NavMain } from "./nav-main";
+import { NavSecondary } from "./nav-secondary";
+import { NavUser } from "./nav-user";
+import { SidebarSkeleton, SidebarUserSkeleton } from "./dashboard-skeleton";
 
-  user: {
-    name: string;
-    email: string;
-    avatar?: string | null;
-  };
-}
+export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
+  const { user, isLoading } = useAuth();
 
-export function AppSidebar({ menu, user, ...props }: AppSidebarProps) {
+  const menu = user ? getDashboardMenu(user.role) : null;
+
   return (
     <Sidebar collapsible='offcanvas' {...props}>
       <SidebarHeader>
@@ -51,18 +40,24 @@ export function AppSidebar({ menu, user, ...props }: AppSidebarProps) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent className='py-4'>
-        <NavMain items={menu.navMain} />
-        <NavSecondary items={menu.navSecondary} className='mt-auto' />
+        {isLoading ? (
+          <SidebarSkeleton />
+        ) : menu ? (
+          <>
+            <NavMain items={menu.navMain} />
+            <NavSecondary items={menu.navSecondary} className='mt-auto' />
+          </>
+        ) : null}
       </SidebarContent>
+
       <SidebarFooter>
-        <NavUser
-          user={{
-            name: user.name,
-            email: user.email,
-            avatar: user.avatar ?? "",
-          }}
-        />
+        {isLoading ? (
+          <SidebarUserSkeleton />
+        ) : user ? (
+          <NavUser user={user} />
+        ) : null}
       </SidebarFooter>
     </Sidebar>
   );

@@ -1,14 +1,15 @@
 "use client";
 
-import { useLogout, useMe } from "./auth";
+import { useAuthMe, useLogout } from "./auth";
 
 export default function useAuth() {
-  const { data, isPending, error, refetch } = useMe();
-  const { mutateAsync: logout, isPending: isLogoutPending } = useLogout();
-  const user = data?.data?.user ?? null;
+  const meQuery = useAuthMe();
+  const logoutMutation = useLogout();
+
+  const user = meQuery.data?.data?.user ?? null;
 
   const refreshUser = async () => {
-    const result = await refetch({
+    const result = await meQuery.refetch({
       throwOnError: false,
     });
 
@@ -17,14 +18,12 @@ export default function useAuth() {
 
   return {
     user,
-    isAuthenticated: !!user,
-
-    isLoading: isPending,
-    error: error?.message ?? null,
-
+    isAuthenticated: Boolean(user),
+    isLoading: meQuery.isPending,
+    isFetching: meQuery.isFetching,
+    error: meQuery.error?.message ?? null,
     refreshUser,
-
-    logout,
-    isLogoutPending,
+    logout: logoutMutation.mutateAsync,
+    isLogoutPending: logoutMutation.isPending,
   };
 }

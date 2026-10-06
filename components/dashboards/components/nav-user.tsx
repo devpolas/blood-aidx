@@ -18,17 +18,15 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import useAuth from "@/hooks/use-auth";
+import type { User } from "@/types/user";
+import { getInitials } from "@/utils/initials.helper";
 import { EllipsisVerticalIcon, LogOutIcon } from "lucide-react";
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}) {
+interface NavUserProps {
+  user: User;
+}
+
+export function NavUser({ user }: NavUserProps) {
   const { isMobile } = useSidebar();
   const { logout, isLogoutPending, refreshUser } = useAuth();
 
@@ -37,7 +35,7 @@ export function NavUser({
     await refreshUser();
   }
 
-  const fallbackName = user.name ? user.name.charAt(0).toUpperCase() : "U";
+  const fallbackName = getInitials(user.name);
 
   return (
     <SidebarMenu>
@@ -47,23 +45,23 @@ export function NavUser({
             render={
               <SidebarMenuButton
                 size='lg'
-                className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:cursor-pointer'
+                className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer'
               >
-                <Avatar className='grayscale rounded-lg size-8'>
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className='rounded-lg'>
+                <Avatar className='rounded-lg size-8'>
+                  <AvatarImage src={user.image ?? ""} alt={user.name} />
+                  <AvatarFallback className='bg-background rounded-lg'>
                     {fallbackName}
                   </AvatarFallback>
                 </Avatar>
 
-                <div className='flex-1 grid text-sm text-left leading-tight'>
+                <div className='flex-1 grid min-w-0 text-sm text-left leading-tight'>
                   <span className='font-medium truncate'>{user.name}</span>
                   <span className='text-muted-foreground text-xs truncate'>
                     {user.email}
                   </span>
                 </div>
 
-                <EllipsisVerticalIcon className='ml-auto size-4' />
+                <EllipsisVerticalIcon className='ml-auto size-4 shrink-0' />
               </SidebarMenuButton>
             }
           />
@@ -78,13 +76,13 @@ export function NavUser({
               <DropdownMenuLabel className='p-0 font-normal'>
                 <div className='flex items-center gap-2 px-1 py-1.5 text-sm text-left'>
                   <Avatar className='rounded-lg size-8'>
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className='rounded-lg'>
+                    <AvatarImage src={user.image ?? ""} alt={user.name} />
+                    <AvatarFallback className='bg-background rounded-lg'>
                       {fallbackName}
                     </AvatarFallback>
                   </Avatar>
 
-                  <div className='flex-1 grid text-sm text-left leading-tight'>
+                  <div className='flex-1 grid min-w-0 text-sm text-left leading-tight'>
                     <span className='font-medium truncate'>{user.name}</span>
                     <span className='text-muted-foreground text-xs truncate'>
                       {user.email}
@@ -97,7 +95,7 @@ export function NavUser({
             <DropdownMenuSeparator />
 
             <DropdownMenuItem
-              className='hover:cursor-pointer'
+              className='cursor-pointer'
               disabled={isLogoutPending}
               onClick={logoutCurrentUser}
             >

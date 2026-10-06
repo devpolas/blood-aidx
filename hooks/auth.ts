@@ -14,7 +14,12 @@ import {
   verifyPassword,
   verifyPasswordReset,
 } from "@/api/auth";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+export const authKeys = {
+  all: ["auth"] as const,
+  me: () => [...authKeys.all, "me"] as const,
+};
 
 // Signup
 export function useSignup() {
@@ -31,12 +36,14 @@ export function useSignin() {
 }
 
 // Current User
-export function useMe() {
+export function useAuthMe() {
   return useQuery({
-    queryKey: ["auth", "me"],
+    queryKey: authKeys.me(),
     queryFn: me,
+
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
+
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -100,8 +107,16 @@ export function useChangePassword() {
 
 // Logout
 export function useLogout() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: logout,
+
+    onSuccess: () => {
+      queryClient.removeQueries({
+        queryKey: authKeys.me(),
+      });
+    },
   });
 }
 
