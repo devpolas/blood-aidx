@@ -13,7 +13,6 @@ import {
   Settings,
   Star,
   User,
-  Users,
 } from "lucide-react";
 
 import {
@@ -22,7 +21,6 @@ import {
   FaDroplet,
   FaFileCircleCheck,
   FaFlag,
-  FaPeopleGroup,
 } from "react-icons/fa6";
 import { UserRole } from "@/types/enum";
 
