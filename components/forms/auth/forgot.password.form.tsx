@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
-import { useForgotPassword } from "@/hooks/auth";
+import { useForgotPassword } from "@/hooks/auths";
 import {
   ForgotPasswordSchema,
   type ForgotPasswordInput,

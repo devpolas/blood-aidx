@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuthMe, useLogout } from "./auth";
+import { useAuthMe, useLogout } from ".";
 
 export default function useAuth() {
   const meQuery = useAuthMe();

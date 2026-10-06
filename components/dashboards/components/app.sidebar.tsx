@@ -14,7 +14,7 @@ import {
 import Logo from "@/components/logo/logo";
 import { ThemeSwitcher } from "@/components/shared/theme/theme.switcher";
 
-import useAuth from "@/hooks/use.auth";
+import useAuth from "@/hooks/auths/use.auth";
 import { getDashboardMenu } from "@/config";
 
 import { NavMain } from "./nav.main";

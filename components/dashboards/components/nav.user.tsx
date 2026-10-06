@@ -17,7 +17,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import useAuth from "@/hooks/use.auth";
+import useAuth from "@/hooks/auths/use.auth";
 import type { User } from "@/types/user";
 import { getInitials } from "@/utils/initials.helper";
 import { EllipsisVerticalIcon, LogOutIcon } from "lucide-react";

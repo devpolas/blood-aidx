@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
-import { useResetPassword } from "@/hooks/auth";
+import { useResetPassword } from "@/hooks/auths";
 import { ResetPasswordSchema } from "@/validators/auth.validator";
 import { Button } from "../../ui/button";
 import { LoadingSpinner } from "../../shared/loading/loading";

@@ -4,7 +4,7 @@ import type { SignUpFormValues } from "@/validators/auth.validator";
 import { useForm } from "@tanstack/react-form";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GENDERS } from "@/config";
-import { useSignup } from "@/hooks/auth";
+import { useSignup } from "@/hooks/auths";
 import { SignUpSchema } from "@/validators/auth.validator";
 import { FormInput } from "../components/form.input";
 import { FormRadioGroup } from "../components/form.radio.group";

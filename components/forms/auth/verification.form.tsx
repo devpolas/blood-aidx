@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
-import { useResendVerification, useVerifyEmail } from "@/hooks/auth";
+import { useResendVerification, useVerifyEmail } from "@/hooks/auths";
 import { useResendCooldown } from "@/hooks/use.resend.cooldown";
 import {
   VerifyEmailSchema,

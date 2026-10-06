@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
 
-import { useForgotPassword, useVerifyPasswordReset } from "@/hooks/auth";
+import { useForgotPassword, useVerifyPasswordReset } from "@/hooks/auths";
 import { useResendCooldown } from "@/hooks/use.resend.cooldown";
 
 import {

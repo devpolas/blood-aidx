@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthMe } from "@/hooks/auth";
+import { useAuthMe } from "@/hooks/auths";
 
 import { clearCallbackUrl, getCallbackUrl } from "@/utils/callback.url";
 
