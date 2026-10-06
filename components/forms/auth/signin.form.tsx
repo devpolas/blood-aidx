@@ -1,15 +1,21 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
-
 import { Button } from "../../ui/button";
 import { LoadingSpinner } from "../../shared/loading/loading";
 import { toast } from "../../ui/toast";
 import { FormInput } from "../components/form.input";
-
 import { useSignin } from "@/hooks/auth";
 import { SignInSchema, type SignInInput } from "@/validators/auth.validator";
+import useAuth from "@/hooks/use-auth";
+
+import {
+  clearCallbackUrl,
+  getCallbackUrl,
+  getSafeCallbackUrl,
+  saveCallbackUrl,
+} from "@/utils/callback.url";
 
 const DEFAULT_VALUES: SignInInput = {
   email: "",
@@ -18,8 +24,12 @@ const DEFAULT_VALUES: SignInInput = {
 
 export default function SigninForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const callbackUrl = getSafeCallbackUrl(searchParams.get("callbackUrl"));
 
   const { mutateAsync: signin, isPending: isSignin } = useSignin();
+  const { refreshUser } = useAuth();
 
   const form = useForm({
     defaultValues: DEFAULT_VALUES,
@@ -30,12 +40,17 @@ export default function SigninForm() {
 
     onSubmit: async ({ value }) => {
       await signin(value, {
-        onSuccess: (res) => {
+        onSuccess: async (res) => {
           if (!res.success) {
             if (res.message === "Please verify your email first") {
               const params = new URLSearchParams({
                 email: value.email,
               });
+
+              if (callbackUrl) {
+                saveCallbackUrl(callbackUrl);
+              }
+
               router.replace(`/verify-account?${params.toString()}`);
               return;
             }
@@ -46,11 +61,23 @@ export default function SigninForm() {
                 res.message || "Something went wrong. Please try again",
               type: "error",
             });
-
             return;
           }
 
-          // Clear the form immediately after successful signup.
+          const redirectUrl = callbackUrl ?? getCallbackUrl() ?? "/";
+          const user = await refreshUser();
+
+          if (!user) {
+            toast.add({
+              title: "Session Load Failed",
+              description:
+                "Your session could not be loaded. Please try signing in again.",
+              type: "error",
+            });
+            return;
+          }
+
+          clearCallbackUrl();
           form.reset();
 
           toast.add({
@@ -58,6 +85,8 @@ export default function SigninForm() {
             description: "Welcome to Blood AidX",
             type: "success",
           });
+
+          router.replace(redirectUrl);
         },
 
         onError: (error) => {

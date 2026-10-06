@@ -2,17 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
-
 import { useResendVerification, useVerifyEmail } from "@/hooks/auth";
 import { useResendCooldown } from "@/hooks/use-resend-cooldown";
-
 import {
   VerifyEmailSchema,
   type VerifyEmailInput,
 } from "@/validators/auth.validator";
-
 import { Time } from "@/utils/time.helper";
-
 import { Button } from "../../ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../ui/input-otp";
 import { toast } from "../../ui/toast";
@@ -68,11 +64,9 @@ export default function VerifyAccountForm({
                 res.message || "The verification code is invalid or expired.",
               type: "error",
             });
-
             return;
           }
 
-          // Clear the form immediately after successful signup.
           form.reset();
 
           toast.add({
@@ -81,7 +75,9 @@ export default function VerifyAccountForm({
             type: "success",
           });
 
-          router.push("/signin");
+          // Keep the callback URL in localStorage.
+          // Signin will read it and redirect the user after authentication.
+          router.replace("/signin");
         },
 
         onError: (error) => {
@@ -154,6 +150,7 @@ export default function VerifyAccountForm({
       onSubmit={(event) => {
         event.preventDefault();
         event.stopPropagation();
+
         void form.handleSubmit();
       }}
     >

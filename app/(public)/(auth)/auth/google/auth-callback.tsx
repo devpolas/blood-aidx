@@ -4,20 +4,27 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthMe } from "@/hooks/auth";
 
+import { clearCallbackUrl, getCallbackUrl } from "@/utils/callback.url";
+
 export default function AuthCallback() {
   const router = useRouter();
-
   const { isLoading, isError } = useAuthMe();
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading) {
+      return;
+    }
 
     if (isError) {
+      clearCallbackUrl();
       router.replace("/signin");
       return;
     }
 
-    router.replace("/");
+    const callbackUrl = getCallbackUrl() ?? "/";
+    clearCallbackUrl();
+
+    router.replace(callbackUrl);
   }, [isLoading, isError, router]);
 
   return null;
