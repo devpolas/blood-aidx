@@ -21,18 +21,21 @@ import useAuth from "@/hooks/use-auth";
 import type { User } from "@/types/user";
 import { getInitials } from "@/utils/initials.helper";
 import { EllipsisVerticalIcon, LogOutIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface NavUserProps {
   user: User;
 }
 
 export function NavUser({ user }: NavUserProps) {
+  const router = useRouter();
   const { isMobile } = useSidebar();
   const { logout, isLogoutPending, refreshUser } = useAuth();
 
   async function logoutCurrentUser() {
     await logout();
     await refreshUser();
+    router.replace("/signin");
   }
 
   const fallbackName = getInitials(user.name);

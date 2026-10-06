@@ -33,6 +33,7 @@ export default function Navbar() {
   async function logoutCurrentUser() {
     await logout();
     await refreshUser();
+    router.replace("/signin");
   }
 
   return (
