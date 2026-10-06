@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { APP_NAME, LOGO } from "@/constraints";
 import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use.mobile";
+import { useIsMobile } from "@/hooks";
 type Props = { className?: string };
 
 export default function Logo({ className }: Props) {

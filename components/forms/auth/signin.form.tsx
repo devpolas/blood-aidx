@@ -6,9 +6,9 @@ import { Button } from "../../ui/button";
 import { LoadingSpinner } from "../../shared/loading/loading";
 import { toast } from "../../ui/toast";
 import { FormInput } from "../components/form.input";
-import { useSignin } from "@/hooks/auths";
+import { useSignin } from "@/hooks";
 import { SignInSchema, type SignInInput } from "@/validators/auth.validator";
-import useAuth from "@/hooks/auths/use.auth";
+import { useAuth } from "@/hooks";
 
 import {
   clearCallbackUrl,

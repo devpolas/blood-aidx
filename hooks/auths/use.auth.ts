@@ -2,7 +2,7 @@
 
 import { useAuthMe, useLogout } from ".";
 
-export default function useAuth() {
+export function useAuth() {
   const meQuery = useAuthMe();
   const logoutMutation = useLogout();
 

@@ -4,14 +4,14 @@ import type { SignUpFormValues } from "@/validators/auth.validator";
 import { useForm } from "@tanstack/react-form";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GENDERS } from "@/config";
-import { useSignup } from "@/hooks/auths";
+import { useSignup } from "@/hooks";
 import { SignUpSchema } from "@/validators/auth.validator";
 import { FormInput } from "../components/form.input";
 import { FormRadioGroup } from "../components/form.radio.group";
 import { Button } from "../../ui/button";
 import { toast } from "../../ui/toast";
 import { LoadingSpinner } from "../../shared/loading/loading";
-import { useIsMobile } from "@/hooks/use.mobile";
+import { useIsMobile } from "@/hooks";
 import { getSafeCallbackUrl, saveCallbackUrl } from "@/utils/callback.url";
 
 const DEFAULT_VALUES: SignUpFormValues = {
