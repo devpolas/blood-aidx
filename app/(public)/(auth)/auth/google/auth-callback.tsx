@@ -2,13 +2,12 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-
-import { useMe } from "@/hooks/auth";
+import { useAuthMe } from "@/hooks/auth";
 
 export default function AuthCallback() {
   const router = useRouter();
 
-  const { isLoading, isError } = useMe();
+  const { isLoading, isError } = useAuthMe();
 
   useEffect(() => {
     if (isLoading) return;
