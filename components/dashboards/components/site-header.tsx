@@ -8,7 +8,7 @@ export function SiteHeader() {
         <SidebarTrigger className='-ml-1' />
         <Separator
           orientation='vertical'
-          className='data-[orientation=vertical]:h-4'
+          className='mt-2 data-[orientation=vertical]:h-4'
         />
         <h1 className='ml-1 font-bold text-brand text-base'>Dashboard</h1>
       </div>
