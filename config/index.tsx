@@ -98,7 +98,7 @@ const userDashboard: DashboardSidebar = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/dashboard/user",
+      url: "/dashboard",
       icon: <LayoutDashboard />,
     },
     {
