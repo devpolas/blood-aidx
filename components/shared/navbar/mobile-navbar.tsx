@@ -89,7 +89,7 @@ export default function MobileNavbar({
                   variant='destructive'
                   size='sm'
                   disabled={isLogoutPending}
-                  className={"hover:cursor-pointer"}
+                  className={"hover:cursor-pointer flex-1"}
                   onClick={() => {
                     if (!isLogoutPending) {
                       router.replace(dashboardHref);
