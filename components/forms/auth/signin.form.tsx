@@ -8,7 +8,7 @@ import { toast } from "../../ui/toast";
 import { FormInput } from "../components/form.input";
 import { useSignin } from "@/hooks/auth";
 import { SignInSchema, type SignInInput } from "@/validators/auth.validator";
-import useAuth from "@/hooks/use-auth";
+import useAuth from "@/hooks/use.auth";
 
 import {
   clearCallbackUrl,

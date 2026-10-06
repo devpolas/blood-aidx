@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import Logo from "@/components/logo/logo";
-import VerifyPasswordResetForm from "@/components/forms/auth/verify-password-reset.form";
+import VerifyPasswordResetForm from "@/components/forms/auth/verify.password.reset.form";
 import { Heading4 } from "@/components/typography/typography";
 import {
   Card,

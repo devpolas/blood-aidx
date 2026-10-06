@@ -11,7 +11,7 @@ import { FormRadioGroup } from "../components/form.radio.group";
 import { Button } from "../../ui/button";
 import { toast } from "../../ui/toast";
 import { LoadingSpinner } from "../../shared/loading/loading";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use.mobile";
 import { getSafeCallbackUrl, saveCallbackUrl } from "@/utils/callback.url";
 
 const DEFAULT_VALUES: SignUpFormValues = {
@@ -99,56 +99,56 @@ export default function SignupForm() {
         void form.handleSubmit();
       }}
     >
-      <div className="flex flex-col gap-3">
-        <form.Field name="name">
+      <div className='flex flex-col gap-3'>
+        <form.Field name='name'>
           {(field) => (
             <FormInput
-              id="name"
-              type="text"
+              id='name'
+              type='text'
               field={field}
-              label="Full Name"
-              placeholder="Enter your full name"
+              label='Full Name'
+              placeholder='Enter your full name'
               isRequired
               disabled={isSignup}
-              autoComplete="name"
+              autoComplete='name'
             />
           )}
         </form.Field>
 
-        <form.Field name="email">
+        <form.Field name='email'>
           {(field) => (
             <FormInput
-              id="email"
-              type="email"
+              id='email'
+              type='email'
               field={field}
-              label="Email Address"
-              placeholder="Enter your email address"
+              label='Email Address'
+              placeholder='Enter your email address'
               isRequired
               disabled={isSignup}
-              autoComplete="email"
+              autoComplete='email'
             />
           )}
         </form.Field>
 
-        <form.Field name="password">
+        <form.Field name='password'>
           {(field) => (
             <FormInput
-              id="password"
-              type="password"
+              id='password'
+              type='password'
               field={field}
-              label="Password"
-              placeholder="Create a password"
+              label='Password'
+              placeholder='Create a password'
               isRequired
               disabled={isSignup}
-              autoComplete="new-password"
+              autoComplete='new-password'
             />
           )}
         </form.Field>
 
-        <form.Field name="gender">
+        <form.Field name='gender'>
           {(field) => (
             <FormRadioGroup
-              label="Gender"
+              label='Gender'
               field={field}
               options={GENDERS}
               isRequired
@@ -159,15 +159,15 @@ export default function SignupForm() {
         </form.Field>
 
         <Button
-          type="submit"
+          type='submit'
           disabled={isSignup}
-          className="hover:bg-brand-foreground mt-2 font-medium text-brand hover:cursor-pointer glass-brand"
+          className='hover:bg-brand-foreground mt-2 font-medium text-brand hover:cursor-pointer glass-brand'
         >
           {isSignup ? (
             <LoadingSpinner
-              spinnerClassName="text-brand"
-              textClassName="text-brand"
-              text="Creating account"
+              spinnerClassName='text-brand'
+              textClassName='text-brand'
+              text='Creating account'
               shimmer
             />
           ) : (

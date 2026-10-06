@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/dashboards/components/app-sidebar";
-import { SiteHeader } from "@/components/dashboards/components/site-header";
+import { AppSidebar } from "@/components/dashboards/components/app.sidebar";
+import { SiteHeader } from "@/components/dashboards/components/site.header";
 
 const dashboardStyle = {
   "--sidebar-width": "calc(var(--spacing) * 72)",

@@ -14,13 +14,13 @@ import {
 import Logo from "@/components/logo/logo";
 import { ThemeSwitcher } from "@/components/shared/theme/theme.switcher";
 
-import useAuth from "@/hooks/use-auth";
+import useAuth from "@/hooks/use.auth";
 import { getDashboardMenu } from "@/config";
 
-import { NavMain } from "./nav-main";
-import { NavSecondary } from "./nav-secondary";
-import { NavUser } from "./nav-user";
-import { SidebarSkeleton, SidebarUserSkeleton } from "./dashboard-skeleton";
+import { NavMain } from "./nav.main";
+import { NavSecondary } from "./nav.secondary";
+import { NavUser } from "./nav.user";
+import { SidebarSkeleton, SidebarUserSkeleton } from "./dashboard.skeleton";
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { user, isLoading } = useAuth();

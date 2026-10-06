@@ -5,11 +5,11 @@ import { LogOutIcon } from "lucide-react";
 
 import Logo from "@/components/logo/logo";
 import { Button } from "@/components/ui/button";
-import NavbarLinks from "./navbar-links";
-import AuthButtons from "./auth-buttons";
-import MobileNavbar from "./mobile-navbar";
+import NavbarLinks from "./navbar.links";
+import AuthButtons from "./auth.buttons";
+import MobileNavbar from "./mobile.navbar";
 import { ThemeSwitcher } from "../theme/theme.switcher";
-import useAuth from "@/hooks/use-auth";
+import useAuth from "@/hooks/use.auth";
 import { Loader, LoadingSpinner } from "../loading/loading";
 import { useRouter } from "next/navigation";
 
