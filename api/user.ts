@@ -1,9 +1,12 @@
 import apiClient from "@/lib/api.client";
+
 import { ApiResponse } from "@/types/api.response";
 import { User } from "@/types/user";
+
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
+
 import {
   AdminUpdateUserInput,
   AdminUpdateUserRoleInput,
@@ -16,14 +19,11 @@ import {
   UserIdSchema,
 } from "@/validators/user.validator";
 
-// Get Users
+// Current User
 // GET /users
-
-export async function getUsers(): Promise<
-  ApiResponse<{ users: User[] } | null>
-> {
+export async function getMe(): Promise<ApiResponse<{ user: User }>> {
   try {
-    return await apiClient<ApiResponse<{ users: User[] }>>("/users", {
+    return await apiClient<ApiResponse<{ user: User }>>("/users", {
       method: "GET",
     });
   } catch (error) {
@@ -31,12 +31,58 @@ export async function getUsers(): Promise<
   }
 }
 
-// Get User
-// GET /users/:id
+// Current User
+// PATCH /users
+export async function updateMe(
+  payload: UpdateUserInput,
+): Promise<ApiResponse<{ user: User }>> {
+  try {
+    const payloadParse = UpdateUserSchema.safeParse(payload);
 
+    if (!payloadParse.success) {
+      return errorResponse(
+        handleZodError(payloadParse.error) || "Invalid input",
+      );
+    }
+
+    return await apiClient<ApiResponse<{ user: User }>>("/users", {
+      method: "PATCH",
+      body: payloadParse.data,
+    });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Current User
+// DELETE /users
+export async function deleteMe(): Promise<ApiResponse<null>> {
+  try {
+    return await apiClient<ApiResponse<null>>("/users", {
+      method: "DELETE",
+    });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Admin: Get All Users
+// GET /admin/users
+export async function getUsers(): Promise<ApiResponse<{ users: User[] }>> {
+  try {
+    return await apiClient<ApiResponse<{ users: User[] }>>("/admin/users", {
+      method: "GET",
+    });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Admin: Get User
+// GET /admin/users/:userId
 export async function getUser(
   id: string,
-): Promise<ApiResponse<{ user: User } | null>> {
+): Promise<ApiResponse<{ user: User }>> {
   try {
     const parse = UserIdSchema.safeParse({ id });
 
@@ -45,7 +91,7 @@ export async function getUser(
     }
 
     return await apiClient<ApiResponse<{ user: User }>>(
-      `/users/${parse.data.id}`,
+      `/admin/users/${parse.data.id}`,
       {
         method: "GET",
       },
@@ -55,66 +101,12 @@ export async function getUser(
   }
 }
 
-// Update User
-// PATCH /users/:id
-
-export async function updateUser(
-  id: string,
-  payload: UpdateUserInput,
-): Promise<ApiResponse<{ user: User } | null>> {
-  try {
-    const idParse = UserIdSchema.safeParse({ id });
-
-    if (!idParse.success) {
-      return errorResponse(handleZodError(idParse.error) || "Invalid user ID");
-    }
-
-    const payloadParse = UpdateUserSchema.safeParse(payload);
-
-    if (!payloadParse.success) {
-      return errorResponse(
-        handleZodError(payloadParse.error) || "Invalid input",
-      );
-    }
-
-    return await apiClient<ApiResponse<{ user: User }>>(
-      `/users/${idParse.data.id}`,
-      {
-        method: "PATCH",
-        body: payloadParse.data,
-      },
-    );
-  } catch (error) {
-    return handleApiError(error);
-  }
-}
-
-// Delete User
-// DELETE /users/:id
-
-export async function deleteUser(id: string): Promise<ApiResponse<null>> {
-  try {
-    const parse = UserIdSchema.safeParse({ id });
-
-    if (!parse.success) {
-      return errorResponse(handleZodError(parse.error) || "Invalid user ID");
-    }
-
-    return await apiClient<ApiResponse<null>>(`/users/${parse.data.id}`, {
-      method: "DELETE",
-    });
-  } catch (error) {
-    return handleApiError(error);
-  }
-}
-
-// Admin Update User
-// PATCH /admin/users/:id
-
+// Admin: Update User
+// PATCH /admin/users/:userId
 export async function adminUpdateUser(
   id: string,
   payload: AdminUpdateUserInput,
-): Promise<ApiResponse<{ user: User } | null>> {
+): Promise<ApiResponse<{ user: User }>> {
   try {
     const idParse = UserIdSchema.safeParse({ id });
 
@@ -142,13 +134,12 @@ export async function adminUpdateUser(
   }
 }
 
-// Admin Update User Role
-// PATCH /admin/users/:id/role
-
+// Admin: Change User Role
+// PATCH /admin/users/:userId/role
 export async function adminUpdateUserRole(
   id: string,
   payload: AdminUpdateUserRoleInput,
-): Promise<ApiResponse<{ user: User } | null>> {
+): Promise<ApiResponse<{ user: User }>> {
   try {
     const idParse = UserIdSchema.safeParse({ id });
 
@@ -176,13 +167,12 @@ export async function adminUpdateUserRole(
   }
 }
 
-// Ban User
-// POST /admin/users/:id/ban
-
+// Admin: Ban User
+// PATCH /admin/users/:userId/ban
 export async function banUser(
   id: string,
   payload: BanUserInput,
-): Promise<ApiResponse<{ user: User } | null>> {
+): Promise<ApiResponse<{ user: User }>> {
   try {
     const idParse = UserIdSchema.safeParse({ id });
 
@@ -201,7 +191,7 @@ export async function banUser(
     return await apiClient<ApiResponse<{ user: User }>>(
       `/admin/users/${idParse.data.id}/ban`,
       {
-        method: "POST",
+        method: "PATCH",
         body: payloadParse.data,
       },
     );
@@ -210,12 +200,11 @@ export async function banUser(
   }
 }
 
-// Unban User
-// DELETE /admin/users/:id/ban
-
+// Admin: Unban User
+// PATCH /admin/users/:userId/unban
 export async function unbanUser(
   id: string,
-): Promise<ApiResponse<{ user: User } | null>> {
+): Promise<ApiResponse<{ user: User }>> {
   try {
     const parse = UserIdSchema.safeParse({ id });
 
@@ -224,11 +213,29 @@ export async function unbanUser(
     }
 
     return await apiClient<ApiResponse<{ user: User }>>(
-      `/admin/users/${parse.data.id}/ban`,
+      `/admin/users/${parse.data.id}/unban`,
       {
-        method: "DELETE",
+        method: "PATCH",
       },
     );
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Admin: Delete User
+// DELETE /admin/users/:userId
+export async function deleteUser(id: string): Promise<ApiResponse<null>> {
+  try {
+    const parse = UserIdSchema.safeParse({ id });
+
+    if (!parse.success) {
+      return errorResponse(handleZodError(parse.error) || "Invalid user ID");
+    }
+
+    return await apiClient<ApiResponse<null>>(`/admin/users/${parse.data.id}`, {
+      method: "DELETE",
+    });
   } catch (error) {
     return handleApiError(error);
   }

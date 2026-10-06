@@ -1,13 +1,12 @@
 import apiClient from "@/lib/api.client";
 
 import { ApiResponse } from "@/types/api.response";
-
+import { DonorProfile } from "@/types/donor.profile";
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
 
 import {
-  DonorProfileResponse,
   UpdateDonorProfileInput,
   UpdateDonorProfileSchema,
 } from "@/validators/donor.validator";
@@ -16,33 +15,30 @@ import {
 // GET /donors
 
 export async function getDonors(): Promise<
-  ApiResponse<{ donors: DonorProfileResponse[] } | null>
+  ApiResponse<{ donors: DonorProfile[] }>
 > {
   try {
-    return await apiClient<ApiResponse<{ donors: DonorProfileResponse[] }>>(
-      "/donors",
-      {
-        method: "GET",
-      },
-    );
+    return await apiClient<ApiResponse<{ donors: DonorProfile[] }>>("/donors", {
+      method: "GET",
+    });
   } catch (error) {
     return handleApiError(error);
   }
 }
 
 // Get Donor
-// GET /donors/:id
+// GET /donors/:donorId
 
 export async function getDonor(
-  id: string,
-): Promise<ApiResponse<{ donor: DonorProfileResponse } | null>> {
+  donorId: string,
+): Promise<ApiResponse<{ donor: DonorProfile }>> {
   try {
-    if (!id.trim()) {
+    if (!donorId.trim()) {
       return errorResponse("Donor ID is required");
     }
 
-    return await apiClient<ApiResponse<{ donor: DonorProfileResponse }>>(
-      `/donors/${id}`,
+    return await apiClient<ApiResponse<{ donor: DonorProfile }>>(
+      `/donors/${donorId}`,
       {
         method: "GET",
       },
@@ -56,26 +52,23 @@ export async function getDonor(
 // GET /donors/me
 
 export async function getMyDonorProfile(): Promise<
-  ApiResponse<{ donor: DonorProfileResponse } | null>
+  ApiResponse<{ donor: DonorProfile }>
 > {
   try {
-    return await apiClient<ApiResponse<{ donor: DonorProfileResponse }>>(
-      "/donors/me",
-      {
-        method: "GET",
-      },
-    );
+    return await apiClient<ApiResponse<{ donor: DonorProfile }>>("/donors/me", {
+      method: "GET",
+    });
   } catch (error) {
     return handleApiError(error);
   }
 }
 
 // Update Current Donor Profile
-// PATCH /donors/me
+// PUT /donors/me
 
 export async function updateMyDonorProfile(
   payload: UpdateDonorProfileInput,
-): Promise<ApiResponse<{ donor: DonorProfileResponse } | null>> {
+): Promise<ApiResponse<{ donor: DonorProfile }>> {
   try {
     const parse = UpdateDonorProfileSchema.safeParse(payload);
 
@@ -83,27 +76,37 @@ export async function updateMyDonorProfile(
       return errorResponse(handleZodError(parse.error) || "Invalid input");
     }
 
-    return await apiClient<ApiResponse<{ donor: DonorProfileResponse }>>(
-      "/donors/me",
-      {
-        method: "PATCH",
-        body: parse.data,
-      },
-    );
+    return await apiClient<ApiResponse<{ donor: DonorProfile }>>("/donors/me", {
+      method: "PUT",
+      body: parse.data,
+    });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Delete Current Donor Profile
+// DELETE /donors/me
+
+export async function deleteMyDonorProfile(): Promise<ApiResponse<null>> {
+  try {
+    return await apiClient<ApiResponse<null>>("/donors/me", {
+      method: "DELETE",
+    });
   } catch (error) {
     return handleApiError(error);
   }
 }
 
 // Update Donor Profile
-// PATCH /donors/:id
+// PATCH /donors/:donorId
 
 export async function updateDonor(
-  id: string,
+  donorId: string,
   payload: UpdateDonorProfileInput,
-): Promise<ApiResponse<{ donor: DonorProfileResponse } | null>> {
+): Promise<ApiResponse<{ donor: DonorProfile }>> {
   try {
-    if (!id.trim()) {
+    if (!donorId.trim()) {
       return errorResponse("Donor ID is required");
     }
 
@@ -113,13 +116,30 @@ export async function updateDonor(
       return errorResponse(handleZodError(parse.error) || "Invalid input");
     }
 
-    return await apiClient<ApiResponse<{ donor: DonorProfileResponse }>>(
-      `/donors/${id}`,
+    return await apiClient<ApiResponse<{ donor: DonorProfile }>>(
+      `/donors/${donorId}`,
       {
         method: "PATCH",
         body: parse.data,
       },
     );
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Delete Donor Profile
+// DELETE /donors/:donorId
+
+export async function deleteDonor(donorId: string): Promise<ApiResponse<null>> {
+  try {
+    if (!donorId.trim()) {
+      return errorResponse("Donor ID is required");
+    }
+
+    return await apiClient<ApiResponse<null>>(`/donors/${donorId}`, {
+      method: "DELETE",
+    });
   } catch (error) {
     return handleApiError(error);
   }

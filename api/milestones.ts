@@ -1,7 +1,7 @@
 import apiClient from "@/lib/api.client";
 
 import { ApiResponse } from "@/types/api.response";
-
+import { UserMilestone } from "@/types/user.milestone";
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
@@ -9,7 +9,6 @@ import { handleZodError } from "@/utils/zod.error";
 import {
   CreateMilestoneInput,
   CreateMilestoneSchema,
-  MilestoneResponse,
   UpdateMilestoneInput,
   UpdateMilestoneSchema,
 } from "@/validators/milestone.validator";
@@ -18,10 +17,10 @@ import {
 // GET /milestones
 
 export async function getMilestones(): Promise<
-  ApiResponse<{ milestones: MilestoneResponse[] } | null>
+  ApiResponse<{ milestones: UserMilestone[] }>
 > {
   try {
-    return await apiClient<ApiResponse<{ milestones: MilestoneResponse[] }>>(
+    return await apiClient<ApiResponse<{ milestones: UserMilestone[] }>>(
       "/milestones",
       {
         method: "GET",
@@ -33,18 +32,58 @@ export async function getMilestones(): Promise<
 }
 
 // Get Milestone
-// GET /milestones/:id
+// GET /milestones/:milestoneId
 
 export async function getMilestone(
-  id: string,
-): Promise<ApiResponse<{ milestone: MilestoneResponse } | null>> {
+  milestoneId: string,
+): Promise<ApiResponse<{ milestone: UserMilestone }>> {
   try {
-    if (!id.trim()) {
+    if (!milestoneId.trim()) {
       return errorResponse("Milestone ID is required");
     }
 
-    return await apiClient<ApiResponse<{ milestone: MilestoneResponse }>>(
-      `/milestones/${id}`,
+    return await apiClient<ApiResponse<{ milestone: UserMilestone }>>(
+      `/milestones/${milestoneId}`,
+      {
+        method: "GET",
+      },
+    );
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Get My Milestones
+// GET /milestones/my
+
+export async function getMyMilestones(): Promise<
+  ApiResponse<{ milestones: UserMilestone[] }>
+> {
+  try {
+    return await apiClient<ApiResponse<{ milestones: UserMilestone[] }>>(
+      "/milestones/my",
+      {
+        method: "GET",
+      },
+    );
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Get User Milestones
+// GET /milestones/user/:userId
+
+export async function getUserMilestones(
+  userId: string,
+): Promise<ApiResponse<{ milestones: UserMilestone[] }>> {
+  try {
+    if (!userId.trim()) {
+      return errorResponse("User ID is required");
+    }
+
+    return await apiClient<ApiResponse<{ milestones: UserMilestone[] }>>(
+      `/milestones/user/${userId}`,
       {
         method: "GET",
       },
@@ -59,7 +98,7 @@ export async function getMilestone(
 
 export async function createMilestone(
   payload: CreateMilestoneInput,
-): Promise<ApiResponse<{ milestone: MilestoneResponse } | null>> {
+): Promise<ApiResponse<{ milestone: UserMilestone }>> {
   try {
     const parse = CreateMilestoneSchema.safeParse(payload);
 
@@ -67,7 +106,7 @@ export async function createMilestone(
       return errorResponse(handleZodError(parse.error) || "Invalid input");
     }
 
-    return await apiClient<ApiResponse<{ milestone: MilestoneResponse }>>(
+    return await apiClient<ApiResponse<{ milestone: UserMilestone }>>(
       "/milestones",
       {
         method: "POST",
@@ -80,14 +119,14 @@ export async function createMilestone(
 }
 
 // Update Milestone
-// PATCH /milestones/:id
+// PATCH /milestones/:milestoneId
 
 export async function updateMilestone(
-  id: string,
+  milestoneId: string,
   payload: UpdateMilestoneInput,
-): Promise<ApiResponse<{ milestone: MilestoneResponse } | null>> {
+): Promise<ApiResponse<{ milestone: UserMilestone }>> {
   try {
-    if (!id.trim()) {
+    if (!milestoneId.trim()) {
       return errorResponse("Milestone ID is required");
     }
 
@@ -97,8 +136,8 @@ export async function updateMilestone(
       return errorResponse(handleZodError(parse.error) || "Invalid input");
     }
 
-    return await apiClient<ApiResponse<{ milestone: MilestoneResponse }>>(
-      `/milestones/${id}`,
+    return await apiClient<ApiResponse<{ milestone: UserMilestone }>>(
+      `/milestones/${milestoneId}`,
       {
         method: "PATCH",
         body: parse.data,
@@ -110,15 +149,17 @@ export async function updateMilestone(
 }
 
 // Delete Milestone
-// DELETE /milestones/:id
+// DELETE /milestones/:milestoneId
 
-export async function deleteMilestone(id: string): Promise<ApiResponse<null>> {
+export async function deleteMilestone(
+  milestoneId: string,
+): Promise<ApiResponse<null>> {
   try {
-    if (!id.trim()) {
+    if (!milestoneId.trim()) {
       return errorResponse("Milestone ID is required");
     }
 
-    return await apiClient<ApiResponse<null>>(`/milestones/${id}`, {
+    return await apiClient<ApiResponse<null>>(`/milestones/${milestoneId}`, {
       method: "DELETE",
     });
   } catch (error) {

@@ -1,7 +1,7 @@
 import apiClient from "@/lib/api.client";
 
 import { ApiResponse } from "@/types/api.response";
-
+import { BloodDonation } from "@/types/blood.donation";
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
@@ -9,19 +9,36 @@ import { handleZodError } from "@/utils/zod.error";
 import {
   CreateDonationInput,
   CreateDonationSchema,
-  DonationResponse,
   UpdateDonationStatusInput,
   UpdateDonationStatusSchema,
 } from "@/validators/donation.validator";
+
+// Get My Donations
+// GET /donations/me
+
+export async function getMyDonations(): Promise<
+  ApiResponse<{ donations: BloodDonation[] }>
+> {
+  try {
+    return await apiClient<ApiResponse<{ donations: BloodDonation[] }>>(
+      "/donations/me",
+      {
+        method: "GET",
+      },
+    );
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
 
 // Get Donations
 // GET /donations
 
 export async function getDonations(): Promise<
-  ApiResponse<{ donations: DonationResponse[] } | null>
+  ApiResponse<{ donations: BloodDonation[] }>
 > {
   try {
-    return await apiClient<ApiResponse<{ donations: DonationResponse[] }>>(
+    return await apiClient<ApiResponse<{ donations: BloodDonation[] }>>(
       "/donations",
       {
         method: "GET",
@@ -33,18 +50,18 @@ export async function getDonations(): Promise<
 }
 
 // Get Donation
-// GET /donations/:id
+// GET /donations/:donationId
 
 export async function getDonation(
-  id: string,
-): Promise<ApiResponse<{ donation: DonationResponse } | null>> {
+  donationId: string,
+): Promise<ApiResponse<{ donation: BloodDonation }>> {
   try {
-    if (!id.trim()) {
+    if (!donationId.trim()) {
       return errorResponse("Donation ID is required");
     }
 
-    return await apiClient<ApiResponse<{ donation: DonationResponse }>>(
-      `/donations/${id}`,
+    return await apiClient<ApiResponse<{ donation: BloodDonation }>>(
+      `/donations/${donationId}`,
       {
         method: "GET",
       },
@@ -59,7 +76,7 @@ export async function getDonation(
 
 export async function createDonation(
   payload: CreateDonationInput,
-): Promise<ApiResponse<{ donation: DonationResponse } | null>> {
+): Promise<ApiResponse<{ donation: BloodDonation }>> {
   try {
     const parse = CreateDonationSchema.safeParse(payload);
 
@@ -67,7 +84,7 @@ export async function createDonation(
       return errorResponse(handleZodError(parse.error) || "Invalid input");
     }
 
-    return await apiClient<ApiResponse<{ donation: DonationResponse }>>(
+    return await apiClient<ApiResponse<{ donation: BloodDonation }>>(
       "/donations",
       {
         method: "POST",
@@ -79,15 +96,37 @@ export async function createDonation(
   }
 }
 
-// Update Donation Status
-// PATCH /donations/:id/status
+// Cancel My Donation
+// POST /donations/:donationId/cancel
 
-export async function updateDonationStatus(
-  id: string,
-  payload: UpdateDonationStatusInput,
-): Promise<ApiResponse<{ donation: DonationResponse } | null>> {
+export async function cancelDonation(
+  donationId: string,
+): Promise<ApiResponse<{ donation: BloodDonation }>> {
   try {
-    if (!id.trim()) {
+    if (!donationId.trim()) {
+      return errorResponse("Donation ID is required");
+    }
+
+    return await apiClient<ApiResponse<{ donation: BloodDonation }>>(
+      `/donations/${donationId}/cancel`,
+      {
+        method: "POST",
+      },
+    );
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Verify Donation
+// PATCH /donations/:donationId/verify
+
+export async function verifyDonation(
+  donationId: string,
+  payload: UpdateDonationStatusInput,
+): Promise<ApiResponse<{ donation: BloodDonation }>> {
+  try {
+    if (!donationId.trim()) {
       return errorResponse("Donation ID is required");
     }
 
@@ -97,8 +136,8 @@ export async function updateDonationStatus(
       return errorResponse(handleZodError(parse.error) || "Invalid input");
     }
 
-    return await apiClient<ApiResponse<{ donation: DonationResponse }>>(
-      `/donations/${id}/status`,
+    return await apiClient<ApiResponse<{ donation: BloodDonation }>>(
+      `/donations/${donationId}/verify`,
       {
         method: "PATCH",
         body: parse.data,

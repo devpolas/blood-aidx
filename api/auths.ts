@@ -3,7 +3,6 @@ import apiClient from "@/lib/api.client";
 import { ApiResponse } from "@/types/api.response";
 import { Session } from "@/types/session";
 import { User } from "@/types/user";
-
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
@@ -35,7 +34,7 @@ import {
 
 export async function signup(
   payload: SignUpInput,
-): Promise<ApiResponse<{ user: User } | null>> {
+): Promise<ApiResponse<{ user: User }>> {
   try {
     const parse = SignUpSchema.safeParse(payload);
 
@@ -56,7 +55,7 @@ export async function signup(
 
 export async function signin(
   payload: SignInInput,
-): Promise<ApiResponse<{ user: User; session: Session } | null>> {
+): Promise<ApiResponse<{ user: User; session: Session }>> {
   try {
     const parse = SignInSchema.safeParse(payload);
 
@@ -80,7 +79,7 @@ export async function signin(
 
 export async function verifyEmail(
   payload: VerifyEmailInput,
-): Promise<ApiResponse<{ user: User } | null>> {
+): Promise<ApiResponse<{ user: User }>> {
   try {
     const parse = VerifyEmailSchema.safeParse(payload);
 
@@ -143,7 +142,7 @@ export async function forgotPassword(
 
 export async function verifyPasswordReset(
   payload: VerifyPasswordResetInput,
-): Promise<ApiResponse<{ resetToken: string } | null>> {
+): Promise<ApiResponse<{ resetToken: string }>> {
   try {
     const parse = VerifyPasswordResetSchema.safeParse(payload);
 
@@ -187,7 +186,7 @@ export async function resetPassword(
 // Current User
 // GET /auth/me
 
-export async function me(): Promise<ApiResponse<{ user: User } | null>> {
+export async function me(): Promise<ApiResponse<{ user: User }>> {
   try {
     return await apiClient<ApiResponse<{ user: User }>>("/auth/me", {
       method: "GET",

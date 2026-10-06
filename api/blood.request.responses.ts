@@ -1,63 +1,65 @@
 import apiClient from "@/lib/api.client";
 
 import { ApiResponse } from "@/types/api.response";
-
+import { BloodRequestResponse } from "@/types/blood.request.response";
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
+
 import {
-  BloodRequestResponseOutput,
   CreateBloodRequestResponseInput,
   CreateBloodRequestResponseSchema,
   UpdateBloodRequestResponseStatusInput,
   UpdateBloodRequestResponseStatusSchema,
 } from "@/validators/blood.request.response.validator";
 
-// Get Blood Request Responses
-// GET /blood-request-responses
+// Get My Blood Request Responses
+// GET /blood-request-responses/me
 
-export async function getBloodRequestResponses(): Promise<
-  ApiResponse<{ responses: BloodRequestResponseOutput[] } | null>
+export async function getMyBloodRequestResponses(): Promise<
+  ApiResponse<{ responses: BloodRequestResponse[] }>
 > {
   try {
-    return await apiClient<
-      ApiResponse<{ responses: BloodRequestResponseOutput[] }>
-    >("/blood-request-responses", {
-      method: "GET",
-    });
+    return await apiClient<ApiResponse<{ responses: BloodRequestResponse[] }>>(
+      "/blood-request-responses/me",
+      {
+        method: "GET",
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
 }
 
-// Get Blood Request Response
-// GET /blood-request-responses/:id
+// Get Responses for a Blood Request
+// GET /blood-request-responses/requests/:requestId
 
-export async function getBloodRequestResponse(
-  id: string,
-): Promise<ApiResponse<{ response: BloodRequestResponseOutput } | null>> {
+export async function getBloodRequestResponses(
+  requestId: string,
+): Promise<ApiResponse<{ responses: BloodRequestResponse[] }>> {
   try {
-    if (!id.trim()) {
-      return errorResponse("Response ID is required");
+    if (!requestId.trim()) {
+      return errorResponse("Blood request ID is required");
     }
 
-    return await apiClient<
-      ApiResponse<{ response: BloodRequestResponseOutput }>
-    >(`/blood-request-responses/${id}`, {
-      method: "GET",
-    });
+    return await apiClient<ApiResponse<{ responses: BloodRequestResponse[] }>>(
+      `/blood-request-responses/requests/${requestId}`,
+      {
+        method: "GET",
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
 }
 
 // Create Blood Request Response
-// POST /blood-request-responses/:requestId
+// POST /blood-request-responses/requests/:requestId
 
 export async function createBloodRequestResponse(
   requestId: string,
   payload: CreateBloodRequestResponseInput,
-): Promise<ApiResponse<{ response: BloodRequestResponseOutput } | null>> {
+): Promise<ApiResponse<{ response: BloodRequestResponse }>> {
   try {
     if (!requestId.trim()) {
       return errorResponse("Blood request ID is required");
@@ -69,26 +71,49 @@ export async function createBloodRequestResponse(
       return errorResponse(handleZodError(parse.error) || "Invalid input");
     }
 
-    return await apiClient<
-      ApiResponse<{ response: BloodRequestResponseOutput }>
-    >(`/blood-request-responses/${requestId}`, {
-      method: "POST",
-      body: parse.data,
-    });
+    return await apiClient<ApiResponse<{ response: BloodRequestResponse }>>(
+      `/blood-request-responses/requests/${requestId}`,
+      {
+        method: "POST",
+        body: parse.data,
+      },
+    );
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Get Individual Blood Request Response
+// GET /blood-request-responses/:responseId
+
+export async function getBloodRequestResponse(
+  responseId: string,
+): Promise<ApiResponse<{ response: BloodRequestResponse }>> {
+  try {
+    if (!responseId.trim()) {
+      return errorResponse("Response ID is required");
+    }
+
+    return await apiClient<ApiResponse<{ response: BloodRequestResponse }>>(
+      `/blood-request-responses/${responseId}`,
+      {
+        method: "GET",
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
 }
 
 // Update Blood Request Response Status
-// PATCH /blood-request-responses/:id/status
+// PATCH /blood-request-responses/:responseId/status
 
 export async function updateBloodRequestResponseStatus(
-  id: string,
+  responseId: string,
   payload: UpdateBloodRequestResponseStatusInput,
-): Promise<ApiResponse<{ response: BloodRequestResponseOutput } | null>> {
+): Promise<ApiResponse<{ response: BloodRequestResponse }>> {
   try {
-    if (!id.trim()) {
+    if (!responseId.trim()) {
       return errorResponse("Response ID is required");
     }
 
@@ -98,30 +123,53 @@ export async function updateBloodRequestResponseStatus(
       return errorResponse(handleZodError(parse.error) || "Invalid input");
     }
 
-    return await apiClient<
-      ApiResponse<{ response: BloodRequestResponseOutput }>
-    >(`/blood-request-responses/${id}/status`, {
-      method: "PATCH",
-      body: parse.data,
-    });
+    return await apiClient<ApiResponse<{ response: BloodRequestResponse }>>(
+      `/blood-request-responses/${responseId}/status`,
+      {
+        method: "PATCH",
+        body: parse.data,
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
 }
 
-// Delete Blood Request Response
-// DELETE /blood-request-responses/:id
+// Cancel My Blood Request Response
+// POST /blood-request-responses/:responseId/cancel
+
+export async function cancelBloodRequestResponse(
+  responseId: string,
+): Promise<ApiResponse<{ response: BloodRequestResponse }>> {
+  try {
+    if (!responseId.trim()) {
+      return errorResponse("Response ID is required");
+    }
+
+    return await apiClient<ApiResponse<{ response: BloodRequestResponse }>>(
+      `/blood-request-responses/${responseId}/cancel`,
+      {
+        method: "POST",
+      },
+    );
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Delete My Blood Request Response
+// DELETE /blood-request-responses/:responseId
 
 export async function deleteBloodRequestResponse(
-  id: string,
+  responseId: string,
 ): Promise<ApiResponse<null>> {
   try {
-    if (!id.trim()) {
+    if (!responseId.trim()) {
       return errorResponse("Response ID is required");
     }
 
     return await apiClient<ApiResponse<null>>(
-      `/blood-request-responses/${id}`,
+      `/blood-request-responses/${responseId}`,
       {
         method: "DELETE",
       },

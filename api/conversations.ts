@@ -1,21 +1,26 @@
 import apiClient from "@/lib/api.client";
+
 import { ApiResponse } from "@/types/api.response";
+import { Conversation } from "@/types/conversation";
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
+
 import {
   AddParticipantInput,
   AddParticipantSchema,
-  ConversationResponse,
   CreateConversationInput,
   CreateConversationSchema,
 } from "@/validators/conversation.validator";
 
+// Get Conversations
+// GET /conversations
+
 export async function getConversations(): Promise<
-  ApiResponse<ConversationResponse[]>
+  ApiResponse<{ conversations: Conversation[] }>
 > {
   try {
-    return await apiClient<ApiResponse<ConversationResponse[]>>(
+    return await apiClient<ApiResponse<{ conversations: Conversation[] }>>(
       "/conversations",
       {
         method: "GET",
@@ -26,16 +31,19 @@ export async function getConversations(): Promise<
   }
 }
 
+// Get Conversation
+// GET /conversations/:conversationId
+
 export async function getConversation(
-  id: string,
-): Promise<ApiResponse<ConversationResponse>> {
+  conversationId: string,
+): Promise<ApiResponse<{ conversation: Conversation }>> {
   try {
-    if (!id.trim()) {
+    if (!conversationId.trim()) {
       return errorResponse("Conversation ID is required");
     }
 
-    return await apiClient<ApiResponse<ConversationResponse>>(
-      `/conversations/${id}`,
+    return await apiClient<ApiResponse<{ conversation: Conversation }>>(
+      `/conversations/${conversationId}`,
       {
         method: "GET",
       },
@@ -45,9 +53,12 @@ export async function getConversation(
   }
 }
 
+// Create Conversation
+// POST /conversations
+
 export async function createConversation(
   payload: CreateConversationInput,
-): Promise<ApiResponse<ConversationResponse>> {
+): Promise<ApiResponse<{ conversation: Conversation }>> {
   try {
     const parse = CreateConversationSchema.safeParse(payload);
 
@@ -57,7 +68,7 @@ export async function createConversation(
       );
     }
 
-    return await apiClient<ApiResponse<ConversationResponse>>(
+    return await apiClient<ApiResponse<{ conversation: Conversation }>>(
       "/conversations",
       {
         method: "POST",
@@ -69,10 +80,13 @@ export async function createConversation(
   }
 }
 
+// Add Conversation Participant
+// POST /conversations/:conversationId/participants
+
 export async function addConversationParticipant(
   conversationId: string,
   payload: AddParticipantInput,
-): Promise<ApiResponse<ConversationResponse>> {
+): Promise<ApiResponse<{ conversation: Conversation }>> {
   try {
     if (!conversationId.trim()) {
       return errorResponse("Conversation ID is required");
@@ -86,7 +100,7 @@ export async function addConversationParticipant(
       );
     }
 
-    return await apiClient<ApiResponse<ConversationResponse>>(
+    return await apiClient<ApiResponse<{ conversation: Conversation }>>(
       `/conversations/${conversationId}/participants`,
       {
         method: "POST",
@@ -97,6 +111,9 @@ export async function addConversationParticipant(
     return handleApiError(error);
   }
 }
+
+// Remove Conversation Participant
+// DELETE /conversations/:conversationId/participants/:userId
 
 export async function removeConversationParticipant(
   conversationId: string,
@@ -122,17 +139,23 @@ export async function removeConversationParticipant(
   }
 }
 
-export async function deleteConversation(
-  id: string,
+// Leave Conversation
+// POST /conversations/:conversationId/leave
+
+export async function leaveConversation(
+  conversationId: string,
 ): Promise<ApiResponse<null>> {
   try {
-    if (!id.trim()) {
+    if (!conversationId.trim()) {
       return errorResponse("Conversation ID is required");
     }
 
-    return await apiClient<ApiResponse<null>>(`/conversations/${id}`, {
-      method: "DELETE",
-    });
+    return await apiClient<ApiResponse<null>>(
+      `/conversations/${conversationId}/leave`,
+      {
+        method: "POST",
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }

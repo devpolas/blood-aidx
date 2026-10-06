@@ -1,7 +1,8 @@
 import apiClient from "@/lib/api.client";
 
 import { ApiResponse } from "@/types/api.response";
-
+import { Organization } from "@/types/organization";
+import { OrganizationMember } from "@/types/organization.member";
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
@@ -11,7 +12,6 @@ import {
   AddOrganizationMemberSchema,
   CreateOrganizationInput,
   CreateOrganizationSchema,
-  OrganizationResponse,
   UpdateOrganizationInput,
   UpdateOrganizationMemberInput,
   UpdateOrganizationMemberSchema,
@@ -24,32 +24,51 @@ import {
 // GET /organizations
 
 export async function getOrganizations(): Promise<
-  ApiResponse<{ organizations: OrganizationResponse[] } | null>
+  ApiResponse<{ organizations: Organization[] }>
 > {
   try {
-    return await apiClient<
-      ApiResponse<{ organizations: OrganizationResponse[] }>
-    >("/organizations", {
-      method: "GET",
-    });
+    return await apiClient<ApiResponse<{ organizations: Organization[] }>>(
+      "/organizations",
+      {
+        method: "GET",
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
 }
 
 // Get Organization
-// GET /organizations/:id
+// GET /organizations/:organizationId
 
 export async function getOrganization(
-  id: string,
-): Promise<ApiResponse<{ organization: OrganizationResponse } | null>> {
+  organizationId: string,
+): Promise<ApiResponse<{ organization: Organization }>> {
   try {
-    if (!id.trim()) {
+    if (!organizationId.trim()) {
       return errorResponse("Organization ID is required");
     }
 
-    return await apiClient<ApiResponse<{ organization: OrganizationResponse }>>(
-      `/organizations/${id}`,
+    return await apiClient<ApiResponse<{ organization: Organization }>>(
+      `/organizations/${organizationId}`,
+      {
+        method: "GET",
+      },
+    );
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Get My Organizations
+// GET /organizations/my
+
+export async function getMyOrganizations(): Promise<
+  ApiResponse<{ organizations: Organization[] }>
+> {
+  try {
+    return await apiClient<ApiResponse<{ organizations: Organization[] }>>(
+      "/organizations/my",
       {
         method: "GET",
       },
@@ -64,7 +83,7 @@ export async function getOrganization(
 
 export async function createOrganization(
   payload: CreateOrganizationInput,
-): Promise<ApiResponse<{ organization: OrganizationResponse } | null>> {
+): Promise<ApiResponse<{ organization: Organization }>> {
   try {
     const parse = CreateOrganizationSchema.safeParse(payload);
 
@@ -72,7 +91,7 @@ export async function createOrganization(
       return errorResponse(handleZodError(parse.error) || "Invalid input");
     }
 
-    return await apiClient<ApiResponse<{ organization: OrganizationResponse }>>(
+    return await apiClient<ApiResponse<{ organization: Organization }>>(
       "/organizations",
       {
         method: "POST",
@@ -85,14 +104,14 @@ export async function createOrganization(
 }
 
 // Update Organization
-// PATCH /organizations/:id
+// PATCH /organizations/:organizationId
 
 export async function updateOrganization(
-  id: string,
+  organizationId: string,
   payload: UpdateOrganizationInput,
-): Promise<ApiResponse<{ organization: OrganizationResponse } | null>> {
+): Promise<ApiResponse<{ organization: Organization }>> {
   try {
-    if (!id.trim()) {
+    if (!organizationId.trim()) {
       return errorResponse("Organization ID is required");
     }
 
@@ -102,8 +121,8 @@ export async function updateOrganization(
       return errorResponse(handleZodError(parse.error) || "Invalid input");
     }
 
-    return await apiClient<ApiResponse<{ organization: OrganizationResponse }>>(
-      `/organizations/${id}`,
+    return await apiClient<ApiResponse<{ organization: Organization }>>(
+      `/organizations/${organizationId}`,
       {
         method: "PATCH",
         body: parse.data,
@@ -115,14 +134,14 @@ export async function updateOrganization(
 }
 
 // Update Organization Status
-// PATCH /organizations/:id/status
+// PATCH /organizations/:organizationId/status
 
 export async function updateOrganizationStatus(
-  id: string,
+  organizationId: string,
   payload: UpdateOrganizationStatusInput,
-): Promise<ApiResponse<{ organization: OrganizationResponse } | null>> {
+): Promise<ApiResponse<{ organization: Organization }>> {
   try {
-    if (!id.trim()) {
+    if (!organizationId.trim()) {
       return errorResponse("Organization ID is required");
     }
 
@@ -132,8 +151,8 @@ export async function updateOrganizationStatus(
       return errorResponse(handleZodError(parse.error) || "Invalid input");
     }
 
-    return await apiClient<ApiResponse<{ organization: OrganizationResponse }>>(
-      `/organizations/${id}/status`,
+    return await apiClient<ApiResponse<{ organization: Organization }>>(
+      `/organizations/${organizationId}/status`,
       {
         method: "PATCH",
         body: parse.data,
@@ -145,37 +164,40 @@ export async function updateOrganizationStatus(
 }
 
 // Delete Organization
-// DELETE /organizations/:id
+// DELETE /organizations/:organizationId
 
 export async function deleteOrganization(
-  id: string,
+  organizationId: string,
 ): Promise<ApiResponse<null>> {
   try {
-    if (!id.trim()) {
+    if (!organizationId.trim()) {
       return errorResponse("Organization ID is required");
     }
 
-    return await apiClient<ApiResponse<null>>(`/organizations/${id}`, {
-      method: "DELETE",
-    });
+    return await apiClient<ApiResponse<null>>(
+      `/organizations/${organizationId}`,
+      {
+        method: "DELETE",
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
 }
 
 // Get Organization Members
-// GET /organizations/:id/members
+// GET /organizations/:organizationId/members
 
 export async function getOrganizationMembers(
-  id: string,
-): Promise<ApiResponse<{ members: unknown[] } | null>> {
+  organizationId: string,
+): Promise<ApiResponse<{ members: OrganizationMember[] }>> {
   try {
-    if (!id.trim()) {
+    if (!organizationId.trim()) {
       return errorResponse("Organization ID is required");
     }
 
-    return await apiClient<ApiResponse<{ members: unknown[] }>>(
-      `/organizations/${id}/members`,
+    return await apiClient<ApiResponse<{ members: OrganizationMember[] }>>(
+      `/organizations/${organizationId}/members`,
       {
         method: "GET",
       },
@@ -186,14 +208,14 @@ export async function getOrganizationMembers(
 }
 
 // Add Organization Member
-// POST /organizations/:id/members
+// POST /organizations/:organizationId/members
 
 export async function addOrganizationMember(
-  id: string,
+  organizationId: string,
   payload: AddOrganizationMemberInput,
-): Promise<ApiResponse<null>> {
+): Promise<ApiResponse<{ member: OrganizationMember }>> {
   try {
-    if (!id.trim()) {
+    if (!organizationId.trim()) {
       return errorResponse("Organization ID is required");
     }
 
@@ -203,29 +225,32 @@ export async function addOrganizationMember(
       return errorResponse(handleZodError(parse.error) || "Invalid input");
     }
 
-    return await apiClient<ApiResponse<null>>(`/organizations/${id}/members`, {
-      method: "POST",
-      body: parse.data,
-    });
+    return await apiClient<ApiResponse<{ member: OrganizationMember }>>(
+      `/organizations/${organizationId}/members`,
+      {
+        method: "POST",
+        body: parse.data,
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
 }
 
 // Update Organization Member
-// PATCH /organizations/:id/members/:userId
+// PATCH /organizations/:organizationId/members/:memberUserId
 
 export async function updateOrganizationMember(
-  id: string,
-  userId: string,
+  organizationId: string,
+  memberUserId: string,
   payload: UpdateOrganizationMemberInput,
-): Promise<ApiResponse<null>> {
+): Promise<ApiResponse<{ member: OrganizationMember }>> {
   try {
-    if (!id.trim()) {
+    if (!organizationId.trim()) {
       return errorResponse("Organization ID is required");
     }
 
-    if (!userId.trim()) {
+    if (!memberUserId.trim()) {
       return errorResponse("User ID is required");
     }
 
@@ -235,8 +260,8 @@ export async function updateOrganizationMember(
       return errorResponse(handleZodError(parse.error) || "Invalid input");
     }
 
-    return await apiClient<ApiResponse<null>>(
-      `/organizations/${id}/members/${userId}`,
+    return await apiClient<ApiResponse<{ member: OrganizationMember }>>(
+      `/organizations/${organizationId}/members/${memberUserId}`,
       {
         method: "PATCH",
         body: parse.data,
@@ -248,23 +273,23 @@ export async function updateOrganizationMember(
 }
 
 // Remove Organization Member
-// DELETE /organizations/:id/members/:userId
+// DELETE /organizations/:organizationId/members/:memberUserId
 
 export async function removeOrganizationMember(
-  id: string,
-  userId: string,
+  organizationId: string,
+  memberUserId: string,
 ): Promise<ApiResponse<null>> {
   try {
-    if (!id.trim()) {
+    if (!organizationId.trim()) {
       return errorResponse("Organization ID is required");
     }
 
-    if (!userId.trim()) {
+    if (!memberUserId.trim()) {
       return errorResponse("User ID is required");
     }
 
     return await apiClient<ApiResponse<null>>(
-      `/organizations/${id}/members/${userId}`,
+      `/organizations/${organizationId}/members/${memberUserId}`,
       {
         method: "DELETE",
       },

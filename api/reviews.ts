@@ -1,21 +1,24 @@
 import apiClient from "@/lib/api.client";
+
 import { ApiResponse } from "@/types/api.response";
+import { Review } from "@/types/review";
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
 import {
   CreateReviewInput,
   CreateReviewSchema,
-  ReviewResponse,
   UpdateReviewInput,
   UpdateReviewSchema,
   UpdateReviewStatusInput,
   UpdateReviewStatusSchema,
 } from "@/validators/review.validator";
 
-export async function getReviews(): Promise<ApiResponse<ReviewResponse[]>> {
+export async function getMyReviews(): Promise<
+  ApiResponse<{ reviews: Review[] }>
+> {
   try {
-    return await apiClient<ApiResponse<ReviewResponse[]>>("/reviews", {
+    return await apiClient<ApiResponse<{ reviews: Review[] }>>("/reviews", {
       method: "GET",
     });
   } catch (error) {
@@ -23,17 +26,58 @@ export async function getReviews(): Promise<ApiResponse<ReviewResponse[]>> {
   }
 }
 
-export async function getReview(
-  id: string,
-): Promise<ApiResponse<ReviewResponse>> {
+export async function getReviewsForUser(
+  userId: string,
+): Promise<ApiResponse<{ reviews: Review[] }>> {
   try {
-    if (!id.trim()) {
+    if (!userId.trim()) {
+      return errorResponse("User ID is required");
+    }
+
+    return await apiClient<ApiResponse<{ reviews: Review[] }>>(
+      `/reviews/user/${userId}`,
+      {
+        method: "GET",
+      },
+    );
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+export async function getReviewsForOrganization(
+  organizationId: string,
+): Promise<ApiResponse<{ reviews: Review[] }>> {
+  try {
+    if (!organizationId.trim()) {
+      return errorResponse("Organization ID is required");
+    }
+
+    return await apiClient<ApiResponse<{ reviews: Review[] }>>(
+      `/reviews/organization/${organizationId}`,
+      {
+        method: "GET",
+      },
+    );
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+export async function getReview(
+  reviewId: string,
+): Promise<ApiResponse<{ review: Review }>> {
+  try {
+    if (!reviewId.trim()) {
       return errorResponse("Review ID is required");
     }
 
-    return await apiClient<ApiResponse<ReviewResponse>>(`/reviews/${id}`, {
-      method: "GET",
-    });
+    return await apiClient<ApiResponse<{ review: Review }>>(
+      `/reviews/${reviewId}`,
+      {
+        method: "GET",
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
@@ -41,7 +85,7 @@ export async function getReview(
 
 export async function createReview(
   payload: CreateReviewInput,
-): Promise<ApiResponse<ReviewResponse>> {
+): Promise<ApiResponse<{ review: Review }>> {
   try {
     const parse = CreateReviewSchema.safeParse(payload);
 
@@ -51,7 +95,7 @@ export async function createReview(
       );
     }
 
-    return await apiClient<ApiResponse<ReviewResponse>>("/reviews", {
+    return await apiClient<ApiResponse<{ review: Review }>>("/reviews", {
       method: "POST",
       body: parse.data,
     });
@@ -61,11 +105,11 @@ export async function createReview(
 }
 
 export async function updateReview(
-  id: string,
+  reviewId: string,
   payload: UpdateReviewInput,
-): Promise<ApiResponse<ReviewResponse>> {
+): Promise<ApiResponse<{ review: Review }>> {
   try {
-    if (!id.trim()) {
+    if (!reviewId.trim()) {
       return errorResponse("Review ID is required");
     }
 
@@ -77,21 +121,24 @@ export async function updateReview(
       );
     }
 
-    return await apiClient<ApiResponse<ReviewResponse>>(`/reviews/${id}`, {
-      method: "PATCH",
-      body: parse.data,
-    });
+    return await apiClient<ApiResponse<{ review: Review }>>(
+      `/reviews/${reviewId}`,
+      {
+        method: "PATCH",
+        body: parse.data,
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
 }
 
 export async function updateReviewStatus(
-  id: string,
+  reviewId: string,
   payload: UpdateReviewStatusInput,
-): Promise<ApiResponse<ReviewResponse>> {
+): Promise<ApiResponse<{ review: Review }>> {
   try {
-    if (!id.trim()) {
+    if (!reviewId.trim()) {
       return errorResponse("Review ID is required");
     }
 
@@ -103,8 +150,8 @@ export async function updateReviewStatus(
       );
     }
 
-    return await apiClient<ApiResponse<ReviewResponse>>(
-      `/reviews/${id}/status`,
+    return await apiClient<ApiResponse<{ review: Review }>>(
+      `/reviews/${reviewId}/status`,
       {
         method: "PATCH",
         body: parse.data,
@@ -115,13 +162,15 @@ export async function updateReviewStatus(
   }
 }
 
-export async function deleteReview(id: string): Promise<ApiResponse<null>> {
+export async function deleteReview(
+  reviewId: string,
+): Promise<ApiResponse<null>> {
   try {
-    if (!id.trim()) {
+    if (!reviewId.trim()) {
       return errorResponse("Review ID is required");
     }
 
-    return await apiClient<ApiResponse<null>>(`/reviews/${id}`, {
+    return await apiClient<ApiResponse<null>>(`/reviews/${reviewId}`, {
       method: "DELETE",
     });
   } catch (error) {

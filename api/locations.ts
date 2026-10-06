@@ -1,7 +1,7 @@
 import apiClient from "@/lib/api.client";
 
 import { ApiResponse } from "@/types/api.response";
-
+import { Location } from "@/types/location";
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
@@ -13,21 +13,15 @@ import {
   LocationUpdateSchema,
 } from "@/validators/location.validator";
 
-export type LocationResponse = LocationCreateInput & {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-};
+// Get My Location
+// GET /locations/me
 
-// Get Locations
-// GET /locations
-
-export async function getLocations(): Promise<
-  ApiResponse<{ locations: LocationResponse[] } | null>
+export async function getMyLocation(): Promise<
+  ApiResponse<{ location: Location }>
 > {
   try {
-    return await apiClient<ApiResponse<{ locations: LocationResponse[] }>>(
-      "/locations",
+    return await apiClient<ApiResponse<{ location: Location }>>(
+      "/locations/me",
       {
         method: "GET",
       },
@@ -38,18 +32,18 @@ export async function getLocations(): Promise<
 }
 
 // Get Location
-// GET /locations/:id
+// GET /locations/:locationId
 
 export async function getLocation(
-  id: string,
-): Promise<ApiResponse<{ location: LocationResponse } | null>> {
+  locationId: string,
+): Promise<ApiResponse<{ location: Location }>> {
   try {
-    if (!id.trim()) {
+    if (!locationId.trim()) {
       return errorResponse("Location ID is required");
     }
 
-    return await apiClient<ApiResponse<{ location: LocationResponse }>>(
-      `/locations/${id}`,
+    return await apiClient<ApiResponse<{ location: Location }>>(
+      `/locations/${locationId}`,
       {
         method: "GET",
       },
@@ -64,7 +58,7 @@ export async function getLocation(
 
 export async function createLocation(
   payload: LocationCreateInput,
-): Promise<ApiResponse<{ location: LocationResponse } | null>> {
+): Promise<ApiResponse<{ location: Location }>> {
   try {
     const parse = LocationCreateSchema.safeParse(payload);
 
@@ -72,38 +66,30 @@ export async function createLocation(
       return errorResponse(handleZodError(parse.error) || "Invalid input");
     }
 
-    return await apiClient<ApiResponse<{ location: LocationResponse }>>(
-      "/locations",
-      {
-        method: "POST",
-        body: parse.data,
-      },
-    );
+    return await apiClient<ApiResponse<{ location: Location }>>("/locations", {
+      method: "POST",
+      body: parse.data,
+    });
   } catch (error) {
     return handleApiError(error);
   }
 }
 
-// Update Location
-// PATCH /locations/:id
+// Update My Location
+// PATCH /locations/me
 
-export async function updateLocation(
-  id: string,
+export async function updateMyLocation(
   payload: LocationUpdateInput,
-): Promise<ApiResponse<{ location: LocationResponse } | null>> {
+): Promise<ApiResponse<{ location: Location }>> {
   try {
-    if (!id.trim()) {
-      return errorResponse("Location ID is required");
-    }
-
     const parse = LocationUpdateSchema.safeParse(payload);
 
     if (!parse.success) {
       return errorResponse(handleZodError(parse.error) || "Invalid input");
     }
 
-    return await apiClient<ApiResponse<{ location: LocationResponse }>>(
-      `/locations/${id}`,
+    return await apiClient<ApiResponse<{ location: Location }>>(
+      "/locations/me",
       {
         method: "PATCH",
         body: parse.data,
@@ -114,16 +100,31 @@ export async function updateLocation(
   }
 }
 
-// Delete Location
-// DELETE /locations/:id
+// Delete My Location
+// DELETE /locations/me
 
-export async function deleteLocation(id: string): Promise<ApiResponse<null>> {
+export async function deleteMyLocation(): Promise<ApiResponse<null>> {
   try {
-    if (!id.trim()) {
+    return await apiClient<ApiResponse<null>>("/locations/me", {
+      method: "DELETE",
+    });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Delete Location By ID
+// DELETE /locations/:locationId
+
+export async function deleteLocation(
+  locationId: string,
+): Promise<ApiResponse<null>> {
+  try {
+    if (!locationId.trim()) {
       return errorResponse("Location ID is required");
     }
 
-    return await apiClient<ApiResponse<null>>(`/locations/${id}`, {
+    return await apiClient<ApiResponse<null>>(`/locations/${locationId}`, {
       method: "DELETE",
     });
   } catch (error) {

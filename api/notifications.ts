@@ -1,19 +1,18 @@
 import apiClient from "@/lib/api.client";
+
 import { ApiResponse } from "@/types/api.response";
+import { Notification } from "@/types/notification";
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
-import { handleZodError } from "@/utils/zod.error";
-import {
-  CreateNotificationInput,
-  CreateNotificationSchema,
-  NotificationResponse,
-} from "@/validators/notification.validator";
+
+// Get My Notifications
+// GET /notifications
 
 export async function getNotifications(): Promise<
-  ApiResponse<NotificationResponse[]>
+  ApiResponse<{ notifications: Notification[] }>
 > {
   try {
-    return await apiClient<ApiResponse<NotificationResponse[]>>(
+    return await apiClient<ApiResponse<{ notifications: Notification[] }>>(
       "/notifications",
       {
         method: "GET",
@@ -24,16 +23,15 @@ export async function getNotifications(): Promise<
   }
 }
 
-export async function getNotification(
-  id: string,
-): Promise<ApiResponse<NotificationResponse>> {
-  try {
-    if (!id.trim()) {
-      return errorResponse("Notification ID is required");
-    }
+// Get Unread Notifications
+// GET /notifications/unread
 
-    return await apiClient<ApiResponse<NotificationResponse>>(
-      `/notifications/${id}`,
+export async function getUnreadNotifications(): Promise<
+  ApiResponse<{ notifications: Notification[] }>
+> {
+  try {
+    return await apiClient<ApiResponse<{ notifications: Notification[] }>>(
+      "/notifications/unread",
       {
         method: "GET",
       },
@@ -43,40 +41,37 @@ export async function getNotification(
   }
 }
 
-export async function createNotification(
-  payload: CreateNotificationInput,
-): Promise<ApiResponse<NotificationResponse>> {
+// Get Unread Notification Count
+// GET /notifications/unread/count
+
+export async function getUnreadNotificationCount(): Promise<
+  ApiResponse<{ count: number }>
+> {
   try {
-    const parse = CreateNotificationSchema.safeParse(payload);
-
-    if (!parse.success) {
-      return errorResponse(
-        handleZodError(parse.error) || "Invalid notification input",
-      );
-    }
-
-    return await apiClient<ApiResponse<NotificationResponse>>(
-      "/notifications",
+    return await apiClient<ApiResponse<{ count: number }>>(
+      "/notifications/unread/count",
       {
-        method: "POST",
-        body: parse.data,
+        method: "GET",
       },
     );
   } catch (error) {
     return handleApiError(error);
   }
 }
+
+// Mark Notification As Read
+// PATCH /notifications/:notificationId/read
 
 export async function markNotificationAsRead(
-  id: string,
-): Promise<ApiResponse<NotificationResponse>> {
+  notificationId: string,
+): Promise<ApiResponse<{ notification: Notification }>> {
   try {
-    if (!id.trim()) {
+    if (!notificationId.trim()) {
       return errorResponse("Notification ID is required");
     }
 
-    return await apiClient<ApiResponse<NotificationResponse>>(
-      `/notifications/${id}/read`,
+    return await apiClient<ApiResponse<{ notification: Notification }>>(
+      `/notifications/${notificationId}/read`,
       {
         method: "PATCH",
       },
@@ -86,17 +81,49 @@ export async function markNotificationAsRead(
   }
 }
 
+// Mark All Notifications As Read
+// PATCH /notifications/read-all
+
+export async function markAllNotificationsAsRead(): Promise<ApiResponse<null>> {
+  try {
+    return await apiClient<ApiResponse<null>>("/notifications/read-all", {
+      method: "PATCH",
+    });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Delete Read Notifications
+// DELETE /notifications/read
+
+export async function deleteReadNotifications(): Promise<ApiResponse<null>> {
+  try {
+    return await apiClient<ApiResponse<null>>("/notifications/read", {
+      method: "DELETE",
+    });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Delete Notification
+// DELETE /notifications/:notificationId
+
 export async function deleteNotification(
-  id: string,
+  notificationId: string,
 ): Promise<ApiResponse<null>> {
   try {
-    if (!id.trim()) {
+    if (!notificationId.trim()) {
       return errorResponse("Notification ID is required");
     }
 
-    return await apiClient<ApiResponse<null>>(`/notifications/${id}`, {
-      method: "DELETE",
-    });
+    return await apiClient<ApiResponse<null>>(
+      `/notifications/${notificationId}`,
+      {
+        method: "DELETE",
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
