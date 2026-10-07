@@ -10,7 +10,7 @@ import {
   getUsers,
   unbanUser,
   updateMe,
-} from "@/api/user";
+} from "@/lib/actions/user";
 
 import type {
   AdminUpdateUserInput,

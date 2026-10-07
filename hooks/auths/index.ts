@@ -13,7 +13,7 @@ import {
   verifyEmail,
   verifyPassword,
   verifyPasswordReset,
-} from "@/api/auths";
+} from "@/lib/actions/auths";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const authKeys = {

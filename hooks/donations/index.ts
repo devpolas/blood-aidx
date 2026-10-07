@@ -5,7 +5,7 @@ import {
   getDonations,
   getMyDonations,
   verifyDonation,
-} from "@/api/donations";
+} from "@/lib/actions/donations";
 
 import type {
   DonationQueryInput,

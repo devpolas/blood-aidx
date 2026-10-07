@@ -6,7 +6,7 @@ import {
   getUnreadNotifications,
   markAllNotificationsAsRead,
   markNotificationAsRead,
-} from "@/api/notifications";
+} from "@/lib/actions/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const notificationKeys = {

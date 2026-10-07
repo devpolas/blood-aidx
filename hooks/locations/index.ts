@@ -5,7 +5,7 @@ import {
   getLocation,
   getMyLocation,
   updateMyLocation,
-} from "@/api/locations";
+} from "@/lib/actions/locations";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 

@@ -10,7 +10,7 @@ import {
   updateOrganization,
   updateOrganizationMember,
   updateOrganizationStatus,
-} from "@/api/organizations";
+} from "@/lib/actions/organizations";
 
 import type {
   AddOrganizationMemberInput,

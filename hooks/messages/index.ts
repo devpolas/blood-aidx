@@ -8,7 +8,7 @@ import {
   markMessageAsRead,
   moderateDeleteMessage,
   updateMessage,
-} from "@/api/messages";
+} from "@/lib/actions/messages";
 import type { UpdateMessageInput } from "@/validators/message.validator";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 

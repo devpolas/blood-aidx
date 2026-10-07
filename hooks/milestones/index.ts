@@ -6,7 +6,7 @@ import {
   getMyMilestones,
   getUserMilestones,
   updateMilestone,
-} from "@/api/milestones";
+} from "@/lib/actions/milestones";
 
 import type {
   CreateMilestoneInput,

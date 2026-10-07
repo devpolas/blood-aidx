@@ -5,7 +5,7 @@ import {
   getProfile,
   updateMyProfile,
   updateProfile,
-} from "@/api/profiles";
+} from "@/lib/actions/profiles";
 import type { UpdateProfileInput } from "@/validators/profile.validator";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 

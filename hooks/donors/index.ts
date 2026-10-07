@@ -6,7 +6,7 @@ import {
   getMyDonorProfile,
   updateDonor,
   updateMyDonorProfile,
-} from "@/api/donors";
+} from "@/lib/actions/donors";
 
 import type {
   DonorQueryInput,

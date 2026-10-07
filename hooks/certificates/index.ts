@@ -2,7 +2,7 @@ import {
   getCertificate,
   getCertificates,
   verifyCertificate,
-} from "@/api/certificates";
+} from "@/lib/actions/certificates";
 import { useQuery } from "@tanstack/react-query";
 
 export const certificateKeys = {

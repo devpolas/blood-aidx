@@ -5,7 +5,7 @@ import {
   getPayment,
   getPaymentForAdmin,
   refundPayment,
-} from "@/api/payments";
+} from "@/lib/actions/payments";
 
 import type {
   PaymentQueryInput,

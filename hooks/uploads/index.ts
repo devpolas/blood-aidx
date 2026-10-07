@@ -1,4 +1,4 @@
-import { deleteFile, uploadFile } from "@/api/uploads";
+import { deleteFile, uploadFile } from "@/lib/actions/uploads";
 import { useMutation } from "@tanstack/react-query";
 
 // Upload File

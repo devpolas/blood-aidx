@@ -5,7 +5,7 @@ import {
   getConversations,
   leaveConversation,
   removeConversationParticipant,
-} from "@/api/conversations";
+} from "@/lib/actions/conversations";
 import type { AddParticipantInput } from "@/validators/conversation.validator";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 

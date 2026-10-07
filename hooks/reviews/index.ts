@@ -7,7 +7,7 @@ import {
   getReviewsForUser,
   updateReview,
   updateReviewStatus,
-} from "@/api/reviews";
+} from "@/lib/actions/reviews";
 
 import type {
   CreateReviewInput,

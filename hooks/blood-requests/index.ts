@@ -7,7 +7,7 @@ import {
   getMyBloodRequests,
   updateBloodRequest,
   updateBloodRequestStatus,
-} from "@/api/blood.requests";
+} from "@/lib/actions/blood.requests";
 
 import type {
   BloodRequestQueryInput,

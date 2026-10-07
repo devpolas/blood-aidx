@@ -5,7 +5,7 @@ import {
   getReport,
   getReports,
   updateReportStatus,
-} from "@/api/reports";
+} from "@/lib/actions/reports";
 
 import type {
   ReportQueryInput,
