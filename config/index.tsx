@@ -69,7 +69,7 @@ export interface DashboardSidebar {
   navSecondary: SidebarItem[];
 }
 
-const commonSecondary = (dashboardPath: string): SidebarItem[] => [
+const commonSecondary = (): SidebarItem[] => [
   {
     title: "Home",
     url: "/",
@@ -77,12 +77,12 @@ const commonSecondary = (dashboardPath: string): SidebarItem[] => [
   },
   {
     title: "Profile",
-    url: `${dashboardPath}/profile`,
+    url: "/dashboard/profile",
     icon: <User />,
   },
   {
     title: "Settings",
-    url: `${dashboardPath}/settings`,
+    url: "/dashboard/settings",
     icon: <Settings />,
   },
   {
@@ -156,7 +156,7 @@ const userDashboard: DashboardSidebar = {
     },
   ],
 
-  navSecondary: commonSecondary("/dashboard/user"),
+  navSecondary: commonSecondary(),
 };
 
 const moderatorDashboard: DashboardSidebar = {
@@ -208,7 +208,7 @@ const moderatorDashboard: DashboardSidebar = {
     },
   ],
 
-  navSecondary: commonSecondary("/dashboard/moderator"),
+  navSecondary: commonSecondary(),
 };
 
 const adminDashboard: DashboardSidebar = {
@@ -271,7 +271,7 @@ const adminDashboard: DashboardSidebar = {
     },
   ],
 
-  navSecondary: commonSecondary("/dashboard/admin"),
+  navSecondary: commonSecondary(),
 };
 
 export const dashboardMenu: Record<UserRole, DashboardSidebar> = {

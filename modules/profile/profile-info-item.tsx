@@ -1,0 +1,33 @@
+import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
+
+import { cn } from "@/lib/utils";
+import { Large, Small } from "@/components/typography/typography";
+
+interface ProfileInfoItemProps {
+  icon: LucideIcon;
+  label: string;
+  value: ReactNode;
+  className?: string;
+}
+
+export function ProfileInfoItem({
+  icon: Icon,
+  label,
+  value,
+  className,
+}: ProfileInfoItemProps) {
+  return (
+    <div className={cn("flex gap-3 min-w-0", className)}>
+      <div className='flex justify-center items-center bg-brand/10 mt-0.5 rounded-lg size-9 text-brand shrink-0'>
+        <Icon className='size-4' />
+      </div>
+
+      <div className='flex-1 min-w-0'>
+        <Small>{label}</Small>
+
+        <Large className='mt-1 warp-break-words'>{value}</Large>
+      </div>
+    </div>
+  );
+}
