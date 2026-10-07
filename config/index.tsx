@@ -285,3 +285,32 @@ export function getDashboardMenu(
 ): DashboardSidebar {
   return dashboardMenu[role];
 }
+
+export const BLOOD_GROUP_OPTIONS = [
+  { label: "A+", value: "a_positive" },
+  { label: "A−", value: "a_negative" },
+  { label: "B+", value: "b_positive" },
+  { label: "B−", value: "b_negative" },
+  { label: "AB+", value: "ab_positive" },
+  { label: "AB−", value: "ab_negative" },
+  { label: "O+", value: "o_positive" },
+  { label: "O−", value: "o_negative" },
+] as const;
+
+export const AVAILABILITY_OPTIONS = [
+  {
+    label: "Available",
+    value: "available",
+    description: "I'm currently available to donate blood.",
+  },
+  {
+    label: "Temporarily unavailable",
+    value: "temporarily_unavailable",
+    description: "I'm temporarily unable to donate.",
+  },
+  {
+    label: "Unavailable",
+    value: "unavailable",
+    description: "I'm currently not available to donate.",
+  },
+] as const;

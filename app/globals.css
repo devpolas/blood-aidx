@@ -251,8 +251,17 @@
 }
 
 @layer utilities {
-  /* Glass */
+  /* Scrollbar */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Glass */
   .glass {
     @apply border border-brand/15
       bg-brand/5
@@ -278,7 +287,6 @@
   }
 
   /* Brand Gradient */
-
   .brand-gradient {
     background:
       radial-gradient(circle at top left, var(--brand) 0%, transparent 42%),
@@ -290,7 +298,6 @@
   }
 
   /* Global Backdrop */
-
   .brand-backdrop {
     @apply -z-10 fixed inset-0 pointer-events-none;
 

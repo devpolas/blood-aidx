@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import { Shimmer } from "@/components/shared/loading/loading";
 import { APP_NAME, LOGO } from "@/constraints";
+import { HeartPulse } from "lucide-react";
 
 export default function Loading() {
   return (
@@ -33,7 +34,10 @@ export default function Loading() {
         </div>
 
         <Shimmer className='mt-1 text-muted-foreground text-sm'>
-          Preparing your experience...
+          <div className='flex items-center gap-2 text-muted-foreground text-sm'>
+            <HeartPulse className='size-4 text-brand animate-pulse' />
+            Preparing your Blood AidX experiences...
+          </div>
         </Shimmer>
       </div>
     </main>
