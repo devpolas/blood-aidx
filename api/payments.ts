@@ -5,12 +5,11 @@ import { Payment } from "@/types/payment";
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
-
 import {
-  createCoffeePaymentSchema,
   CreateCoffeePaymentInput,
-  refundPaymentSchema,
+  CreateCoffeePaymentSchema,
   RefundPaymentInput,
+  RefundPaymentSchema,
 } from "@/validators/payment.validator";
 
 // Create Coffee Payment
@@ -20,7 +19,7 @@ export async function createCoffeePayment(
   payload: CreateCoffeePaymentInput,
 ): Promise<ApiResponse<{ payment: Payment }>> {
   try {
-    const parse = createCoffeePaymentSchema.safeParse(payload);
+    const parse = CreateCoffeePaymentSchema.safeParse(payload);
 
     if (!parse.success) {
       return errorResponse(
@@ -136,7 +135,7 @@ export async function refundPayment(
       return errorResponse("Payment ID is required");
     }
 
-    const parse = refundPaymentSchema.safeParse(payload);
+    const parse = RefundPaymentSchema.safeParse(payload);
 
     if (!parse.success) {
       return errorResponse(
