@@ -8,14 +8,12 @@ import {
   updateReview,
   updateReviewStatus,
 } from "@/api/reviews";
-
 import type {
   CreateReviewInput,
   UpdateReviewInput,
   UpdateReviewStatusInput,
 } from "@/validators/review.validator";
-
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const reviewKeys = {
   all: ["reviews"] as const,
@@ -64,40 +62,77 @@ export function useReview(reviewId: string) {
 
 // Create Review
 export function useCreateReview() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (payload: CreateReviewInput) => createReview(payload),
+    mutationFn: createReview,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: reviewKeys.me(),
+      });
+    },
   });
 }
+
+type UpdateReviewVariables = {
+  reviewId: string;
+  payload: UpdateReviewInput;
+};
 
 // Update Review
 export function useUpdateReview() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      reviewId,
-      payload,
-    }: {
-      reviewId: string;
-      payload: UpdateReviewInput;
-    }) => updateReview(reviewId, payload),
+    mutationFn: ({ reviewId, payload }: UpdateReviewVariables) =>
+      updateReview(reviewId, payload),
+    onSuccess: (_, { reviewId }) => {
+      queryClient.invalidateQueries({
+        queryKey: reviewKeys.detail(reviewId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: reviewKeys.me(),
+      });
+    },
   });
 }
 
+type UpdateReviewStatusVariables = {
+  reviewId: string;
+  payload: UpdateReviewStatusInput;
+};
+
 // Update Review Status
 export function useUpdateReviewStatus() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      reviewId,
-      payload,
-    }: {
-      reviewId: string;
-      payload: UpdateReviewStatusInput;
-    }) => updateReviewStatus(reviewId, payload),
+    mutationFn: ({ reviewId, payload }: UpdateReviewStatusVariables) =>
+      updateReviewStatus(reviewId, payload),
+    onSuccess: (_, { reviewId }) => {
+      queryClient.invalidateQueries({
+        queryKey: reviewKeys.detail(reviewId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: reviewKeys.me(),
+      });
+    },
   });
 }
 
 // Delete Review
 export function useDeleteReview() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (reviewId: string) => deleteReview(reviewId),
+    mutationFn: deleteReview,
+    onSuccess: (_, reviewId) => {
+      queryClient.removeQueries({
+        queryKey: reviewKeys.detail(reviewId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: reviewKeys.me(),
+      });
+    },
   });
 }

@@ -6,13 +6,8 @@ import {
   leaveConversation,
   removeConversationParticipant,
 } from "@/api/conversations";
-
-import type {
-  AddParticipantInput,
-  CreateConversationInput,
-} from "@/validators/conversation.validator";
-
-import { useMutation, useQuery } from "@tanstack/react-query";
+import type { AddParticipantInput } from "@/validators/conversation.validator";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const conversationKeys = {
   all: ["conversations"] as const,
@@ -22,6 +17,7 @@ export const conversationKeys = {
 };
 
 // Conversations
+
 export function useConversations() {
   return useQuery({
     queryKey: conversationKeys.list(),
@@ -30,6 +26,7 @@ export function useConversations() {
 }
 
 // Conversation
+
 export function useConversation(conversationId: string) {
   return useQuery({
     queryKey: conversationKeys.detail(conversationId),
@@ -39,42 +36,91 @@ export function useConversation(conversationId: string) {
 }
 
 // Create Conversation
+
 export function useCreateConversation() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (payload: CreateConversationInput) =>
-      createConversation(payload),
+    mutationFn: createConversation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: conversationKeys.list(),
+      });
+    },
   });
 }
 
 // Add Conversation Participant
+
+type AddConversationParticipantVariables = {
+  conversationId: string;
+  payload: AddParticipantInput;
+};
+
 export function useAddConversationParticipant() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({
       conversationId,
       payload,
-    }: {
-      conversationId: string;
-      payload: AddParticipantInput;
-    }) => addConversationParticipant(conversationId, payload),
+    }: AddConversationParticipantVariables) =>
+      addConversationParticipant(conversationId, payload),
+    onSuccess: (_, { conversationId }) => {
+      queryClient.invalidateQueries({
+        queryKey: conversationKeys.detail(conversationId),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: conversationKeys.list(),
+      });
+    },
   });
 }
 
 // Remove Conversation Participant
+
+type RemoveConversationParticipantVariables = {
+  conversationId: string;
+  userId: string;
+};
+
 export function useRemoveConversationParticipant() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({
       conversationId,
       userId,
-    }: {
-      conversationId: string;
-      userId: string;
-    }) => removeConversationParticipant(conversationId, userId),
+    }: RemoveConversationParticipantVariables) =>
+      removeConversationParticipant(conversationId, userId),
+    onSuccess: (_, { conversationId }) => {
+      queryClient.invalidateQueries({
+        queryKey: conversationKeys.detail(conversationId),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: conversationKeys.list(),
+      });
+    },
   });
 }
 
 // Leave Conversation
+
 export function useLeaveConversation() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (conversationId: string) => leaveConversation(conversationId),
+    mutationFn: leaveConversation,
+    onSuccess: (_, conversationId) => {
+      queryClient.removeQueries({
+        queryKey: conversationKeys.detail(conversationId),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: conversationKeys.list(),
+      });
+    },
   });
 }

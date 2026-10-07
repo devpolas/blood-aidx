@@ -8,14 +8,11 @@ import {
   updateBloodRequest,
   updateBloodRequestStatus,
 } from "@/api/blood.requests";
-
 import type {
-  CreateBloodRequestInput,
   UpdateBloodRequestInput,
   UpdateBloodRequestStatusInput,
 } from "@/validators/blood.request.validator";
-
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const bloodRequestKeys = {
   all: ["blood-requests"] as const,
@@ -26,6 +23,7 @@ export const bloodRequestKeys = {
 };
 
 // Blood Requests
+
 export function useBloodRequests() {
   return useQuery({
     queryKey: bloodRequestKeys.list(),
@@ -34,6 +32,7 @@ export function useBloodRequests() {
 }
 
 // My Blood Requests
+
 export function useMyBloodRequests() {
   return useQuery({
     queryKey: bloodRequestKeys.me(),
@@ -42,6 +41,7 @@ export function useMyBloodRequests() {
 }
 
 // Blood Request
+
 export function useBloodRequest(requestId: string) {
   return useQuery({
     queryKey: bloodRequestKeys.detail(requestId),
@@ -51,49 +51,124 @@ export function useBloodRequest(requestId: string) {
 }
 
 // Create Blood Request
+
 export function useCreateBloodRequest() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (payload: CreateBloodRequestInput) =>
-      createBloodRequest(payload),
+    mutationFn: createBloodRequest,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: bloodRequestKeys.list(),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: bloodRequestKeys.me(),
+      });
+    },
   });
 }
 
 // Update Blood Request
+
+type UpdateBloodRequestVariables = {
+  requestId: string;
+  payload: UpdateBloodRequestInput;
+};
+
 export function useUpdateBloodRequest() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      requestId,
-      payload,
-    }: {
-      requestId: string;
-      payload: UpdateBloodRequestInput;
-    }) => updateBloodRequest(requestId, payload),
+    mutationFn: ({ requestId, payload }: UpdateBloodRequestVariables) =>
+      updateBloodRequest(requestId, payload),
+    onSuccess: (_, { requestId }) => {
+      queryClient.invalidateQueries({
+        queryKey: bloodRequestKeys.detail(requestId),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: bloodRequestKeys.list(),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: bloodRequestKeys.me(),
+      });
+    },
   });
 }
 
 // Update Blood Request Status
+
+type UpdateBloodRequestStatusVariables = {
+  requestId: string;
+  payload: UpdateBloodRequestStatusInput;
+};
+
 export function useUpdateBloodRequestStatus() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      requestId,
-      payload,
-    }: {
-      requestId: string;
-      payload: UpdateBloodRequestStatusInput;
-    }) => updateBloodRequestStatus(requestId, payload),
+    mutationFn: ({ requestId, payload }: UpdateBloodRequestStatusVariables) =>
+      updateBloodRequestStatus(requestId, payload),
+    onSuccess: (_, { requestId }) => {
+      queryClient.invalidateQueries({
+        queryKey: bloodRequestKeys.detail(requestId),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: bloodRequestKeys.list(),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: bloodRequestKeys.me(),
+      });
+    },
   });
 }
 
 // Cancel Blood Request
+
 export function useCancelBloodRequest() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (requestId: string) => cancelBloodRequest(requestId),
+    mutationFn: cancelBloodRequest,
+    onSuccess: (_, requestId) => {
+      queryClient.invalidateQueries({
+        queryKey: bloodRequestKeys.detail(requestId),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: bloodRequestKeys.list(),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: bloodRequestKeys.me(),
+      });
+    },
   });
 }
 
 // Delete Blood Request
+
 export function useDeleteBloodRequest() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (requestId: string) => deleteBloodRequest(requestId),
+    mutationFn: deleteBloodRequest,
+    onSuccess: (_, requestId) => {
+      queryClient.removeQueries({
+        queryKey: bloodRequestKeys.detail(requestId),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: bloodRequestKeys.list(),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: bloodRequestKeys.me(),
+      });
+    },
   });
 }

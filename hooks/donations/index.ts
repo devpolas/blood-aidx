@@ -6,13 +6,8 @@ import {
   getMyDonations,
   verifyDonation,
 } from "@/api/donations";
-
-import type {
-  CreateDonationInput,
-  UpdateDonationStatusInput,
-} from "@/validators/donation.validator";
-
-import { useMutation, useQuery } from "@tanstack/react-query";
+import type { UpdateDonationStatusInput } from "@/validators/donation.validator";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const donationKeys = {
   all: ["donations"] as const,
@@ -23,6 +18,7 @@ export const donationKeys = {
 };
 
 // My Donations
+
 export function useMyDonations() {
   return useQuery({
     queryKey: donationKeys.me(),
@@ -30,21 +26,8 @@ export function useMyDonations() {
   });
 }
 
-// Create Donation
-export function useCreateDonation() {
-  return useMutation({
-    mutationFn: (payload: CreateDonationInput) => createDonation(payload),
-  });
-}
-
-// Cancel Donation
-export function useCancelDonation() {
-  return useMutation({
-    mutationFn: (donationId: string) => cancelDonation(donationId),
-  });
-}
-
 // Donations
+
 export function useDonations() {
   return useQuery({
     queryKey: donationKeys.list(),
@@ -53,6 +36,7 @@ export function useDonations() {
 }
 
 // Donation
+
 export function useDonation(donationId: string) {
   return useQuery({
     queryKey: donationKeys.detail(donationId),
@@ -61,15 +45,73 @@ export function useDonation(donationId: string) {
   });
 }
 
-// Verify Donation
-export function useVerifyDonation() {
+// Create Donation
+
+export function useCreateDonation() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      donationId,
-      payload,
-    }: {
-      donationId: string;
-      payload: UpdateDonationStatusInput;
-    }) => verifyDonation(donationId, payload),
+    mutationFn: createDonation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: donationKeys.me(),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: donationKeys.list(),
+      });
+    },
+  });
+}
+
+// Cancel Donation
+
+export function useCancelDonation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: cancelDonation,
+    onSuccess: (_, donationId) => {
+      queryClient.invalidateQueries({
+        queryKey: donationKeys.detail(donationId),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: donationKeys.me(),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: donationKeys.list(),
+      });
+    },
+  });
+}
+
+// Verify Donation
+
+type VerifyDonationVariables = {
+  donationId: string;
+  payload: UpdateDonationStatusInput;
+};
+
+export function useVerifyDonation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ donationId, payload }: VerifyDonationVariables) =>
+      verifyDonation(donationId, payload),
+    onSuccess: (_, { donationId }) => {
+      queryClient.invalidateQueries({
+        queryKey: donationKeys.detail(donationId),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: donationKeys.me(),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: donationKeys.list(),
+      });
+    },
   });
 }

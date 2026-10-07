@@ -5,13 +5,11 @@ import {
   getReport,
   updateReportStatus,
 } from "@/api/reports";
-
 import type {
   CreateReportInput,
   UpdateReportStatusInput,
 } from "@/validators/report.validator";
-
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const reportKeys = {
   all: ["reports"] as const,
@@ -39,27 +37,54 @@ export function useReport(reportId: string) {
 
 // Create Report
 export function useCreateReport() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (payload: CreateReportInput) => createReport(payload),
+    mutationFn: createReport,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: reportKeys.me(),
+      });
+    },
   });
 }
 
+type UpdateReportStatusVariables = {
+  reportId: string;
+  payload: UpdateReportStatusInput;
+};
+
 // Update Report Status
 export function useUpdateReportStatus() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      reportId,
-      payload,
-    }: {
-      reportId: string;
-      payload: UpdateReportStatusInput;
-    }) => updateReportStatus(reportId, payload),
+    mutationFn: ({ reportId, payload }: UpdateReportStatusVariables) =>
+      updateReportStatus(reportId, payload),
+    onSuccess: (_, { reportId }) => {
+      queryClient.invalidateQueries({
+        queryKey: reportKeys.detail(reportId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: reportKeys.me(),
+      });
+    },
   });
 }
 
 // Delete Report
 export function useDeleteReport() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (reportId: string) => deleteReport(reportId),
+    mutationFn: deleteReport,
+    onSuccess: (_, reportId) => {
+      queryClient.removeQueries({
+        queryKey: reportKeys.detail(reportId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: reportKeys.me(),
+      });
+    },
   });
 }

@@ -7,13 +7,11 @@ import {
   getUserMilestones,
   updateMilestone,
 } from "@/api/milestones";
-
 import type {
   CreateMilestoneInput,
   UpdateMilestoneInput,
 } from "@/validators/milestone.validator";
-
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const milestoneKeys = {
   all: ["milestones"] as const,
@@ -60,27 +58,63 @@ export function useUserMilestones(userId: string) {
 
 // Create Milestone
 export function useCreateMilestone() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (payload: CreateMilestoneInput) => createMilestone(payload),
+    mutationFn: createMilestone,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: milestoneKeys.list(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: milestoneKeys.me(),
+      });
+    },
   });
 }
 
+type UpdateMilestoneVariables = {
+  milestoneId: string;
+  payload: UpdateMilestoneInput;
+};
+
 // Update Milestone
 export function useUpdateMilestone() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      milestoneId,
-      payload,
-    }: {
-      milestoneId: string;
-      payload: UpdateMilestoneInput;
-    }) => updateMilestone(milestoneId, payload),
+    mutationFn: ({ milestoneId, payload }: UpdateMilestoneVariables) =>
+      updateMilestone(milestoneId, payload),
+    onSuccess: (_, { milestoneId }) => {
+      queryClient.invalidateQueries({
+        queryKey: milestoneKeys.detail(milestoneId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: milestoneKeys.list(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: milestoneKeys.me(),
+      });
+    },
   });
 }
 
 // Delete Milestone
 export function useDeleteMilestone() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (milestoneId: string) => deleteMilestone(milestoneId),
+    mutationFn: deleteMilestone,
+    onSuccess: (_, milestoneId) => {
+      queryClient.removeQueries({
+        queryKey: milestoneKeys.detail(milestoneId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: milestoneKeys.list(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: milestoneKeys.me(),
+      });
+    },
   });
 }

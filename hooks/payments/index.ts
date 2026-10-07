@@ -6,13 +6,11 @@ import {
   getPaymentForAdmin,
   refundPayment,
 } from "@/api/payments";
-
 import type {
   CreateCoffeePaymentInput,
   RefundPaymentInput,
 } from "@/validators/payment.validator";
-
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const paymentKeys = {
   all: ["payments"] as const,
@@ -61,21 +59,40 @@ export function usePaymentForAdmin(paymentId: string) {
 
 // Create Coffee Payment
 export function useCreateCoffeePayment() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (payload: CreateCoffeePaymentInput) =>
-      createCoffeePayment(payload),
+    mutationFn: createCoffeePayment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: paymentKeys.me(),
+      });
+    },
   });
 }
 
+type RefundPaymentVariables = {
+  paymentId: string;
+  payload: RefundPaymentInput;
+};
+
 // Refund Payment
 export function useRefundPayment() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      paymentId,
-      payload,
-    }: {
-      paymentId: string;
-      payload: RefundPaymentInput;
-    }) => refundPayment(paymentId, payload),
+    mutationFn: ({ paymentId, payload }: RefundPaymentVariables) =>
+      refundPayment(paymentId, payload),
+    onSuccess: (_, { paymentId }) => {
+      queryClient.invalidateQueries({
+        queryKey: paymentKeys.detail(paymentId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: paymentKeys.adminDetail(paymentId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: paymentKeys.me(),
+      });
+    },
   });
 }

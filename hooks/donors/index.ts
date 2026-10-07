@@ -7,10 +7,8 @@ import {
   updateDonor,
   updateMyDonorProfile,
 } from "@/api/donors";
-
 import type { UpdateDonorProfileInput } from "@/validators/donor.validator";
-
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const donorKeys = {
   all: ["donors"] as const,
@@ -20,6 +18,7 @@ export const donorKeys = {
 };
 
 // My Donor Profile
+
 export function useMyDonorProfile() {
   return useQuery({
     queryKey: donorKeys.me(),
@@ -28,21 +27,45 @@ export function useMyDonorProfile() {
 }
 
 // Update My Donor Profile
+
 export function useUpdateMyDonorProfile() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (payload: UpdateDonorProfileInput) =>
-      updateMyDonorProfile(payload),
+    mutationFn: updateMyDonorProfile,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: donorKeys.me(),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: donorKeys.list(),
+      });
+    },
   });
 }
 
 // Delete My Donor Profile
+
 export function useDeleteMyDonorProfile() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: deleteMyDonorProfile,
+    onSuccess: () => {
+      queryClient.removeQueries({
+        queryKey: donorKeys.me(),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: donorKeys.list(),
+      });
+    },
   });
 }
 
 // Donors
+
 export function useDonors() {
   return useQuery({
     queryKey: donorKeys.list(),
@@ -51,6 +74,7 @@ export function useDonors() {
 }
 
 // Donor
+
 export function useDonor(donorId: string) {
   return useQuery({
     queryKey: donorKeys.detail(donorId),
@@ -60,21 +84,45 @@ export function useDonor(donorId: string) {
 }
 
 // Update Donor
+
+type UpdateDonorVariables = {
+  donorId: string;
+  payload: UpdateDonorProfileInput;
+};
+
 export function useUpdateDonor() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      donorId,
-      payload,
-    }: {
-      donorId: string;
-      payload: UpdateDonorProfileInput;
-    }) => updateDonor(donorId, payload),
+    mutationFn: ({ donorId, payload }: UpdateDonorVariables) =>
+      updateDonor(donorId, payload),
+    onSuccess: (_, { donorId }) => {
+      queryClient.invalidateQueries({
+        queryKey: donorKeys.detail(donorId),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: donorKeys.list(),
+      });
+    },
   });
 }
 
 // Delete Donor
+
 export function useDeleteDonor() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (donorId: string) => deleteDonor(donorId),
+    mutationFn: deleteDonor,
+    onSuccess: (_, donorId) => {
+      queryClient.removeQueries({
+        queryKey: donorKeys.detail(donorId),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: donorKeys.list(),
+      });
+    },
   });
 }

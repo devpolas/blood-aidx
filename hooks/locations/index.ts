@@ -7,12 +7,7 @@ import {
   updateMyLocation,
 } from "@/api/locations";
 
-import type {
-  LocationCreateInput,
-  LocationUpdateInput,
-} from "@/validators/location.validator";
-
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const locationKeys = {
   all: ["locations"] as const,
@@ -22,6 +17,7 @@ export const locationKeys = {
 };
 
 // My Location
+
 export function useMyLocation() {
   return useQuery({
     queryKey: locationKeys.me(),
@@ -30,6 +26,7 @@ export function useMyLocation() {
 }
 
 // Location
+
 export function useLocation(locationId: string) {
   return useQuery({
     queryKey: locationKeys.detail(locationId),
@@ -39,29 +36,61 @@ export function useLocation(locationId: string) {
 }
 
 // Create Location
+
 export function useCreateLocation() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (payload: LocationCreateInput) => createLocation(payload),
+    mutationFn: createLocation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: locationKeys.me(),
+      });
+    },
   });
 }
 
 // Update My Location
+
 export function useUpdateMyLocation() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (payload: LocationUpdateInput) => updateMyLocation(payload),
+    mutationFn: updateMyLocation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: locationKeys.me(),
+      });
+    },
   });
 }
 
 // Delete My Location
+
 export function useDeleteMyLocation() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: deleteMyLocation,
+    onSuccess: () => {
+      queryClient.removeQueries({
+        queryKey: locationKeys.me(),
+      });
+    },
   });
 }
 
 // Delete Location
+
 export function useDeleteLocation() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (locationId: string) => deleteLocation(locationId),
+    mutationFn: deleteLocation,
+    onSuccess: (_, locationId) => {
+      queryClient.removeQueries({
+        queryKey: locationKeys.detail(locationId),
+      });
+    },
   });
 }

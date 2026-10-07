@@ -10,14 +10,12 @@ import {
   unbanUser,
   updateMe,
 } from "@/api/user";
-
 import type {
   AdminUpdateUserInput,
   AdminUpdateUserRoleInput,
   BanUserInput,
 } from "@/validators/user.validator";
-
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const userKeys = {
   all: ["users"] as const,
@@ -36,15 +34,29 @@ export function useCurrentUser() {
 
 // Update Current User
 export function useUpdateCurrentUser() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: updateMe,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: userKeys.me(),
+      });
+    },
   });
 }
 
 // Delete Current User
 export function useDeleteCurrentUser() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: deleteMe,
+    onSuccess: () => {
+      queryClient.removeQueries({
+        queryKey: userKeys.me(),
+      });
+    },
   });
 }
 
@@ -65,55 +77,115 @@ export function useUser(userId: string) {
   });
 }
 
+type AdminUpdateUserVariables = {
+  userId: string;
+  payload: AdminUpdateUserInput;
+};
+
 // Admin Update User
 export function useAdminUpdateUser() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      userId,
-      payload,
-    }: {
-      userId: string;
-      payload: AdminUpdateUserInput;
-    }) => adminUpdateUser(userId, payload),
+    mutationFn: ({ userId, payload }: AdminUpdateUserVariables) =>
+      adminUpdateUser(userId, payload),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({
+        queryKey: userKeys.detail(userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.list(),
+      });
+    },
   });
 }
+
+type AdminUpdateUserRoleVariables = {
+  userId: string;
+  payload: AdminUpdateUserRoleInput;
+};
 
 // Admin Update User Role
 export function useAdminUpdateUserRole() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      userId,
-      payload,
-    }: {
-      userId: string;
-      payload: AdminUpdateUserRoleInput;
-    }) => adminUpdateUserRole(userId, payload),
+    mutationFn: ({ userId, payload }: AdminUpdateUserRoleVariables) =>
+      adminUpdateUserRole(userId, payload),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({
+        queryKey: userKeys.detail(userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.list(),
+      });
+    },
   });
 }
 
+type BanUserVariables = {
+  userId: string;
+  payload: BanUserInput;
+};
+
 // Ban User
 export function useBanUser() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      userId,
-      payload,
-    }: {
-      userId: string;
-      payload: BanUserInput;
-    }) => banUser(userId, payload),
+    mutationFn: ({ userId, payload }: BanUserVariables) =>
+      banUser(userId, payload),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({
+        queryKey: userKeys.detail(userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.list(),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: userKeys.me(),
+      });
+    },
   });
 }
 
 // Unban User
 export function useUnbanUser() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (userId: string) => unbanUser(userId),
+    mutationFn: unbanUser,
+    onSuccess: (_, userId) => {
+      queryClient.invalidateQueries({
+        queryKey: userKeys.detail(userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.list(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.me(),
+      });
+    },
   });
 }
 
 // Delete User
 export function useDeleteUser() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (userId: string) => deleteUser(userId),
+    mutationFn: deleteUser,
+    onSuccess: (_, userId) => {
+      queryClient.removeQueries({
+        queryKey: userKeys.detail(userId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.list(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.me(),
+      });
+    },
   });
 }

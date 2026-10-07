@@ -11,7 +11,6 @@ import {
   updateOrganizationMember,
   updateOrganizationStatus,
 } from "@/api/organizations";
-
 import type {
   AddOrganizationMemberInput,
   CreateOrganizationInput,
@@ -19,8 +18,7 @@ import type {
   UpdateOrganizationMemberInput,
   UpdateOrganizationStatusInput,
 } from "@/validators/organization.validator";
-
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const organizationKeys = {
   all: ["organizations"] as const,
@@ -57,44 +55,98 @@ export function useOrganization(organizationId: string) {
   });
 }
 
+type UpdateOrganizationVariables = {
+  organizationId: string;
+  payload: UpdateOrganizationInput;
+};
+
 // Create Organization
 export function useCreateOrganization() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (payload: CreateOrganizationInput) =>
-      createOrganization(payload),
+    mutationFn: createOrganization,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: organizationKeys.list(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: organizationKeys.me(),
+      });
+    },
   });
 }
 
 // Update Organization
 export function useUpdateOrganization() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      organizationId,
-      payload,
-    }: {
-      organizationId: string;
-      payload: UpdateOrganizationInput;
-    }) => updateOrganization(organizationId, payload),
+    mutationFn: ({ organizationId, payload }: UpdateOrganizationVariables) =>
+      updateOrganization(organizationId, payload),
+    onSuccess: (_, { organizationId }) => {
+      queryClient.invalidateQueries({
+        queryKey: organizationKeys.detail(organizationId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: organizationKeys.list(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: organizationKeys.me(),
+      });
+    },
   });
 }
 
 // Delete Organization
 export function useDeleteOrganization() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (organizationId: string) => deleteOrganization(organizationId),
+    mutationFn: deleteOrganization,
+    onSuccess: (_, organizationId) => {
+      queryClient.removeQueries({
+        queryKey: organizationKeys.detail(organizationId),
+      });
+      queryClient.removeQueries({
+        queryKey: organizationKeys.members(organizationId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: organizationKeys.list(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: organizationKeys.me(),
+      });
+    },
   });
 }
 
+type UpdateOrganizationStatusVariables = {
+  organizationId: string;
+  payload: UpdateOrganizationStatusInput;
+};
+
 // Update Organization Status
 export function useUpdateOrganizationStatus() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({
       organizationId,
       payload,
-    }: {
-      organizationId: string;
-      payload: UpdateOrganizationStatusInput;
-    }) => updateOrganizationStatus(organizationId, payload),
+    }: UpdateOrganizationStatusVariables) =>
+      updateOrganizationStatus(organizationId, payload),
+    onSuccess: (_, { organizationId }) => {
+      queryClient.invalidateQueries({
+        queryKey: organizationKeys.detail(organizationId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: organizationKeys.list(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: organizationKeys.me(),
+      });
+    },
   });
 }
 
@@ -107,43 +159,79 @@ export function useOrganizationMembers(organizationId: string) {
   });
 }
 
+type AddOrganizationMemberVariables = {
+  organizationId: string;
+  payload: AddOrganizationMemberInput;
+};
+
 // Add Organization Member
 export function useAddOrganizationMember() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      organizationId,
-      payload,
-    }: {
-      organizationId: string;
-      payload: AddOrganizationMemberInput;
-    }) => addOrganizationMember(organizationId, payload),
+    mutationFn: ({ organizationId, payload }: AddOrganizationMemberVariables) =>
+      addOrganizationMember(organizationId, payload),
+    onSuccess: (_, { organizationId }) => {
+      queryClient.invalidateQueries({
+        queryKey: organizationKeys.members(organizationId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: organizationKeys.detail(organizationId),
+      });
+    },
   });
 }
+
+type UpdateOrganizationMemberVariables = {
+  organizationId: string;
+  memberUserId: string;
+  payload: UpdateOrganizationMemberInput;
+};
 
 // Update Organization Member
 export function useUpdateOrganizationMember() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({
       organizationId,
       memberUserId,
       payload,
-    }: {
-      organizationId: string;
-      memberUserId: string;
-      payload: UpdateOrganizationMemberInput;
-    }) => updateOrganizationMember(organizationId, memberUserId, payload),
+    }: UpdateOrganizationMemberVariables) =>
+      updateOrganizationMember(organizationId, memberUserId, payload),
+    onSuccess: (_, { organizationId }) => {
+      queryClient.invalidateQueries({
+        queryKey: organizationKeys.members(organizationId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: organizationKeys.detail(organizationId),
+      });
+    },
   });
 }
 
+type RemoveOrganizationMemberVariables = {
+  organizationId: string;
+  memberUserId: string;
+};
+
 // Remove Organization Member
 export function useRemoveOrganizationMember() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({
       organizationId,
       memberUserId,
-    }: {
-      organizationId: string;
-      memberUserId: string;
-    }) => removeOrganizationMember(organizationId, memberUserId),
+    }: RemoveOrganizationMemberVariables) =>
+      removeOrganizationMember(organizationId, memberUserId),
+    onSuccess: (_, { organizationId }) => {
+      queryClient.invalidateQueries({
+        queryKey: organizationKeys.members(organizationId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: organizationKeys.detail(organizationId),
+      });
+    },
   });
 }

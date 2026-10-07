@@ -3,7 +3,6 @@ import {
   getCertificates,
   verifyCertificate,
 } from "@/api/certificates";
-
 import { useQuery } from "@tanstack/react-query";
 
 export const certificateKeys = {
@@ -15,7 +14,8 @@ export const certificateKeys = {
     [...certificateKeys.all, "verify", certificateNumber] as const,
 };
 
-// My Certificates
+// Certificates
+
 export function useCertificates() {
   return useQuery({
     queryKey: certificateKeys.list(),
@@ -24,6 +24,7 @@ export function useCertificates() {
 }
 
 // Certificate
+
 export function useCertificate(certificateId: string) {
   return useQuery({
     queryKey: certificateKeys.detail(certificateId),
@@ -33,6 +34,7 @@ export function useCertificate(certificateId: string) {
 }
 
 // Verify Certificate
+
 export function useVerifyCertificate(certificateNumber: string) {
   return useQuery({
     queryKey: certificateKeys.verify(certificateNumber),

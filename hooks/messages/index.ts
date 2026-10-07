@@ -9,13 +9,8 @@ import {
   moderateDeleteMessage,
   updateMessage,
 } from "@/api/messages";
-
-import type {
-  CreateMessageInput,
-  UpdateMessageInput,
-} from "@/validators/message.validator";
-
-import { useMutation, useQuery } from "@tanstack/react-query";
+import type { UpdateMessageInput } from "@/validators/message.validator";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const messageKeys = {
   all: ["messages"] as const,
@@ -57,48 +52,85 @@ export function useMessage(messageId: string) {
 // Create Message
 export function useCreateMessage() {
   return useMutation({
-    mutationFn: (payload: CreateMessageInput) => createMessage(payload),
+    mutationFn: createMessage,
   });
 }
 
+type UpdateMessageVariables = {
+  messageId: string;
+  payload: UpdateMessageInput;
+};
+
 // Update Message
 export function useUpdateMessage() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      messageId,
-      payload,
-    }: {
-      messageId: string;
-      payload: UpdateMessageInput;
-    }) => updateMessage(messageId, payload),
+    mutationFn: ({ messageId, payload }: UpdateMessageVariables) =>
+      updateMessage(messageId, payload),
+    onSuccess: (_, { messageId }) => {
+      queryClient.invalidateQueries({
+        queryKey: messageKeys.detail(messageId),
+      });
+    },
   });
 }
 
 // Delete Message
 export function useDeleteMessage() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (messageId: string) => deleteMessage(messageId),
+    mutationFn: deleteMessage,
+    onSuccess: (_, messageId) => {
+      queryClient.removeQueries({
+        queryKey: messageKeys.detail(messageId),
+      });
+    },
   });
 }
 
 // Moderate Delete Message
 export function useModerateDeleteMessage() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (messageId: string) => moderateDeleteMessage(messageId),
+    mutationFn: moderateDeleteMessage,
+    onSuccess: (_, messageId) => {
+      queryClient.invalidateQueries({
+        queryKey: messageKeys.detail(messageId),
+      });
+    },
   });
 }
 
 // Mark Message As Read
 export function useMarkMessageAsRead() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (messageId: string) => markMessageAsRead(messageId),
+    mutationFn: markMessageAsRead,
+    onSuccess: (_, messageId) => {
+      queryClient.invalidateQueries({
+        queryKey: messageKeys.detail(messageId),
+      });
+    },
   });
 }
 
 // Mark Conversation Messages As Read
 export function useMarkConversationMessagesAsRead() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (conversationId: string) =>
-      markConversationMessagesAsRead(conversationId),
+    mutationFn: markConversationMessagesAsRead,
+    onSuccess: (_, conversationId) => {
+      queryClient.invalidateQueries({
+        queryKey: messageKeys.conversation(conversationId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: messageKeys.unreadCount(conversationId),
+      });
+    },
   });
 }

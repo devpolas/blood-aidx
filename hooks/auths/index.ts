@@ -22,6 +22,7 @@ export const authKeys = {
 };
 
 // Signup
+
 export function useSignup() {
   return useMutation({
     mutationFn: signup,
@@ -29,27 +30,35 @@ export function useSignup() {
 }
 
 // Signin
+
 export function useSignin() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: signin,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: authKeys.me(),
+      });
+    },
   });
 }
 
 // Current User
+
 export function useAuthMe() {
   return useQuery({
     queryKey: authKeys.me(),
     queryFn: me,
-
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
-
     retry: false,
     refetchOnWindowFocus: false,
   });
 }
 
 // Fresh Access Token
+
 export function useFreshToken() {
   return useMutation({
     mutationFn: freshToken,
@@ -57,6 +66,7 @@ export function useFreshToken() {
 }
 
 // Verify Email
+
 export function useVerifyEmail() {
   return useMutation({
     mutationFn: verifyEmail,
@@ -64,6 +74,7 @@ export function useVerifyEmail() {
 }
 
 // Resend Verification
+
 export function useResendVerification() {
   return useMutation({
     mutationFn: resendVerification,
@@ -71,6 +82,7 @@ export function useResendVerification() {
 }
 
 // Forgot Password
+
 export function useForgotPassword() {
   return useMutation({
     mutationFn: forgotPassword,
@@ -78,6 +90,7 @@ export function useForgotPassword() {
 }
 
 // Verify Password Reset OTP
+
 export function useVerifyPasswordReset() {
   return useMutation({
     mutationFn: verifyPasswordReset,
@@ -85,6 +98,7 @@ export function useVerifyPasswordReset() {
 }
 
 // Reset Password
+
 export function useResetPassword() {
   return useMutation({
     mutationFn: resetPassword,
@@ -92,6 +106,7 @@ export function useResetPassword() {
 }
 
 // Verify Password
+
 export function useVerifyPassword() {
   return useMutation({
     mutationFn: verifyPassword,
@@ -99,6 +114,7 @@ export function useVerifyPassword() {
 }
 
 // Change Password
+
 export function useChangePassword() {
   return useMutation({
     mutationFn: changePassword,
@@ -106,12 +122,12 @@ export function useChangePassword() {
 }
 
 // Logout
+
 export function useLogout() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: logout,
-
     onSuccess: () => {
       queryClient.removeQueries({
         queryKey: authKeys.me(),
@@ -121,13 +137,22 @@ export function useLogout() {
 }
 
 // Logout All Devices
+
 export function useLogoutAll() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: logoutAll,
+    onSuccess: () => {
+      queryClient.removeQueries({
+        queryKey: authKeys.me(),
+      });
+    },
   });
 }
 
 // Logout Other Devices
+
 export function useLogoutOtherDevices() {
   return useMutation({
     mutationFn: logoutOtherDevices,

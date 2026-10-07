@@ -6,10 +6,8 @@ import {
   updateMyProfile,
   updateProfile,
 } from "@/api/profiles";
-
 import type { UpdateProfileInput } from "@/validators/profile.validator";
-
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const profileKeys = {
   all: ["profiles"] as const,
@@ -27,15 +25,29 @@ export function useMyProfile() {
 
 // Update My Profile
 export function useUpdateMyProfile() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (payload: UpdateProfileInput) => updateMyProfile(payload),
+    mutationFn: updateMyProfile,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: profileKeys.me(),
+      });
+    },
   });
 }
 
 // Delete My Profile
 export function useDeleteMyProfile() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: deleteMyProfile,
+    onSuccess: () => {
+      queryClient.removeQueries({
+        queryKey: profileKeys.me(),
+      });
+    },
   });
 }
 
@@ -48,22 +60,36 @@ export function useProfile(userId: string) {
   });
 }
 
+type UpdateProfileVariables = {
+  userId: string;
+  payload: UpdateProfileInput;
+};
+
 // Update Profile
 export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      userId,
-      payload,
-    }: {
-      userId: string;
-      payload: UpdateProfileInput;
-    }) => updateProfile(userId, payload),
+    mutationFn: ({ userId, payload }: UpdateProfileVariables) =>
+      updateProfile(userId, payload),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({
+        queryKey: profileKeys.detail(userId),
+      });
+    },
   });
 }
 
 // Delete Profile
 export function useDeleteProfile() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (userId: string) => deleteProfile(userId),
+    mutationFn: deleteProfile,
+    onSuccess: (_, userId) => {
+      queryClient.removeQueries({
+        queryKey: profileKeys.detail(userId),
+      });
+    },
   });
 }
