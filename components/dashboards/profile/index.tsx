@@ -117,8 +117,8 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className='space-y-5 sm:space-y-6 mx-auto w-full'>
-      <header className='space-y-2'>
+    <main className='space-y-4 mx-auto w-full'>
+      <header>
         <Heading2>Profile</Heading2>
 
         <Paragraph>
@@ -133,7 +133,7 @@ export default function ProfilePage() {
         isLogoutPending={isLogoutPending}
       />
 
-      <div className='gap-5 lg:gap-6 grid lg:grid-cols-2'>
+      <div className='gap-4 grid lg:grid-cols-2'>
         <PersonalInformation user={user} profile={profile} />
         <AccountInformation user={user} />
         <ContactInformation user={user} profile={profile} />

@@ -1,16 +1,16 @@
 "use client";
 
-import { CalendarDaysIcon, MapPinIcon, UserIcon } from "lucide-react";
-
 import {
-  LoadingMarkerState,
-  LoadingStep,
-  LoadingSteps,
-} from "@/components/shared/loading/loading";
+  CalendarDaysIcon,
+  ContactIcon,
+  MapPinIcon,
+  ShieldUserIcon,
+  UserIcon,
+} from "lucide-react";
+
 import { Heading2, Muted } from "@/components/typography/typography";
-import { Card, CardContent } from "@/components/ui/card";
-import { ProfileHeaderLoading } from "@/modules/profile/profile-header-loading";
-import { ProfileSectionLoading } from "@/modules/profile/profile-section-loading";
+import { ProfileHeaderLoading } from "@/modules/profile/loading/profile-header-loading";
+import { ProfileSectionLoading } from "@/modules/profile/loading/profile-section-loading";
 
 interface ProfileLoadingProps {
   isProfileLoading?: boolean;
@@ -25,43 +25,25 @@ export function ProfileLoading({
   isDonorLoading = false,
   isDonor = false,
 }: ProfileLoadingProps) {
-  const getLoadingState = (isLoading: boolean): LoadingMarkerState => {
-    return isLoading ? "active" : "completed";
-  };
-
-  const steps: LoadingStep[] = [
-    {
-      id: "profile",
-      label: "Loading personal and account information",
-      state: getLoadingState(isProfileLoading),
-    },
-    {
-      id: "location",
-      label: "Loading location information",
-      state: getLoadingState(isLocationLoading),
-    },
-  ];
-
-  if (isDonor) {
-    steps.push({
-      id: "donor",
-      label: "Loading donor information",
-      state: getLoadingState(isDonorLoading),
-    });
-  }
+  const loadingMessage = isProfileLoading
+    ? "Loading your profile information..."
+    : isLocationLoading
+      ? "Loading your location information..."
+      : isDonor && isDonorLoading
+        ? "Loading your donor information..."
+        : "Preparing your profile...";
 
   return (
-    <main className='space-y-5 sm:space-y-6 mx-auto w-full'>
+    <main
+      className='space-y-5 sm:space-y-6 mx-auto w-full'
+      aria-busy='true'
+      aria-live='polite'
+    >
       <header className='space-y-2'>
         <Heading2>Profile</Heading2>
-        <Muted>Preparing your profile information...</Muted>
-      </header>
 
-      <Card className='border-brand/10'>
-        <CardContent className='p-4 sm:p-5 lg:p-6'>
-          <LoadingSteps steps={steps} duration={2000} />
-        </CardContent>
-      </Card>
+        <Muted>{loadingMessage}</Muted>
+      </header>
 
       <ProfileHeaderLoading />
 
@@ -73,13 +55,13 @@ export function ProfileLoading({
         />
 
         <ProfileSectionLoading
-          icon={UserIcon}
+          icon={ShieldUserIcon}
           title='Account Information'
           count={4}
         />
 
         <ProfileSectionLoading
-          icon={UserIcon}
+          icon={ContactIcon}
           title='Contact Information'
           count={2}
         />
