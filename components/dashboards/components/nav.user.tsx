@@ -17,7 +17,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {useAuth} from "@/hooks";
+import { useAuth } from "@/hooks";
 import type { User } from "@/types/user";
 import { getInitials } from "@/utils/initials.helper";
 import { EllipsisVerticalIcon, LogOutIcon } from "lucide-react";
@@ -102,8 +102,6 @@ export function NavUser({ user }: NavUserProps) {
               disabled={isLogoutPending}
               onClick={logoutCurrentUser}
             >
-              <LogOutIcon className='text-destructive' />
-
               {isLogoutPending ? (
                 <LoadingSpinner
                   spinnerClassName='text-brand'
@@ -112,7 +110,10 @@ export function NavUser({ user }: NavUserProps) {
                   shimmer
                 />
               ) : (
-                <span className='text-destructive'>Logout</span>
+                <>
+                  <LogOutIcon className='text-destructive' />
+                  <span className='text-destructive'>Logout</span>
+                </>
               )}
             </DropdownMenuItem>
           </DropdownMenuContent>

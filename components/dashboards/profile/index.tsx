@@ -1,23 +1,23 @@
 "use client";
 
+import { useEffect } from "react";
 import { XCircleIcon } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import {
   useAuth,
+  useCurrentUser,
   useMyDonorProfile,
   useMyLocation,
   useMyProfile,
 } from "@/hooks";
-
 import { Card, CardContent } from "@/components/ui/card";
-
 import {
   Heading2,
   Heading3,
   Muted,
   Paragraph,
 } from "@/components/typography/typography";
-
 import { ProfileHeader } from "@/modules/profile/profile-header";
 import { PersonalInformation } from "@/modules/profile/personal-information";
 import { AccountInformation } from "@/modules/profile/account-information";
@@ -26,16 +26,61 @@ import { LocationInformation } from "@/modules/profile/location-information";
 import { DonorInformation } from "@/modules/profile/donor-information";
 import { ProfileActivity } from "@/modules/profile/profile-activity";
 import { ProfileLoading } from "./profile-loading";
+import Loading from "@/app/loading";
 
 export default function ProfilePage() {
-  const { user, isLoading: isAuthLoading, error: authError } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const {
+    isAuthenticated,
+    isLoading: isAuthLoading,
+    logout,
+    isLogoutPending,
+  } = useAuth();
+
+  const { data: userResponse, isLoading: isUserLoading } = useCurrentUser();
+
   const { data: profileResponse, isPending: isProfileLoading } = useMyProfile();
+
   const { data: donorResponse, isPending: isDonorLoading } =
     useMyDonorProfile();
+
   const { data: locationResponse, isPending: isLocationLoading } =
     useMyLocation();
 
+  const user = userResponse?.data?.user;
+  const profile = profileResponse?.data?.profile;
+  const donor = donorResponse?.data?.donor;
+  const location = locationResponse?.data?.location;
+
+  const search = searchParams.toString();
+  const callbackUrl = `${pathname}${search ? `?${search}` : ""}`;
+
+  useEffect(() => {
+    if (isAuthLoading || isAuthenticated) {
+      return;
+    }
+
+    router.replace(`/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+  }, [isAuthLoading, isAuthenticated, callbackUrl, router]);
+
+  async function logoutCurrentUser() {
+    await logout();
+
+    router.replace(`/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+  }
+
   if (isAuthLoading) {
+    return <Loading />;
+  }
+
+  if (!isAuthenticated) {
+    return <Loading />;
+  }
+
+  if (isUserLoading) {
     return <ProfileLoading />;
   }
 
@@ -48,16 +93,13 @@ export default function ProfilePage() {
 
             <Heading3>Unable to load profile</Heading3>
 
-            <Muted>{authError ?? "Your account could not be loaded."}</Muted>
+            <Muted>Your account could not be loaded.</Muted>
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  const profile = profileResponse?.data?.profile;
-  const donor = donorResponse?.data?.donor;
-  const location = locationResponse?.data?.location;
   const isDonor = user.role === "user";
 
   const isLoading =
@@ -75,9 +117,9 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className='space-y-5 sm:space-y-6 mx-auto py-5 sm:py-8 w-full max-w-6xl'>
+    <main className='space-y-5 sm:space-y-6 mx-auto w-full'>
       <header className='space-y-2'>
-        <Heading2>My Profile</Heading2>
+        <Heading2>Profile</Heading2>
 
         <Paragraph>
           Manage your personal information, donor details, location, and account
@@ -85,7 +127,11 @@ export default function ProfilePage() {
         </Paragraph>
       </header>
 
-      <ProfileHeader user={user} />
+      <ProfileHeader
+        user={user}
+        logout={logoutCurrentUser}
+        isLogoutPending={isLogoutPending}
+      />
 
       <div className='gap-5 lg:gap-6 grid lg:grid-cols-2'>
         <PersonalInformation user={user} profile={profile} />

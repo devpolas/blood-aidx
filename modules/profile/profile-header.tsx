@@ -2,7 +2,7 @@ import {
   CalendarDaysIcon,
   CheckCircle2Icon,
   Clock3Icon,
-  EditIcon,
+  LogOutIcon,
   MailIcon,
 } from "lucide-react";
 
@@ -16,16 +16,26 @@ import { namePerfect } from "@/utils/refine.name";
 import { getInitials } from "@/utils/initials.helper";
 import { Heading3, Large, Small } from "@/components/typography/typography";
 import { dateFormat } from "@/utils/date.format";
+import { Separator } from "@/components/ui/separator";
+import { LoadingSpinner } from "@/components/shared/loading/loading";
+import { useIsMobile } from "@/hooks";
 
 interface ProfileHeaderProps {
   user: User;
+  logout: () => void;
+  isLogoutPending: boolean;
 }
 
-export function ProfileHeader({ user }: ProfileHeaderProps) {
+export function ProfileHeader({
+  user,
+  logout,
+  isLogoutPending,
+}: ProfileHeaderProps) {
+  const isMobile = useIsMobile();
   return (
     <Card className='overflow-hidden'>
-      <div className='bg-brand/5 px-4 sm:px-6 lg:px-8 py-5 sm:py-7 border-brand/10 border-b'>
-        <div className='flex lg:flex-row flex-col lg:justify-between lg:items-center gap-5 sm:gap-6'>
+      <div className='px-4 sm:px-6 lg:px-8 border-brand/10 border-b'>
+        <div className='flex flex-row justify-between lg:items-center gap-5 sm:gap-6'>
           <div className='flex items-center gap-3 sm:gap-5 min-w-0'>
             <Avatar className='border-2 border-brand/20 size-16 sm:size-20 lg:size-24 shrink-0'>
               <AvatarImage
@@ -46,7 +56,7 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
 
                 {user.emailVerified ? (
                   <Badge variant='secondary' className='shrink-0'>
-                    <CheckCircle2Icon className='size-3.5' />
+                    <CheckCircle2Icon className='size-3.5 text-brand-success' />
                     Verified
                   </Badge>
                 ) : (
@@ -71,11 +81,32 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
             </div>
           </div>
 
-          <Button variant='outline' className='w-full sm:w-auto shrink-0'>
-            <EditIcon className='size-4' />
-            Edit Profile
+          <Button
+            disabled={isLogoutPending}
+            onClick={logout}
+            variant='destructive'
+            className='cursor-pointer shrink-0'
+            size={isMobile ? "sm" : "default"}
+          >
+            {isLogoutPending ? (
+              <LoadingSpinner
+                spinnerClassName='text-brand'
+                textClassName='text-brand'
+                text='Logging out'
+                shimmer
+              />
+            ) : (
+              <>
+                <LogOutIcon className='text-destructive' />
+                <span className='text-destructive'>Logout</span>
+              </>
+            )}
           </Button>
         </div>
+      </div>
+
+      <div className='px-4'>
+        <Separator />
       </div>
 
       <CardContent className='gap-5 sm:gap-6 grid sm:grid-cols-2 lg:grid-cols-4 p-4 sm:p-6 lg:p-8'>
@@ -101,7 +132,7 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
               <Badge variant='destructive'>Banned</Badge>
             ) : (
               <Badge variant='secondary'>
-                <CheckCircle2Icon className='size-3.5' />
+                <CheckCircle2Icon className='size-3.5 text-brand-success' />
                 Active
               </Badge>
             )}

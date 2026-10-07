@@ -51,9 +51,9 @@ export function ProfileLoading({
   }
 
   return (
-    <main className='space-y-5 sm:space-y-6 mx-auto py-5 sm:py-8 w-full max-w-6xl'>
+    <main className='space-y-5 sm:space-y-6 mx-auto w-full'>
       <header className='space-y-2'>
-        <Heading2>My Profile</Heading2>
+        <Heading2>Profile</Heading2>
         <Muted>Preparing your profile information...</Muted>
       </header>
 

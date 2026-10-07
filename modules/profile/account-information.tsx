@@ -41,7 +41,7 @@ export function AccountInformation({ user }: AccountInformationProps) {
         value={
           user.emailVerified ? (
             <Badge variant='secondary'>
-              <CheckCircle2Icon className='size-3.5' />
+              <CheckCircle2Icon className='size-3.5 text-brand-success' />
               Verified
             </Badge>
           ) : (
@@ -64,7 +64,7 @@ export function AccountInformation({ user }: AccountInformationProps) {
             </Badge>
           ) : (
             <Badge variant='secondary'>
-              <CheckCircle2Icon className='size-3.5' />
+              <CheckCircle2Icon className='size-3.5 text-brand-success' />
               Active
             </Badge>
           )
