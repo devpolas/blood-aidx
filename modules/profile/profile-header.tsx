@@ -34,7 +34,7 @@ export function ProfileHeader({
   const isMobile = useIsMobile();
   return (
     <Card className='overflow-hidden'>
-      <div className='px-4 sm:px-6 lg:px-8 border-brand/10 border-b'>
+      <div className='p-4 border-brand/20 border-b'>
         <div className='flex flex-row justify-between lg:items-center gap-5 sm:gap-6'>
           <div className='flex items-center gap-3 sm:gap-5 min-w-0'>
             <Avatar className='border-2 border-brand/20 size-16 sm:size-20 lg:size-24 shrink-0'>
@@ -104,11 +104,6 @@ export function ProfileHeader({
           </Button>
         </div>
       </div>
-
-      <div className='px-4'>
-        <Separator />
-      </div>
-
       <CardContent className='gap-5 sm:gap-6 grid sm:grid-cols-2 lg:grid-cols-4 p-4 sm:p-6 lg:p-8'>
         <div className='min-w-0'>
           <Small>Gender</Small>

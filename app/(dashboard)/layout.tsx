@@ -11,7 +11,7 @@ const dashboardStyle = {
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider style={dashboardStyle}>
-      <AppSidebar variant='inset' />
+      <AppSidebar variant='sidebar' />
       <SidebarInset className='min-w-0'>
         <SiteHeader />
         <main className='px-4 md:px-6 py-4 w-full'>{children}</main>

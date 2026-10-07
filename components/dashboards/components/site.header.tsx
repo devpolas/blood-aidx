@@ -3,14 +3,23 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export function SiteHeader() {
   return (
-    <header className='flex h-(--header-height) w-full rounded shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)'>
-      <div className='flex items-center gap-1 px-4 w-full'>
-        <SidebarTrigger className='-ml-1' />
+    <header className='sticky top-0 z-30 flex h-(--header-height) w-full shrink-0 items-center border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80'>
+      <div className='flex items-center gap-2 px-3 sm:px-4 w-full min-w-0 h-full'>
+        <SidebarTrigger
+          className='size-8 shrink-0'
+          aria-label='Toggle sidebar'
+        />
+
         <Separator
           orientation='vertical'
-          className='mt-2 data-[orientation=vertical]:h-4'
+          className='bg-brand/40 mx-2 my-auto h-4 shrink-0'
         />
-        <h1 className='ml-1 font-bold text-brand text-base'>Dashboard</h1>
+
+        <div className='flex flex-1 items-center min-w-0'>
+          <h1 className='font-semibold text-brand text-sm sm:text-base truncate'>
+            Dashboard
+          </h1>
+        </div>
       </div>
     </header>
   );

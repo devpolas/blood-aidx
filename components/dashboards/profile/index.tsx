@@ -117,7 +117,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className='space-y-4 mx-auto w-full'>
+    <section className='space-y-4 mx-auto w-full'>
       <header>
         <Heading2>Profile</Heading2>
 
@@ -143,6 +143,6 @@ export default function ProfilePage() {
       {isDonor && <DonorInformation donor={donor} />}
 
       <ProfileActivity profile={profile} />
-    </main>
+    </section>
   );
 }
