@@ -7,13 +7,21 @@ import {
   updateDonor,
   updateMyDonorProfile,
 } from "@/api/donors";
-import type { UpdateDonorProfileInput } from "@/validators/donor.validator";
+
+import type {
+  DonorQueryInput,
+  UpdateDonorProfileInput,
+} from "@/validators/donor.validator";
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const donorKeys = {
   all: ["donors"] as const,
+
   me: () => [...donorKeys.all, "me"] as const,
-  list: () => [...donorKeys.all, "list"] as const,
+
+  list: (query?: DonorQueryInput) => [...donorKeys.all, "list", query] as const,
+
   detail: (donorId: string) => [...donorKeys.all, "detail", donorId] as const,
 };
 
@@ -33,6 +41,7 @@ export function useUpdateMyDonorProfile() {
 
   return useMutation({
     mutationFn: updateMyDonorProfile,
+
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: donorKeys.me(),
@@ -52,6 +61,7 @@ export function useDeleteMyDonorProfile() {
 
   return useMutation({
     mutationFn: deleteMyDonorProfile,
+
     onSuccess: () => {
       queryClient.removeQueries({
         queryKey: donorKeys.me(),
@@ -66,10 +76,10 @@ export function useDeleteMyDonorProfile() {
 
 // Donors
 
-export function useDonors() {
+export function useDonors(query?: DonorQueryInput) {
   return useQuery({
-    queryKey: donorKeys.list(),
-    queryFn: getDonors,
+    queryKey: donorKeys.list(query),
+    queryFn: () => getDonors(query),
   });
 }
 
@@ -83,12 +93,12 @@ export function useDonor(donorId: string) {
   });
 }
 
-// Update Donor
-
 type UpdateDonorVariables = {
   donorId: string;
   payload: UpdateDonorProfileInput;
 };
+
+// Update Donor
 
 export function useUpdateDonor() {
   const queryClient = useQueryClient();
@@ -96,6 +106,7 @@ export function useUpdateDonor() {
   return useMutation({
     mutationFn: ({ donorId, payload }: UpdateDonorVariables) =>
       updateDonor(donorId, payload),
+
     onSuccess: (_, { donorId }) => {
       queryClient.invalidateQueries({
         queryKey: donorKeys.detail(donorId),
@@ -115,6 +126,7 @@ export function useDeleteDonor() {
 
   return useMutation({
     mutationFn: deleteDonor,
+
     onSuccess: (_, donorId) => {
       queryClient.removeQueries({
         queryKey: donorKeys.detail(donorId),

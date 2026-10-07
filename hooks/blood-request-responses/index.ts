@@ -7,36 +7,48 @@ import {
   getMyBloodRequestResponses,
   updateBloodRequestResponseStatus,
 } from "@/api/blood.request.responses";
+
 import type {
+  BloodRequestResponseQueryInput,
   CreateBloodRequestResponseInput,
   UpdateBloodRequestResponseStatusInput,
 } from "@/validators/blood.request.response.validator";
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const bloodRequestResponseKeys = {
   all: ["blood-request-responses"] as const,
-  me: () => [...bloodRequestResponseKeys.all, "me"] as const,
-  request: (requestId: string) =>
-    [...bloodRequestResponseKeys.all, "request", requestId] as const,
+
+  me: (query?: BloodRequestResponseQueryInput) =>
+    [...bloodRequestResponseKeys.all, "me", query] as const,
+
+  request: (requestId: string, query?: BloodRequestResponseQueryInput) =>
+    [...bloodRequestResponseKeys.all, "request", requestId, query] as const,
+
   detail: (responseId: string) =>
     [...bloodRequestResponseKeys.all, "detail", responseId] as const,
 };
 
 // My Blood Request Responses
 
-export function useMyBloodRequestResponses() {
+export function useMyBloodRequestResponses(
+  query?: BloodRequestResponseQueryInput,
+) {
   return useQuery({
-    queryKey: bloodRequestResponseKeys.me(),
-    queryFn: getMyBloodRequestResponses,
+    queryKey: bloodRequestResponseKeys.me(query),
+    queryFn: () => getMyBloodRequestResponses(query),
   });
 }
 
 // Blood Request Responses
 
-export function useBloodRequestResponses(requestId: string) {
+export function useBloodRequestResponses(
+  requestId: string,
+  query?: BloodRequestResponseQueryInput,
+) {
   return useQuery({
-    queryKey: bloodRequestResponseKeys.request(requestId),
-    queryFn: () => getBloodRequestResponses(requestId),
+    queryKey: bloodRequestResponseKeys.request(requestId, query),
+    queryFn: () => getBloodRequestResponses(requestId, query),
     enabled: Boolean(requestId),
   });
 }
@@ -64,6 +76,7 @@ export function useCreateBloodRequestResponse() {
   return useMutation({
     mutationFn: ({ requestId, payload }: CreateBloodRequestResponseVariables) =>
       createBloodRequestResponse(requestId, payload),
+
     onSuccess: (_, { requestId }) => {
       queryClient.invalidateQueries({
         queryKey: bloodRequestResponseKeys.me(),
@@ -92,6 +105,7 @@ export function useUpdateBloodRequestResponseStatus() {
       payload,
     }: UpdateBloodRequestResponseStatusVariables) =>
       updateBloodRequestResponseStatus(responseId, payload),
+
     onSuccess: (_, { responseId }) => {
       queryClient.invalidateQueries({
         queryKey: bloodRequestResponseKeys.detail(responseId),
@@ -115,6 +129,7 @@ export function useCancelBloodRequestResponse() {
 
   return useMutation({
     mutationFn: cancelBloodRequestResponse,
+
     onSuccess: (_, responseId) => {
       queryClient.invalidateQueries({
         queryKey: bloodRequestResponseKeys.detail(responseId),
@@ -138,6 +153,7 @@ export function useDeleteBloodRequestResponse() {
 
   return useMutation({
     mutationFn: deleteBloodRequestResponse,
+
     onSuccess: (_, responseId) => {
       queryClient.removeQueries({
         queryKey: bloodRequestResponseKeys.detail(responseId),

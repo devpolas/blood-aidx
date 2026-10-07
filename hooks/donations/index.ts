@@ -6,32 +6,42 @@ import {
   getMyDonations,
   verifyDonation,
 } from "@/api/donations";
-import type { UpdateDonationStatusInput } from "@/validators/donation.validator";
+
+import type {
+  DonationQueryInput,
+  UpdateDonationStatusInput,
+} from "@/validators/donation.validator";
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const donationKeys = {
   all: ["donations"] as const,
-  me: () => [...donationKeys.all, "me"] as const,
-  list: () => [...donationKeys.all, "list"] as const,
+
+  me: (query?: DonationQueryInput) =>
+    [...donationKeys.all, "me", query] as const,
+
+  list: (query?: DonationQueryInput) =>
+    [...donationKeys.all, "list", query] as const,
+
   detail: (donationId: string) =>
     [...donationKeys.all, "detail", donationId] as const,
 };
 
 // My Donations
 
-export function useMyDonations() {
+export function useMyDonations(query?: DonationQueryInput) {
   return useQuery({
-    queryKey: donationKeys.me(),
-    queryFn: getMyDonations,
+    queryKey: donationKeys.me(query),
+    queryFn: () => getMyDonations(query),
   });
 }
 
 // Donations
 
-export function useDonations() {
+export function useDonations(query?: DonationQueryInput) {
   return useQuery({
-    queryKey: donationKeys.list(),
-    queryFn: getDonations,
+    queryKey: donationKeys.list(query),
+    queryFn: () => getDonations(query),
   });
 }
 
@@ -52,6 +62,7 @@ export function useCreateDonation() {
 
   return useMutation({
     mutationFn: createDonation,
+
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: donationKeys.me(),
@@ -71,6 +82,7 @@ export function useCancelDonation() {
 
   return useMutation({
     mutationFn: cancelDonation,
+
     onSuccess: (_, donationId) => {
       queryClient.invalidateQueries({
         queryKey: donationKeys.detail(donationId),
@@ -87,12 +99,12 @@ export function useCancelDonation() {
   });
 }
 
-// Verify Donation
-
 type VerifyDonationVariables = {
   donationId: string;
   payload: UpdateDonationStatusInput;
 };
+
+// Verify Donation
 
 export function useVerifyDonation() {
   const queryClient = useQueryClient();
@@ -100,6 +112,7 @@ export function useVerifyDonation() {
   return useMutation({
     mutationFn: ({ donationId, payload }: VerifyDonationVariables) =>
       verifyDonation(donationId, payload),
+
     onSuccess: (_, { donationId }) => {
       queryClient.invalidateQueries({
         queryKey: donationKeys.detail(donationId),
