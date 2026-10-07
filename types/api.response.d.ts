@@ -3,6 +3,8 @@ export interface Meta {
   limit: number;
   total: number;
   totalPage: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }
 
 export interface ApiResponse<T> {

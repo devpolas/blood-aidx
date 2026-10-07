@@ -2,12 +2,12 @@ import apiClient from "@/lib/api.client";
 
 import { ApiResponse } from "@/types/api.response";
 import { BloodRequest } from "@/types/blood.request";
-
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
-
 import {
+  BloodRequestQueryInput,
+  BloodRequestQuerySchema,
   CreateBloodRequestInput,
   CreateBloodRequestSchema,
   UpdateBloodRequestInput,
@@ -17,26 +17,32 @@ import {
 } from "@/validators/blood.request.validator";
 
 // Get My Blood Requests
-// GET /blood-requests/me
 
-export async function getMyBloodRequests(): Promise<
-  ApiResponse<{ requests: BloodRequest[] }>
-> {
+// GET /blood-requests/me
+export async function getMyBloodRequests(
+  query?: BloodRequestQueryInput,
+): Promise<ApiResponse<BloodRequest[]>> {
   try {
-    return await apiClient<ApiResponse<{ requests: BloodRequest[] }>>(
-      "/blood-requests/me",
-      {
-        method: "GET",
-      },
-    );
+    const queryParse = BloodRequestQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) || "Invalid blood request query",
+      );
+    }
+
+    return await apiClient<ApiResponse<BloodRequest[]>>("/blood-requests/me", {
+      method: "GET",
+      query: queryParse.data,
+    });
   } catch (error) {
     return handleApiError(error);
   }
 }
 
 // Cancel Blood Request
-// POST /blood-requests/:id/cancel
 
+// POST /blood-requests/:id/cancel
 export async function cancelBloodRequest(
   id: string,
 ): Promise<ApiResponse<{ request: BloodRequest }>> {
@@ -57,26 +63,32 @@ export async function cancelBloodRequest(
 }
 
 // Get Blood Requests
-// GET /blood-requests
 
-export async function getBloodRequests(): Promise<
-  ApiResponse<{ requests: BloodRequest[] }>
-> {
+// GET /blood-requests
+export async function getBloodRequests(
+  query?: BloodRequestQueryInput,
+): Promise<ApiResponse<BloodRequest[]>> {
   try {
-    return await apiClient<ApiResponse<{ requests: BloodRequest[] }>>(
-      "/blood-requests",
-      {
-        method: "GET",
-      },
-    );
+    const queryParse = BloodRequestQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) || "Invalid blood request query",
+      );
+    }
+
+    return await apiClient<ApiResponse<BloodRequest[]>>("/blood-requests", {
+      method: "GET",
+      query: queryParse.data,
+    });
   } catch (error) {
     return handleApiError(error);
   }
 }
 
 // Get Blood Request
-// GET /blood-requests/:id
 
+// GET /blood-requests/:id
 export async function getBloodRequest(
   id: string,
 ): Promise<ApiResponse<{ request: BloodRequest }>> {
@@ -97,8 +109,8 @@ export async function getBloodRequest(
 }
 
 // Create Blood Request
-// POST /blood-requests
 
+// POST /blood-requests
 export async function createBloodRequest(
   payload: CreateBloodRequestInput,
 ): Promise<ApiResponse<{ request: BloodRequest }>> {
@@ -122,8 +134,8 @@ export async function createBloodRequest(
 }
 
 // Update Blood Request
-// PATCH /blood-requests/:id
 
+// PATCH /blood-requests/:id
 export async function updateBloodRequest(
   id: string,
   payload: UpdateBloodRequestInput,
@@ -152,8 +164,8 @@ export async function updateBloodRequest(
 }
 
 // Update Blood Request Status
-// PATCH /blood-requests/:id/status
 
+// PATCH /blood-requests/:id/status
 export async function updateBloodRequestStatus(
   id: string,
   payload: UpdateBloodRequestStatusInput,
@@ -182,8 +194,8 @@ export async function updateBloodRequestStatus(
 }
 
 // Delete Blood Request
-// DELETE /blood-requests/:id
 
+// DELETE /blood-requests/:id
 export async function deleteBloodRequest(
   id: string,
 ): Promise<ApiResponse<null>> {

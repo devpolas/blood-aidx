@@ -5,35 +5,42 @@ import { UserMilestone } from "@/types/user.milestone";
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
-
 import {
   CreateMilestoneInput,
   CreateMilestoneSchema,
+  MilestoneQueryInput,
+  MilestoneQuerySchema,
   UpdateMilestoneInput,
   UpdateMilestoneSchema,
 } from "@/validators/milestone.validator";
 
 // Get Milestones
-// GET /milestones
 
-export async function getMilestones(): Promise<
-  ApiResponse<{ milestones: UserMilestone[] }>
-> {
+// GET /milestones
+export async function getMilestones(
+  query?: MilestoneQueryInput,
+): Promise<ApiResponse<UserMilestone[]>> {
   try {
-    return await apiClient<ApiResponse<{ milestones: UserMilestone[] }>>(
-      "/milestones",
-      {
-        method: "GET",
-      },
-    );
+    const queryParse = MilestoneQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) || "Invalid milestone query",
+      );
+    }
+
+    return await apiClient<ApiResponse<UserMilestone[]>>("/milestones", {
+      method: "GET",
+      query: queryParse.data,
+    });
   } catch (error) {
     return handleApiError(error);
   }
 }
 
 // Get Milestone
-// GET /milestones/:milestoneId
 
+// GET /milestones/:milestoneId
 export async function getMilestone(
   milestoneId: string,
 ): Promise<ApiResponse<{ milestone: UserMilestone }>> {
@@ -54,38 +61,54 @@ export async function getMilestone(
 }
 
 // Get My Milestones
-// GET /milestones/my
 
-export async function getMyMilestones(): Promise<
-  ApiResponse<{ milestones: UserMilestone[] }>
-> {
+// GET /milestones/my
+export async function getMyMilestones(
+  query?: MilestoneQueryInput,
+): Promise<ApiResponse<UserMilestone[]>> {
   try {
-    return await apiClient<ApiResponse<{ milestones: UserMilestone[] }>>(
-      "/milestones/my",
-      {
-        method: "GET",
-      },
-    );
+    const queryParse = MilestoneQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) || "Invalid milestone query",
+      );
+    }
+
+    return await apiClient<ApiResponse<UserMilestone[]>>("/milestones/my", {
+      method: "GET",
+      query: queryParse.data,
+    });
   } catch (error) {
     return handleApiError(error);
   }
 }
 
 // Get User Milestones
-// GET /milestones/user/:userId
 
+// GET /milestones/user/:userId
 export async function getUserMilestones(
   userId: string,
-): Promise<ApiResponse<{ milestones: UserMilestone[] }>> {
+  query?: MilestoneQueryInput,
+): Promise<ApiResponse<UserMilestone[]>> {
   try {
     if (!userId.trim()) {
       return errorResponse("User ID is required");
     }
 
-    return await apiClient<ApiResponse<{ milestones: UserMilestone[] }>>(
+    const queryParse = MilestoneQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) || "Invalid milestone query",
+      );
+    }
+
+    return await apiClient<ApiResponse<UserMilestone[]>>(
       `/milestones/user/${userId}`,
       {
         method: "GET",
+        query: queryParse.data,
       },
     );
   } catch (error) {
@@ -94,8 +117,8 @@ export async function getUserMilestones(
 }
 
 // Create Milestone
-// POST /milestones
 
+// POST /milestones
 export async function createMilestone(
   payload: CreateMilestoneInput,
 ): Promise<ApiResponse<{ milestone: UserMilestone }>> {
@@ -119,8 +142,8 @@ export async function createMilestone(
 }
 
 // Update Milestone
-// PATCH /milestones/:milestoneId
 
+// PATCH /milestones/:milestoneId
 export async function updateMilestone(
   milestoneId: string,
   payload: UpdateMilestoneInput,
@@ -149,8 +172,8 @@ export async function updateMilestone(
 }
 
 // Delete Milestone
-// DELETE /milestones/:milestoneId
 
+// DELETE /milestones/:milestoneId
 export async function deleteMilestone(
   milestoneId: string,
 ): Promise<ApiResponse<null>> {

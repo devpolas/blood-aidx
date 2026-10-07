@@ -6,6 +6,7 @@ import {
   deleteUser,
   getMe,
   getUser,
+  getUserById,
   getUsers,
   unbanUser,
   updateMe,
@@ -29,6 +30,15 @@ export function useCurrentUser() {
   return useQuery({
     queryKey: userKeys.me(),
     queryFn: getMe,
+  });
+}
+
+// User By Id
+export function useUserById(userId: string) {
+  return useQuery({
+    queryKey: userKeys.detail(userId),
+    queryFn: () => getUserById(userId),
+    enabled: Boolean(userId),
   });
 }
 

@@ -7,16 +7,16 @@ import { errorResponse } from "@/utils/api.response";
 
 // Get My Certificates
 // GET /certificates/me
-
 export async function getCertificates(): Promise<
-  ApiResponse<{ certificates: DonationCertificate[] }>
+  ApiResponse<DonationCertificate[]>
 > {
   try {
-    return await apiClient<
-      ApiResponse<{ certificates: DonationCertificate[] }>
-    >("/certificates/me", {
-      method: "GET",
-    });
+    return await apiClient<ApiResponse<DonationCertificate[]>>(
+      "/certificates/me",
+      {
+        method: "GET",
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
@@ -24,7 +24,6 @@ export async function getCertificates(): Promise<
 
 // Get My Certificate
 // GET /certificates/me/:certificateId
-
 export async function getCertificate(
   id: string,
 ): Promise<ApiResponse<{ certificate: DonationCertificate }>> {
@@ -46,7 +45,6 @@ export async function getCertificate(
 
 // Verify Certificate
 // GET /certificates/verify/:certificateNumber
-
 export async function verifyCertificate(
   certificateNumber: string,
 ): Promise<ApiResponse<{ certificate: DonationCertificate }>> {

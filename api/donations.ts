@@ -5,53 +5,66 @@ import { BloodDonation } from "@/types/blood.donation";
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
-
 import {
   CreateDonationInput,
   CreateDonationSchema,
+  DonationQueryInput,
+  DonationQuerySchema,
   UpdateDonationStatusInput,
   UpdateDonationStatusSchema,
 } from "@/validators/donation.validator";
 
 // Get My Donations
-// GET /donations/me
 
-export async function getMyDonations(): Promise<
-  ApiResponse<{ donations: BloodDonation[] }>
-> {
+// GET /donations/me
+export async function getMyDonations(
+  query?: DonationQueryInput,
+): Promise<ApiResponse<BloodDonation[]>> {
   try {
-    return await apiClient<ApiResponse<{ donations: BloodDonation[] }>>(
-      "/donations/me",
-      {
-        method: "GET",
-      },
-    );
+    const queryParse = DonationQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) || "Invalid donation query",
+      );
+    }
+
+    return await apiClient<ApiResponse<BloodDonation[]>>("/donations/me", {
+      method: "GET",
+      query: queryParse.data,
+    });
   } catch (error) {
     return handleApiError(error);
   }
 }
 
 // Get Donations
-// GET /donations
 
-export async function getDonations(): Promise<
-  ApiResponse<{ donations: BloodDonation[] }>
-> {
+// GET /donations
+export async function getDonations(
+  query?: DonationQueryInput,
+): Promise<ApiResponse<BloodDonation[]>> {
   try {
-    return await apiClient<ApiResponse<{ donations: BloodDonation[] }>>(
-      "/donations",
-      {
-        method: "GET",
-      },
-    );
+    const queryParse = DonationQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) || "Invalid donation query",
+      );
+    }
+
+    return await apiClient<ApiResponse<BloodDonation[]>>("/donations", {
+      method: "GET",
+      query: queryParse.data,
+    });
   } catch (error) {
     return handleApiError(error);
   }
 }
 
 // Get Donation
-// GET /donations/:donationId
 
+// GET /donations/:donationId
 export async function getDonation(
   donationId: string,
 ): Promise<ApiResponse<{ donation: BloodDonation }>> {
@@ -72,8 +85,8 @@ export async function getDonation(
 }
 
 // Create Donation
-// POST /donations
 
+// POST /donations
 export async function createDonation(
   payload: CreateDonationInput,
 ): Promise<ApiResponse<{ donation: BloodDonation }>> {
@@ -97,8 +110,8 @@ export async function createDonation(
 }
 
 // Cancel My Donation
-// POST /donations/:donationId/cancel
 
+// POST /donations/:donationId/cancel
 export async function cancelDonation(
   donationId: string,
 ): Promise<ApiResponse<{ donation: BloodDonation }>> {
@@ -119,8 +132,8 @@ export async function cancelDonation(
 }
 
 // Verify Donation
-// PATCH /donations/:donationId/verify
 
+// PATCH /donations/:donationId/verify
 export async function verifyDonation(
   donationId: string,
   payload: UpdateDonationStatusInput,

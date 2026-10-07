@@ -8,13 +8,15 @@ import { handleZodError } from "@/utils/zod.error";
 import {
   CreateCoffeePaymentInput,
   CreateCoffeePaymentSchema,
+  PaymentQueryInput,
+  PaymentQuerySchema,
   RefundPaymentInput,
   RefundPaymentSchema,
 } from "@/validators/payment.validator";
 
 // Create Coffee Payment
-// POST /payments/coffee
 
+// POST /payments/coffee
 export async function createCoffeePayment(
   payload: CreateCoffeePaymentInput,
 ): Promise<ApiResponse<{ payment: Payment }>> {
@@ -40,38 +42,54 @@ export async function createCoffeePayment(
 }
 
 // Get My Payments
-// GET /payments/my
 
-export async function getMyPayments(): Promise<
-  ApiResponse<{ payments: Payment[] }>
-> {
+// GET /payments/my
+export async function getMyPayments(
+  query?: PaymentQueryInput,
+): Promise<ApiResponse<Payment[]>> {
   try {
-    return await apiClient<ApiResponse<{ payments: Payment[] }>>(
-      "/payments/my",
-      {
-        method: "GET",
-      },
-    );
+    const queryParse = PaymentQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) || "Invalid payment query",
+      );
+    }
+
+    return await apiClient<ApiResponse<Payment[]>>("/payments/my", {
+      method: "GET",
+      query: queryParse.data,
+    });
   } catch (error) {
     return handleApiError(error);
   }
 }
 
 // Get Donor Payments
-// GET /payments/donor/:donorId
 
+// GET /payments/donor/:donorId
 export async function getDonorPayments(
   donorId: string,
-): Promise<ApiResponse<{ payments: Payment[] }>> {
+  query?: PaymentQueryInput,
+): Promise<ApiResponse<Payment[]>> {
   try {
     if (!donorId.trim()) {
       return errorResponse("Donor ID is required");
     }
 
-    return await apiClient<ApiResponse<{ payments: Payment[] }>>(
+    const queryParse = PaymentQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) || "Invalid payment query",
+      );
+    }
+
+    return await apiClient<ApiResponse<Payment[]>>(
       `/payments/donor/${donorId}`,
       {
         method: "GET",
+        query: queryParse.data,
       },
     );
   } catch (error) {
@@ -80,8 +98,8 @@ export async function getDonorPayments(
 }
 
 // Get Payment
-// GET /payments/:paymentId
 
+// GET /payments/:paymentId
 export async function getPayment(
   paymentId: string,
 ): Promise<ApiResponse<{ payment: Payment }>> {
@@ -102,8 +120,8 @@ export async function getPayment(
 }
 
 // Get Payment For Admin
-// GET /payments/admin/:paymentId
 
+// GET /payments/admin/:paymentId
 export async function getPaymentForAdmin(
   paymentId: string,
 ): Promise<ApiResponse<{ payment: Payment }>> {
@@ -124,8 +142,8 @@ export async function getPaymentForAdmin(
 }
 
 // Refund Payment
-// POST /payments/admin/:paymentId/refund
 
+// POST /payments/admin/:paymentId/refund
 export async function refundPayment(
   paymentId: string,
   payload: RefundPaymentInput,

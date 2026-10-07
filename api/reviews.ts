@@ -8,55 +8,92 @@ import { handleZodError } from "@/utils/zod.error";
 import {
   CreateReviewInput,
   CreateReviewSchema,
+  ReviewQueryInput,
+  ReviewQuerySchema,
   UpdateReviewInput,
   UpdateReviewSchema,
   UpdateReviewStatusInput,
   UpdateReviewStatusSchema,
 } from "@/validators/review.validator";
 
-export async function getMyReviews(): Promise<
-  ApiResponse<{ reviews: Review[] }>
-> {
+// Get My Reviews
+
+// GET /reviews
+export async function getMyReviews(
+  query?: ReviewQueryInput,
+): Promise<ApiResponse<Review[]>> {
   try {
-    return await apiClient<ApiResponse<{ reviews: Review[] }>>("/reviews", {
+    const queryParse = ReviewQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) || "Invalid review query",
+      );
+    }
+
+    return await apiClient<ApiResponse<Review[]>>("/reviews", {
       method: "GET",
+      query: queryParse.data,
     });
   } catch (error) {
     return handleApiError(error);
   }
 }
 
+// Get Reviews for User
+
+// GET /reviews/user/:userId
 export async function getReviewsForUser(
   userId: string,
-): Promise<ApiResponse<{ reviews: Review[] }>> {
+  query?: ReviewQueryInput,
+): Promise<ApiResponse<Review[]>> {
   try {
     if (!userId.trim()) {
       return errorResponse("User ID is required");
     }
 
-    return await apiClient<ApiResponse<{ reviews: Review[] }>>(
-      `/reviews/user/${userId}`,
-      {
-        method: "GET",
-      },
-    );
+    const queryParse = ReviewQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) || "Invalid review query",
+      );
+    }
+
+    return await apiClient<ApiResponse<Review[]>>(`/reviews/user/${userId}`, {
+      method: "GET",
+      query: queryParse.data,
+    });
   } catch (error) {
     return handleApiError(error);
   }
 }
 
+// Get Reviews for Organization
+
+// GET /reviews/organization/:organizationId
 export async function getReviewsForOrganization(
   organizationId: string,
-): Promise<ApiResponse<{ reviews: Review[] }>> {
+  query?: ReviewQueryInput,
+): Promise<ApiResponse<Review[]>> {
   try {
     if (!organizationId.trim()) {
       return errorResponse("Organization ID is required");
     }
 
-    return await apiClient<ApiResponse<{ reviews: Review[] }>>(
+    const queryParse = ReviewQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) || "Invalid review query",
+      );
+    }
+
+    return await apiClient<ApiResponse<Review[]>>(
       `/reviews/organization/${organizationId}`,
       {
         method: "GET",
+        query: queryParse.data,
       },
     );
   } catch (error) {
@@ -64,6 +101,9 @@ export async function getReviewsForOrganization(
   }
 }
 
+// Get Review
+
+// GET /reviews/:reviewId
 export async function getReview(
   reviewId: string,
 ): Promise<ApiResponse<{ review: Review }>> {
@@ -83,6 +123,9 @@ export async function getReview(
   }
 }
 
+// Create Review
+
+// POST /reviews
 export async function createReview(
   payload: CreateReviewInput,
 ): Promise<ApiResponse<{ review: Review }>> {
@@ -104,6 +147,9 @@ export async function createReview(
   }
 }
 
+// Update Review
+
+// PATCH /reviews/:reviewId
 export async function updateReview(
   reviewId: string,
   payload: UpdateReviewInput,
@@ -133,6 +179,9 @@ export async function updateReview(
   }
 }
 
+// Update Review Status
+
+// PATCH /reviews/:reviewId/status
 export async function updateReviewStatus(
   reviewId: string,
   payload: UpdateReviewStatusInput,
@@ -162,6 +211,9 @@ export async function updateReviewStatus(
   }
 }
 
+// Delete Review
+
+// DELETE /reviews/:reviewId
 export async function deleteReview(
   reviewId: string,
 ): Promise<ApiResponse<null>> {

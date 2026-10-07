@@ -5,21 +5,31 @@ import { DonorProfile } from "@/types/donor.profile";
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
-
 import {
+  DonorQueryInput,
+  DonorQuerySchema,
   UpdateDonorProfileInput,
   UpdateDonorProfileSchema,
 } from "@/validators/donor.validator";
 
 // Get Donors
-// GET /donors
 
-export async function getDonors(): Promise<
-  ApiResponse<{ donors: DonorProfile[] }>
-> {
+// GET /donors
+export async function getDonors(
+  query?: DonorQueryInput,
+): Promise<ApiResponse<DonorProfile[]>> {
   try {
-    return await apiClient<ApiResponse<{ donors: DonorProfile[] }>>("/donors", {
+    const queryParse = DonorQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) || "Invalid donor query",
+      );
+    }
+
+    return await apiClient<ApiResponse<DonorProfile[]>>("/donors", {
       method: "GET",
+      query: queryParse.data,
     });
   } catch (error) {
     return handleApiError(error);
@@ -27,8 +37,8 @@ export async function getDonors(): Promise<
 }
 
 // Get Donor
-// GET /donors/:donorId
 
+// GET /donors/:donorId
 export async function getDonor(
   donorId: string,
 ): Promise<ApiResponse<{ donor: DonorProfile }>> {
@@ -49,8 +59,8 @@ export async function getDonor(
 }
 
 // Get Current Donor Profile
-// GET /donors/me
 
+// GET /donors/me
 export async function getMyDonorProfile(): Promise<
   ApiResponse<{ donor: DonorProfile }>
 > {
@@ -64,8 +74,8 @@ export async function getMyDonorProfile(): Promise<
 }
 
 // Update Current Donor Profile
-// PUT /donors/me
 
+// PUT /donors/me
 export async function updateMyDonorProfile(
   payload: UpdateDonorProfileInput,
 ): Promise<ApiResponse<{ donor: DonorProfile }>> {
@@ -86,8 +96,8 @@ export async function updateMyDonorProfile(
 }
 
 // Delete Current Donor Profile
-// DELETE /donors/me
 
+// DELETE /donors/me
 export async function deleteMyDonorProfile(): Promise<ApiResponse<null>> {
   try {
     return await apiClient<ApiResponse<null>>("/donors/me", {
@@ -99,8 +109,8 @@ export async function deleteMyDonorProfile(): Promise<ApiResponse<null>> {
 }
 
 // Update Donor Profile
-// PATCH /donors/:donorId
 
+// PATCH /donors/:donorId
 export async function updateDonor(
   donorId: string,
   payload: UpdateDonorProfileInput,
@@ -129,8 +139,8 @@ export async function updateDonor(
 }
 
 // Delete Donor Profile
-// DELETE /donors/:donorId
 
+// DELETE /donors/:donorId
 export async function deleteDonor(donorId: string): Promise<ApiResponse<null>> {
   try {
     if (!donorId.trim()) {

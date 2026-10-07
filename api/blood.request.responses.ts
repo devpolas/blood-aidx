@@ -5,8 +5,9 @@ import { BloodRequestResponse } from "@/types/blood.request.response";
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
-
 import {
+  BloodRequestResponseQueryInput,
+  BloodRequestResponseQuerySchema,
   CreateBloodRequestResponseInput,
   CreateBloodRequestResponseSchema,
   UpdateBloodRequestResponseStatusInput,
@@ -14,16 +15,26 @@ import {
 } from "@/validators/blood.request.response.validator";
 
 // Get My Blood Request Responses
-// GET /blood-request-responses/me
 
-export async function getMyBloodRequestResponses(): Promise<
-  ApiResponse<{ responses: BloodRequestResponse[] }>
-> {
+// GET /blood-request-responses/me
+export async function getMyBloodRequestResponses(
+  query?: BloodRequestResponseQueryInput,
+): Promise<ApiResponse<BloodRequestResponse[]>> {
   try {
-    return await apiClient<ApiResponse<{ responses: BloodRequestResponse[] }>>(
+    const queryParse = BloodRequestResponseQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) ||
+          "Invalid blood request response query",
+      );
+    }
+
+    return await apiClient<ApiResponse<BloodRequestResponse[]>>(
       "/blood-request-responses/me",
       {
         method: "GET",
+        query: queryParse.data,
       },
     );
   } catch (error) {
@@ -32,20 +43,31 @@ export async function getMyBloodRequestResponses(): Promise<
 }
 
 // Get Responses for a Blood Request
-// GET /blood-request-responses/requests/:requestId
 
+// GET /blood-request-responses/requests/:requestId
 export async function getBloodRequestResponses(
   requestId: string,
-): Promise<ApiResponse<{ responses: BloodRequestResponse[] }>> {
+  query?: BloodRequestResponseQueryInput,
+): Promise<ApiResponse<BloodRequestResponse[]>> {
   try {
     if (!requestId.trim()) {
       return errorResponse("Blood request ID is required");
     }
 
-    return await apiClient<ApiResponse<{ responses: BloodRequestResponse[] }>>(
+    const queryParse = BloodRequestResponseQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) ||
+          "Invalid blood request response query",
+      );
+    }
+
+    return await apiClient<ApiResponse<BloodRequestResponse[]>>(
       `/blood-request-responses/requests/${requestId}`,
       {
         method: "GET",
+        query: queryParse.data,
       },
     );
   } catch (error) {
@@ -54,8 +76,8 @@ export async function getBloodRequestResponses(
 }
 
 // Create Blood Request Response
-// POST /blood-request-responses/requests/:requestId
 
+// POST /blood-request-responses/requests/:requestId
 export async function createBloodRequestResponse(
   requestId: string,
   payload: CreateBloodRequestResponseInput,
@@ -84,8 +106,8 @@ export async function createBloodRequestResponse(
 }
 
 // Get Individual Blood Request Response
-// GET /blood-request-responses/:responseId
 
+// GET /blood-request-responses/:responseId
 export async function getBloodRequestResponse(
   responseId: string,
 ): Promise<ApiResponse<{ response: BloodRequestResponse }>> {
@@ -106,8 +128,8 @@ export async function getBloodRequestResponse(
 }
 
 // Update Blood Request Response Status
-// PATCH /blood-request-responses/:responseId/status
 
+// PATCH /blood-request-responses/:responseId/status
 export async function updateBloodRequestResponseStatus(
   responseId: string,
   payload: UpdateBloodRequestResponseStatusInput,
@@ -136,8 +158,8 @@ export async function updateBloodRequestResponseStatus(
 }
 
 // Cancel My Blood Request Response
-// POST /blood-request-responses/:responseId/cancel
 
+// POST /blood-request-responses/:responseId/cancel
 export async function cancelBloodRequestResponse(
   responseId: string,
 ): Promise<ApiResponse<{ response: BloodRequestResponse }>> {
@@ -158,8 +180,8 @@ export async function cancelBloodRequestResponse(
 }
 
 // Delete My Blood Request Response
-// DELETE /blood-request-responses/:responseId
 
+// DELETE /blood-request-responses/:responseId
 export async function deleteBloodRequestResponse(
   responseId: string,
 ): Promise<ApiResponse<null>> {

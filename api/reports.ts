@@ -8,22 +8,39 @@ import { handleZodError } from "@/utils/zod.error";
 import {
   CreateReportInput,
   CreateReportSchema,
+  ReportQueryInput,
+  ReportQuerySchema,
   UpdateReportStatusInput,
   UpdateReportStatusSchema,
 } from "@/validators/report.validator";
 
-export async function getMyReports(): Promise<
-  ApiResponse<{ reports: Report[] }>
-> {
+// Current User
+
+// GET /reports/me
+export async function getMyReports(
+  query?: ReportQueryInput,
+): Promise<ApiResponse<Report[]>> {
   try {
-    return await apiClient<ApiResponse<{ reports: Report[] }>>("/reports/me", {
+    const queryParse = ReportQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) || "Invalid report query",
+      );
+    }
+
+    return await apiClient<ApiResponse<Report[]>>("/reports/me", {
       method: "GET",
+      query: queryParse.data,
     });
   } catch (error) {
     return handleApiError(error);
   }
 }
 
+// Public / Current User
+
+// GET /reports/:reportId
 export async function getReport(
   reportId: string,
 ): Promise<ApiResponse<{ report: Report }>> {
@@ -43,6 +60,9 @@ export async function getReport(
   }
 }
 
+// Current User
+
+// POST /reports
 export async function createReport(
   payload: CreateReportInput,
 ): Promise<ApiResponse<{ report: Report }>> {
@@ -64,6 +84,33 @@ export async function createReport(
   }
 }
 
+// Moderator / Admin
+
+// GET /reports
+export async function getReports(
+  query?: ReportQueryInput,
+): Promise<ApiResponse<Report[]>> {
+  try {
+    const queryParse = ReportQuerySchema.safeParse(query ?? {});
+
+    if (!queryParse.success) {
+      return errorResponse(
+        handleZodError(queryParse.error) || "Invalid report query",
+      );
+    }
+
+    return await apiClient<ApiResponse<Report[]>>("/reports", {
+      method: "GET",
+      query: queryParse.data,
+    });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+
+// Moderator / Admin
+
+// PATCH /reports/:reportId/status
 export async function updateReportStatus(
   reportId: string,
   payload: UpdateReportStatusInput,
@@ -93,6 +140,9 @@ export async function updateReportStatus(
   }
 }
 
+// Current User
+
+// DELETE /reports/:reportId
 export async function deleteReport(
   reportId: string,
 ): Promise<ApiResponse<null>> {
