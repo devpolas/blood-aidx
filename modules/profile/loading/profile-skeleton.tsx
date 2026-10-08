@@ -20,6 +20,7 @@ export function ProfileSkeletonItem() {
 
       <div className='flex-1 space-y-2 min-w-0'>
         <ProfileSkeleton className='w-16 h-3' />
+
         <ProfileSkeleton className='w-28 max-w-full h-5' />
       </div>
     </div>

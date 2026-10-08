@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { XCircleIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -11,27 +11,30 @@ import {
   useMyLocation,
   useMyProfile,
 } from "@/hooks";
-import { Card, CardContent } from "@/components/ui/card";
+
 import {
   Heading2,
   Heading3,
   Muted,
   Paragraph,
 } from "@/components/typography/typography";
+
+import { Card, CardContent } from "@/components/ui/card";
 import { ProfileHeader } from "@/modules/profile/profile-header";
 import { PersonalInformation } from "@/modules/profile/personal-information";
 import { AccountInformation } from "@/modules/profile/account-information";
-import { ContactInformation } from "@/modules/profile/contact-information";
 import { LocationInformation } from "@/modules/profile/location-information";
 import { DonorInformation } from "@/modules/profile/donor-information";
-import { ProfileActivity } from "@/modules/profile/profile-activity";
 import { ProfileLoading } from "./profile-loading";
+
 import Loading from "@/app/loading";
 
 export default function ProfilePage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const [profileEditOpen, setProfileEditOpen] = useState(false);
 
   const {
     isAuthenticated,
@@ -41,9 +44,7 @@ export default function ProfilePage() {
   } = useAuth();
 
   const { data: userResponse, isLoading: isUserLoading } = useCurrentUser();
-
   const { data: profileResponse, isPending: isProfileLoading } = useMyProfile();
-
   const { data: donorResponse, isPending: isDonorLoading } =
     useMyDonorProfile();
 
@@ -56,6 +57,7 @@ export default function ProfilePage() {
   const location = locationResponse?.data?.location;
 
   const search = searchParams.toString();
+
   const callbackUrl = `${pathname}${search ? `?${search}` : ""}`;
 
   useEffect(() => {
@@ -72,11 +74,7 @@ export default function ProfilePage() {
     router.replace(`/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
   }
 
-  if (isAuthLoading) {
-    return <Loading />;
-  }
-
-  if (!isAuthenticated) {
+  if (isAuthLoading || !isAuthenticated) {
     return <Loading />;
   }
 
@@ -117,32 +115,29 @@ export default function ProfilePage() {
   }
 
   return (
-    <section className='space-y-4 mx-auto w-full'>
+    <section className='space-y-5 sm:space-y-6 mx-auto w-full'>
       <header>
         <Heading2>Profile</Heading2>
 
-        <Paragraph>
-          Manage your personal information, donor details, location, and account
-          information.
+        <Paragraph className='mt-1'>
+          Manage your personal information, location, donor profile, and account
+          details.
         </Paragraph>
       </header>
 
       <ProfileHeader
         user={user}
+        onEdit={() => setProfileEditOpen(true)}
         logout={logoutCurrentUser}
         isLogoutPending={isLogoutPending}
       />
 
-      <div className='gap-4 grid lg:grid-cols-2'>
+      <div className='gap-5 lg:gap-6 grid lg:grid-cols-2'>
         <PersonalInformation user={user} profile={profile} />
         <AccountInformation user={user} />
-        <ContactInformation user={user} profile={profile} />
         <LocationInformation location={location} />
+        {isDonor && <DonorInformation donor={donor} />}
       </div>
-
-      {isDonor && <DonorInformation donor={donor} />}
-
-      <ProfileActivity profile={profile} />
     </section>
   );
 }

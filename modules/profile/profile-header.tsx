@@ -2,6 +2,7 @@ import {
   CalendarDaysIcon,
   CheckCircle2Icon,
   Clock3Icon,
+  DropletsIcon,
   LogOutIcon,
   MailIcon,
 } from "lucide-react";
@@ -12,13 +13,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { namePerfect } from "@/utils/refine.name";
-import { getInitials } from "@/utils/initials.helper";
 import { Heading3, Large, Small } from "@/components/typography/typography";
-import { dateFormat } from "@/utils/date.format";
-import { Separator } from "@/components/ui/separator";
 import { LoadingSpinner } from "@/components/shared/loading/loading";
-import { useIsMobile } from "@/hooks";
+
+import { dateFormat } from "@/utils/date.format";
+import { getInitials } from "@/utils/initials.helper";
+import { namePerfect } from "@/utils/refine.name";
 
 interface ProfileHeaderProps {
   user: User;
@@ -31,12 +31,12 @@ export function ProfileHeader({
   logout,
   isLogoutPending,
 }: ProfileHeaderProps) {
-  const isMobile = useIsMobile();
   return (
-    <Card className='overflow-hidden'>
-      <div className='p-4 border-brand/20 border-b'>
-        <div className='flex flex-row justify-between lg:items-center gap-5 sm:gap-6'>
-          <div className='flex items-center gap-3 sm:gap-5 min-w-0'>
+    <Card className='border-brand/20 overflow-hidden'>
+      <div className='relative p-4 sm:p-6 lg:p-8'>
+        <div className='flex sm:flex-row flex-col sm:justify-between sm:items-center gap-6'>
+          {/* Profile identity */}
+          <div className='flex items-center gap-4 sm:gap-5 min-w-0'>
             <Avatar className='border-2 border-brand/20 size-16 sm:size-20 lg:size-24 shrink-0'>
               <AvatarImage
                 src={user.image ?? undefined}
@@ -49,24 +49,26 @@ export function ProfileHeader({
             </Avatar>
 
             <div className='space-y-2 min-w-0'>
-              <div className='flex flex-wrap items-center gap-2 min-w-0'>
-                <Heading3 className='min-w-0 text-lg sm:text-xl lg:text-2xl truncate'>
+              {/* Name */}
+              <div className='flex flex-wrap items-center gap-2'>
+                <Heading3 className='text-lg sm:text-xl lg:text-2xl wrap-break-words'>
                   {namePerfect(user.name)}
                 </Heading3>
 
                 {user.emailVerified ? (
-                  <Badge variant='secondary' className='shrink-0'>
+                  <Badge variant='secondary' className='gap-1.5 shrink-0'>
                     <CheckCircle2Icon className='size-3.5 text-brand-success' />
                     Verified
                   </Badge>
                 ) : (
-                  <Badge variant='outline' className='shrink-0'>
+                  <Badge variant='outline' className='gap-1.5 shrink-0'>
                     <Clock3Icon className='size-3.5' />
                     Unverified
                   </Badge>
                 )}
               </div>
 
+              {/* Email */}
               <div className='flex items-center gap-2 min-w-0 text-muted-foreground'>
                 <MailIcon className='size-4 shrink-0' />
 
@@ -75,18 +77,20 @@ export function ProfileHeader({
                 </span>
               </div>
 
-              <Badge className='capitalize'>
+              {/* Role */}
+              <Badge className='gap-1.5 w-fit capitalize'>
+                <DropletsIcon className='size-3.5' />
                 {user.role.replaceAll("_", " ")}
               </Badge>
             </div>
           </div>
 
           <Button
+            type='button'
+            variant='destructive'
             disabled={isLogoutPending}
             onClick={logout}
-            variant='destructive'
             className='cursor-pointer shrink-0'
-            size={isMobile ? "sm" : "default"}
           >
             {isLogoutPending ? (
               <LoadingSpinner
@@ -97,36 +101,45 @@ export function ProfileHeader({
               />
             ) : (
               <>
-                <LogOutIcon className='text-destructive' />
-                <span className='text-destructive'>Logout</span>
+                <LogOutIcon />
+                Logout
               </>
             )}
           </Button>
         </div>
       </div>
-      <CardContent className='gap-5 sm:gap-6 grid sm:grid-cols-2 lg:grid-cols-4 p-4 sm:p-6 lg:p-8'>
-        <div className='min-w-0'>
+
+      {/* Account overview */}
+      <CardContent className='gap-0 grid grid-cols-2 lg:grid-cols-4 p-0 border-brand/10 border-t'>
+        {/* Gender */}
+        <div className='p-4 sm:p-5 lg:p-6 border-border/60 border-r min-w-0'>
           <Small>Gender</Small>
-          <Large className='mt-1 warp-break-words'>
+
+          <Large className='mt-1 wrap-break-words'>
             {user.gender ? namePerfect(user.gender.replaceAll("_", " ")) : "—"}
           </Large>
         </div>
 
-        <div className='min-w-0'>
+        {/* Member since */}
+        <div className='p-4 sm:p-5 lg:p-6 border-border/60 lg:border-r border-b lg:border-b-0 min-w-0'>
           <Small>Member Since</Small>
+
           <Large className='flex items-center gap-2 mt-1'>
             <CalendarDaysIcon className='size-4 text-brand shrink-0' />
-            {dateFormat(user.createdAt)}
+
+            <span className='truncate'>{dateFormat(user.createdAt)}</span>
           </Large>
         </div>
 
-        <div className='min-w-0'>
+        {/* Account status */}
+        <div className='p-4 sm:p-5 lg:p-6 border-border/60 border-r min-w-0'>
           <Small>Account Status</Small>
+
           <div className='mt-1'>
             {user.banned ? (
               <Badge variant='destructive'>Banned</Badge>
             ) : (
-              <Badge variant='secondary'>
+              <Badge variant='secondary' className='gap-1.5'>
                 <CheckCircle2Icon className='size-3.5 text-brand-success' />
                 Active
               </Badge>
@@ -134,9 +147,13 @@ export function ProfileHeader({
           </div>
         </div>
 
-        <div className='min-w-0'>
+        {/* Last updated */}
+        <div className='p-4 sm:p-5 lg:p-6 min-w-0'>
           <Small>Last Updated</Small>
-          <Large className='mt-1'>{dateFormat(user.updatedAt)}</Large>
+
+          <Large className='mt-1 wrap-break-words'>
+            {dateFormat(user.updatedAt)}
+          </Large>
         </div>
       </CardContent>
     </Card>

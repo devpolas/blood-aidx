@@ -1,14 +1,14 @@
 "use client";
 
 import {
-  CalendarDaysIcon,
-  ContactIcon,
+  DropletsIcon,
   MapPinIcon,
   ShieldUserIcon,
   UserIcon,
 } from "lucide-react";
 
 import { Heading2, Muted } from "@/components/typography/typography";
+
 import { ProfileHeaderLoading } from "@/modules/profile/loading/profile-header-loading";
 import { ProfileSectionLoading } from "@/modules/profile/loading/profile-section-loading";
 
@@ -39,9 +39,8 @@ export function ProfileLoading({
       aria-busy='true'
       aria-live='polite'
     >
-      <header className='space-y-2'>
+      <header className='space-y-1'>
         <Heading2>Profile</Heading2>
-
         <Muted>{loadingMessage}</Muted>
       </header>
 
@@ -51,42 +50,31 @@ export function ProfileLoading({
         <ProfileSectionLoading
           icon={UserIcon}
           title='Personal Information'
-          count={4}
+          count={5}
         />
 
         <ProfileSectionLoading
           icon={ShieldUserIcon}
           title='Account Information'
-          count={4}
-        />
-
-        <ProfileSectionLoading
-          icon={ContactIcon}
-          title='Contact Information'
-          count={2}
+          count={5}
         />
 
         <ProfileSectionLoading
           icon={MapPinIcon}
-          title='Location Information'
-          count={4}
-        />
-      </div>
-
-      {isDonor && (
-        <ProfileSectionLoading
-          icon={UserIcon}
-          title='Donor Information'
-          count={6}
+          title='Location'
+          count={7}
           wide
         />
-      )}
 
-      <ProfileSectionLoading
-        icon={CalendarDaysIcon}
-        title='Profile Activity'
-        count={2}
-      />
+        {isDonor && (
+          <ProfileSectionLoading
+            icon={DropletsIcon}
+            title='Donor Information'
+            count={8}
+            wide
+          />
+        )}
+      </div>
     </main>
   );
 }
