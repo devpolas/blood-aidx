@@ -1,7 +1,12 @@
 import apiClient from "@/lib/api.client";
 
 import { ApiResponse } from "@/types/api.response";
-import { Location } from "@/types/location";
+import {
+  CitiesResponse,
+  CountriesResponse,
+  Location,
+  RegionsResponse,
+} from "@/types/location";
 import { handleApiError } from "@/utils/api.error";
 import { errorResponse } from "@/utils/api.response";
 import { handleZodError } from "@/utils/zod.error";
@@ -12,6 +17,7 @@ import {
   LocationUpdateInput,
   LocationUpdateSchema,
 } from "@/validators/location.validator";
+import { placeDbClient } from "../api.place.client";
 
 // Get My Location
 // GET /locations/me
@@ -131,3 +137,21 @@ export async function deleteLocation(
     return handleApiError(error);
   }
 }
+
+// Get World Locations
+
+export const getCountries = async () => {
+  return placeDbClient<CountriesResponse>("/countries.json");
+};
+
+export const getRegions = async (countryCode: string) => {
+  return placeDbClient<RegionsResponse>(
+    `/regions/${countryCode.toUpperCase()}.json`,
+  );
+};
+
+export const getSettlements = async (countryCode: string, regionId: number) => {
+  return placeDbClient<CitiesResponse>(
+    `/cities/${countryCode.toUpperCase()}/${regionId}.json`,
+  );
+};
