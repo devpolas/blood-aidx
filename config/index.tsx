@@ -314,3 +314,9 @@ export const AVAILABILITY_OPTIONS = [
     description: "I'm currently not available to donate.",
   },
 ] as const;
+
+export const PRIORITY_OPTIONS = [
+  { label: "Low", value: "low" },
+  { label: "High", value: "high" },
+  { label: "Urgent", value: "urgent" },
+] as const;
