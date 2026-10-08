@@ -18,10 +18,12 @@ export const DonationStatusSchema = z.enum([
   "cancelled",
 ]);
 
+// Create
+
 export const CreateDonationSchema = z
   .object({
     requestId: z.uuid().optional(),
-    organizationId: z.uuid().optional(),
+    organizationId: z.uuid(),
     locationId: z.uuid().optional(),
     units: z.number().int().positive().max(10),
     donatedAt: z.iso.datetime(),
@@ -29,41 +31,63 @@ export const CreateDonationSchema = z
   })
   .strict();
 
+// Verify / Reject
+
 export const UpdateDonationStatusSchema = z
   .object({
-    status: z.enum(["verified", "rejected", "cancelled"]),
-
-    verificationNotes: z.string().trim().max(1000).optional(),
+    status: z.enum(["verified", "rejected"]),
+    rejectionReason: z.string().trim().max(1000).optional(),
   })
-  .strict();
+  .strict()
+  .superRefine((data, ctx) => {
+    if (data.status === "rejected" && !data.rejectionReason) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["rejectionReason"],
+        message: "Rejection reason is required when rejecting a donation",
+      });
+    }
+
+    if (data.status === "verified" && data.rejectionReason) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["rejectionReason"],
+        message:
+          "Rejection reason can only be provided when rejecting a donation",
+      });
+    }
+  });
+
+// Response
 
 export const DonationSchema = z.object({
   id: z.uuid(),
   donorId: z.uuid(),
   requestId: z.uuid().nullable(),
-  organizationId: z.uuid().nullable(),
+  organizationId: z.uuid(),
   locationId: z.uuid().nullable(),
   donationNumber: z.string(),
   bloodGroup: BloodGroupSchema,
   units: z.number().int(),
   donatedAt: z.string(),
   status: DonationStatusSchema,
-  verifiedById: z.uuid().nullable(),
   verifiedAt: z.string().nullable(),
-  verificationNotes: z.string().nullable(),
+  verifiedById: z.uuid().nullable(),
+  rejectionReason: z.string().nullable(),
   notes: z.string().nullable(),
-
   createdAt: z.string(),
   updatedAt: z.string(),
 });
 
-export type CreateDonationInput = z.input<typeof CreateDonationSchema>;
+// Types
 
+export type CreateDonationInput = z.input<typeof CreateDonationSchema>;
 export type UpdateDonationStatusInput = z.input<
   typeof UpdateDonationStatusSchema
 >;
-
 export type DonationResponse = z.input<typeof DonationSchema>;
+
+// Donation Query
 
 export const DonationSortBySchema = z.enum([
   "createdAt",
@@ -108,7 +132,9 @@ export const DonationQuerySchema = z
     ] as const;
 
     for (const [fromKey, toKey, from, to] of ranges) {
-      if (from && to && new Date(to) < new Date(from)) {
+      if (!from || !to) continue;
+
+      if (new Date(to) < new Date(from)) {
         ctx.addIssue({
           code: "custom",
           path: [toKey],
