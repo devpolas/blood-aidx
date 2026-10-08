@@ -27,31 +27,191 @@ export const BloodRequestStatusSchema = z.enum([
 
 export const CreateBloodRequestSchema = z
   .object({
-    organizationId: z.uuid(),
-    bloodGroup: BloodGroupSchema,
-    unitsRequired: z.number().int().positive().max(100),
-    priority: PrioritySchema.default("low"),
-    patientName: z.string().trim().min(2).max(150).optional(),
-    patientAge: z.number().int().min(0).max(150).optional(),
-    requiredAt: z.iso.datetime().optional(),
-    expiresAt: z.iso.datetime().optional(),
-    description: z.string().trim().max(2000).optional(),
+    organizationId: z.string().trim(),
+
+    bloodGroup: z.string().trim(),
+
+    unitsRequired: z
+      .number({
+        error: "Units required is required",
+      })
+      .int("Units required must be a whole number")
+      .positive("Units required must be greater than 0")
+      .max(100, "Units required cannot exceed 100")
+      .optional(),
+
+    priority: z.string().trim(),
+
+    patientName: z
+      .string()
+      .trim()
+      .max(150, "Patient name must be at most 150 characters"),
+
+    patientAge: z
+      .number({
+        error: "Patient age is required",
+      })
+      .int("Patient age must be a whole number")
+      .min(0, "Patient age cannot be negative")
+      .max(150, "Patient age must be at most 150")
+      .optional(),
+
+    requiredAt: z.string().trim(),
+
+    expiresAt: z.string().trim(),
+
+    description: z
+      .string()
+      .trim()
+      .max(2000, "Description must be at most 2000 characters"),
   })
-  .strict()
   .superRefine((data, ctx) => {
-    if (!data.requiredAt || !data.expiresAt) return;
+    // Organization
+    if (!data.organizationId) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["organizationId"],
+        message: "Please select an organization",
+      });
+    } else if (!z.uuid().safeParse(data.organizationId).success) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["organizationId"],
+        message: "Please select a valid organization",
+      });
+    }
 
-    const requiredAt = new Date(data.requiredAt);
-    const expiresAt = new Date(data.expiresAt);
+    // Blood group
+    if (!data.bloodGroup) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["bloodGroup"],
+        message: "Please select a blood group",
+      });
+    } else if (!BloodGroupSchema.safeParse(data.bloodGroup).success) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["bloodGroup"],
+        message: "Please select a valid blood group",
+      });
+    }
 
-    if (expiresAt <= requiredAt) {
+    // Units required
+    if (data.unitsRequired === undefined) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["unitsRequired"],
+        message: "Please enter the number of units required",
+      });
+    }
+
+    // Priority
+    if (!data.priority) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["priority"],
+        message: "Please select a priority",
+      });
+    } else if (!PrioritySchema.safeParse(data.priority).success) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["priority"],
+        message: "Please select a valid priority",
+      });
+    }
+
+    // Patient name
+    if (!data.patientName) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["patientName"],
+        message: "Please enter the patient's name",
+      });
+    } else if (data.patientName.length < 2) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["patientName"],
+        message: "Patient name must be at least 2 characters",
+      });
+    }
+
+    // Patient age
+    if (data.patientAge === undefined) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["patientAge"],
+        message: "Please enter the patient's age",
+      });
+    }
+
+    // Required date
+    const requiredAtResult = z.iso.datetime().safeParse(data.requiredAt);
+
+    if (!data.requiredAt) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["requiredAt"],
+        message: "Please select when the blood is required",
+      });
+    } else if (!requiredAtResult.success) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["requiredAt"],
+        message: "Please select a valid required date",
+      });
+    }
+
+    // Expiration date
+    const expiresAtResult = z.iso.datetime().safeParse(data.expiresAt);
+
+    if (!data.expiresAt) {
       ctx.addIssue({
         code: "custom",
         path: ["expiresAt"],
-        message: "Expiration time must be after required time",
+        message: "Please select when this request expires",
+      });
+    } else if (!expiresAtResult.success) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["expiresAt"],
+        message: "Please select a valid expiration date",
       });
     }
-  });
+
+    // Required date cannot be in the past
+    if (requiredAtResult.success) {
+      const today = new Date();
+
+      today.setHours(0, 0, 0, 0);
+
+      const requiredAt = new Date(data.requiredAt);
+
+      requiredAt.setHours(0, 0, 0, 0);
+
+      if (requiredAt < today) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["requiredAt"],
+          message: "Required date cannot be in the past",
+        });
+      }
+    }
+
+    // Expiration must be after required date
+    if (requiredAtResult.success && expiresAtResult.success) {
+      const requiredAt = new Date(data.requiredAt);
+      const expiresAt = new Date(data.expiresAt);
+
+      if (expiresAt <= requiredAt) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["expiresAt"],
+          message: "Expiration date must be after the required date",
+        });
+      }
+    }
+  })
+  .strict();
 
 // Update Blood Request
 
@@ -114,7 +274,7 @@ export const BloodRequestSchema = z.object({
 // Types
 
 export type CreateBloodRequestInput = z.input<typeof CreateBloodRequestSchema>;
-
+export type BloodRequestFormValues = z.input<typeof CreateBloodRequestSchema>;
 export type UpdateBloodRequestInput = z.input<typeof UpdateBloodRequestSchema>;
 
 export type UpdateBloodRequestStatusInput = z.input<
