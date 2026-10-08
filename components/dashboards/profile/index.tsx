@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { XCircleIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -33,8 +33,6 @@ export default function ProfilePage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
-  const [profileEditOpen, setProfileEditOpen] = useState(false);
 
   const {
     isAuthenticated,
@@ -127,7 +125,6 @@ export default function ProfilePage() {
 
       <ProfileHeader
         user={user}
-        onEdit={() => setProfileEditOpen(true)}
         logout={logoutCurrentUser}
         isLogoutPending={isLogoutPending}
       />
