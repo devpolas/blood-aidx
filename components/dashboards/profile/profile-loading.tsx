@@ -4,10 +4,11 @@ import {
   DropletsIcon,
   MapPinIcon,
   ShieldUserIcon,
+  UserCircle,
   UserIcon,
 } from "lucide-react";
 
-import { Heading2, Muted } from "@/components/typography/typography";
+import { Heading3, Muted } from "@/components/typography/typography";
 
 import { ProfileHeaderLoading } from "@/modules/profile/loading/profile-header-loading";
 import { ProfileSectionLoading } from "@/modules/profile/loading/profile-section-loading";
@@ -40,7 +41,10 @@ export function ProfileLoading({
       aria-live='polite'
     >
       <header className='space-y-1'>
-        <Heading2>Profile</Heading2>
+        <div className='flex items-center gap-2 text-xl'>
+          <UserCircle className='size-6 text-brand' />
+          <Heading3>Profile</Heading3>
+        </div>
         <Muted>{loadingMessage}</Muted>
       </header>
 

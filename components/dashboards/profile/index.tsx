@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { XCircleIcon } from "lucide-react";
+import { UserCircle, XCircleIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import {
@@ -115,7 +115,10 @@ export default function ProfilePage() {
   return (
     <section className='space-y-5 sm:space-y-6 mx-auto w-full'>
       <header>
-        <Heading2>Profile</Heading2>
+        <div className='flex items-center gap-2 text-xl'>
+          <UserCircle className='size-6 text-brand' />
+          <Heading3>Profile</Heading3>
+        </div>
 
         <Paragraph className='mt-1'>
           Manage your personal information, location, donor profile, and account
