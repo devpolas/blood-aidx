@@ -21,12 +21,10 @@ import {
   UpdateOrganizationStatusSchema,
 } from "@/validators/organization.validator";
 
-// Get Organizations
-
 // GET /organizations
 export async function getOrganizations(
   query?: OrganizationQueryInput,
-): Promise<ApiResponse<Organization[]>> {
+): Promise<ApiResponse<{ organizations: Organization[] }>> {
   try {
     const queryParse = OrganizationQuerySchema.safeParse(query ?? {});
 
@@ -36,10 +34,13 @@ export async function getOrganizations(
       );
     }
 
-    return await apiClient<ApiResponse<Organization[]>>("/organizations", {
-      method: "GET",
-      query: queryParse.data,
-    });
+    return await apiClient<ApiResponse<{ organizations: Organization[] }>>(
+      "/organizations",
+      {
+        method: "GET",
+        query: queryParse.data,
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
