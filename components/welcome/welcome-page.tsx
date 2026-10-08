@@ -3,27 +3,30 @@
 import { useEffect, useState } from "react";
 import { HeartPulse } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Loading from "@/app/loading";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  useAuth,
   useCurrentUser,
   useMyDonorProfile,
   useMyLocation,
   useMyProfile,
   useProfileCompletion,
 } from "@/hooks";
-
 import { getSafeCallbackUrl } from "@/utils/callback.url";
-import { WelcomeProgress } from "./welcome-progress";
-import { PersonalStep } from "./personal-step";
+
 import { DonorStep } from "./donor-step";
 import { LocationStep } from "./location-step";
-import Loading from "@/app/loading";
+import { PersonalStep } from "./personal-step";
+import { WelcomeProgress } from "./welcome-progress";
 
 export default function WelcomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
   const callbackUrl = getSafeCallbackUrl(searchParams.get("callbackUrl"));
-  const [currentStep, setCurrentStep] = useState(1);
+
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { data: userResponse, isPending: isUserLoading } = useCurrentUser();
   const { data: profileResponse, isPending: isProfileLoading } = useMyProfile();
   const { data: donorResponse, isPending: isDonorLoading } =
@@ -38,14 +41,15 @@ export default function WelcomePage() {
     steps,
   } = useProfileCompletion();
 
+  const [currentStep, setCurrentStep] = useState(1);
+
   const user = userResponse?.data?.user;
   const profile = profileResponse?.data?.profile;
   const donor = donorResponse?.data?.donor;
   const location = locationResponse?.data?.location;
 
-  console.log(user, profile, donor, location);
-
   const isLoading =
+    isAuthLoading ||
     isUserLoading ||
     isProfileLoading ||
     isDonorLoading ||
@@ -55,7 +59,7 @@ export default function WelcomePage() {
   useEffect(() => {
     if (isLoading) return;
 
-    if (!user) {
+    if (!isAuthenticated || !user) {
       const target = callbackUrl || "/dashboard";
 
       router.replace(`/signin?callbackUrl=${encodeURIComponent(target)}`);
@@ -66,20 +70,54 @@ export default function WelcomePage() {
     if (!requiresProfileSetup || isComplete) {
       router.replace(callbackUrl || "/dashboard");
     }
-  }, [user, isLoading, requiresProfileSetup, isComplete, callbackUrl, router]);
+  }, [
+    isLoading,
+    isAuthenticated,
+    user,
+    requiresProfileSetup,
+    isComplete,
+    callbackUrl,
+    router,
+  ]);
+
+  useEffect(() => {
+    if (isLoading || !user || !requiresProfileSetup || isComplete) {
+      return;
+    }
+
+    if (!steps.personal) {
+      setCurrentStep(1);
+      return;
+    }
+
+    if (!steps.donor) {
+      setCurrentStep(2);
+      return;
+    }
+
+    if (!steps.location) {
+      setCurrentStep(3);
+    }
+  }, [isLoading, user, requiresProfileSetup, isComplete, steps]);
 
   function handleComplete() {
     router.replace(callbackUrl || "/dashboard");
   }
 
-  if (isLoading || !user || !requiresProfileSetup || isComplete) {
+  if (
+    isLoading ||
+    !isAuthenticated ||
+    !user ||
+    !requiresProfileSetup ||
+    isComplete
+  ) {
     return <Loading />;
   }
 
   return (
-    <main className='bg-background px-4 py-8 sm:py-12 min-h-screen'>
+    <section className='bg-background px-4 py-8 sm:py-12 min-h-screen'>
       <div className='mx-auto w-full max-w-4xl'>
-        <header className='mb-8 sm:mb-10 text-center'>
+        <div className='mb-8 sm:mb-10 text-center'>
           <div className='flex justify-center items-center bg-brand/10 mx-auto mb-5 rounded-2xl size-14 text-brand'>
             <HeartPulse className='size-7' />
           </div>
@@ -92,7 +130,7 @@ export default function WelcomePage() {
             Let&apos;s complete your profile so you can discover donors, respond
             to blood requests, and help save lives.
           </p>
-        </header>
+        </div>
 
         <div className='mb-8'>
           <WelcomeProgress currentStep={currentStep} completedSteps={steps} />
@@ -131,6 +169,6 @@ export default function WelcomePage() {
           support.
         </p>
       </div>
-    </main>
+    </section>
   );
 }
