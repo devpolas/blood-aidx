@@ -24,6 +24,7 @@ import {
   isFieldInvalid,
 } from "./form.field";
 import { useState } from "react";
+import { Field } from "@/components/ui/field";
 export type FormComboboxOption = { label: string; value: string };
 type FormComboboxProps = {
   field: AnyFieldApi;
@@ -53,7 +54,7 @@ export function FormCombobox({
   const invalid = isFieldInvalid(field);
   const selected = options.find((item) => item.value === field.state.value);
   return (
-    <div className='space-y-4'>
+    <Field data-invalid={invalid}>
       <div className='flex justify-between items-center gap-3'>
         <div className='flex items-center gap-0.5'>
           <FormFieldLabel field={field} label={label} id={inputId} />
@@ -136,6 +137,6 @@ export function FormCombobox({
         </PopoverContent>
       </Popover>
       <FormFieldError field={field} />
-    </div>
+    </Field>
   );
 }

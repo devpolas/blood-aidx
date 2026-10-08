@@ -40,7 +40,7 @@ export function FormFile({
   const invalid = isFieldInvalid(field);
 
   return (
-    <Field data-invalid={invalid} className='space-y-2'>
+    <Field data-invalid={invalid}>
       <div className='flex items-center gap-0.5'>
         <FormFieldLabel field={field} label={label} id={inputId} />
         {isRequired && (

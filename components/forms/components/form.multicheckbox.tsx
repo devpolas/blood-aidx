@@ -17,7 +17,13 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-import { FormFieldError, FormFieldLabel, getFieldId } from "./form.field";
+import {
+  FormFieldError,
+  FormFieldLabel,
+  getFieldId,
+  isFieldInvalid,
+} from "./form.field";
+import { Field } from "@/components/ui/field";
 
 export type FormMultiCheckboxOption = { label: string; value: string };
 type FormMultiCheckboxProps = {
@@ -43,8 +49,8 @@ export function FormMultiCheckbox({
   onCreateNew,
   disabled = false,
 }: FormMultiCheckboxProps) {
-
   const inputId = getFieldId(field, id);
+  const invalid = isFieldInvalid(field);
   const selectedValues = Array.isArray(field.state.value)
     ? (field.state.value as string[])
     : [];
@@ -64,7 +70,7 @@ export function FormMultiCheckbox({
   }
 
   return (
-    <div className='space-y-4'>
+    <Field data-invalid={invalid}>
       <div className='flex justify-between items-center gap-3'>
         <div className='flex items-center gap-0.5'>
           <FormFieldLabel field={field} label={label} id={inputId} />
@@ -167,6 +173,6 @@ export function FormMultiCheckbox({
         </div>
       )}
       <FormFieldError field={field} />
-    </div>
+    </Field>
   );
 }

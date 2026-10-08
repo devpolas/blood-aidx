@@ -49,7 +49,7 @@ export function FormDatePicker({
   const value =
     field.state.value instanceof Date ? field.state.value : undefined;
   return (
-    <Field data-invalid={invalid} className='space-y-2'>
+    <Field data-invalid={invalid}>
       <div className='flex items-center gap-0.5'>
         <FormFieldLabel field={field} label={label} id={inputId} />
         {isRequired && (

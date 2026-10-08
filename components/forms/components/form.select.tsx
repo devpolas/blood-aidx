@@ -56,7 +56,7 @@ export function FormSelect({
   const selectId = getFieldId(field, id);
   const invalid = isFieldInvalid(field);
   return (
-    <Field data-invalid={invalid} className='space-y-2'>
+    <Field data-invalid={invalid}>
       <div className='flex justify-between items-center gap-3'>
         <div className='flex items-center gap-0.5'>
           <FormFieldLabel field={field} label={label} id={selectId} />
