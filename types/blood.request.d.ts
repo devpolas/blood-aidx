@@ -1,4 +1,4 @@
-import {
+import type {
   BloodGroup,
   BloodRequestStatus,
   ID,
@@ -9,7 +9,7 @@ import {
 export interface BloodRequest {
   id: ID;
   requesterId: ID;
-  locationId: ID | null;
+  organizationId: ID;
   bloodGroup: BloodGroup;
   unitsRequired: number;
   unitsFulfilled: number;
@@ -17,7 +17,6 @@ export interface BloodRequest {
   status: BloodRequestStatus;
   patientName: string | null;
   patientAge: number | null;
-  hospitalName: string | null;
   requiredAt: ISODateString | null;
   expiresAt: ISODateString | null;
   description: string | null;

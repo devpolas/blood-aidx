@@ -1,4 +1,4 @@
-import { ID, ISODateString } from "./enum";
+import type { ID, ISODateString } from "./enum";
 
 export interface MilestoneCertificate {
   id: ID;

@@ -7,7 +7,7 @@ export interface DonationCertificate {
   verificationCode: string;
   donorName: string;
   bloodGroup: BloodGroup;
-  donationNumber: number;
+  donationNumber: string;
   donatedAt: ISODateString;
   issuedAt: ISODateString;
   certificateUrl: string | null;

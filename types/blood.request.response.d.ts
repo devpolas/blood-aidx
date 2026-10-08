@@ -1,4 +1,4 @@
-import { ID, ISODateString, RequestResponseStatus } from "./enum";
+import type { ID, ISODateString, RequestResponseStatus } from "./enum";
 
 export interface BloodRequestResponse {
   id: ID;
