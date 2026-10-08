@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
-import { Large, Small } from "@/components/typography/typography";
+import { Small } from "@/components/typography/typography";
 
 interface ProfileInfoItemProps {
   icon: LucideIcon;
@@ -26,7 +26,9 @@ export function ProfileInfoItem({
       <div className='flex-1 min-w-0'>
         <Small>{label}</Small>
 
-        <Large className='mt-1 warp-break-words'>{value}</Large>
+        <div className='mt-1 font-semibold text-foreground text-base sm:text-lg warp-break-words leading-6 sm:leading-7'>
+          {value}
+        </div>
       </div>
     </div>
   );
