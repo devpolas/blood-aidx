@@ -1,25 +1,15 @@
 "use client";
 
-import { ArrowLeft, MapPin } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
+import { MapPin } from "lucide-react";
 import { LocationForm } from "@/components/forms/location/location.form";
-
 import type { Location } from "@/types/location";
-
 type LocationStepProps = {
   location?: Location;
   disabled?: boolean;
-  onBack: () => void;
   onComplete: () => void;
 };
 
-export function LocationStep({
-  location,
-  disabled = false,
-  onBack,
-  onComplete,
-}: LocationStepProps) {
+export function LocationStep({ location, onComplete }: LocationStepProps) {
   return (
     <div className='space-y-7'>
       <div>

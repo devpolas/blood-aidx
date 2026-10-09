@@ -155,11 +155,7 @@ export default function WelcomePage() {
             )}
 
             {currentStep === 3 && (
-              <LocationStep
-                location={location}
-                onBack={() => setCurrentStep(2)}
-                onComplete={handleComplete}
-              />
+              <LocationStep location={location} onComplete={handleComplete} />
             )}
           </CardContent>
         </Card>
