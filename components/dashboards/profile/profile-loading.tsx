@@ -8,7 +8,7 @@ import {
   UserIcon,
 } from "lucide-react";
 
-import { Heading4, Muted } from "@/components/typography/typography";
+import { Heading3, Muted } from "@/components/typography/typography";
 
 import { ProfileHeaderLoading } from "@/modules/profile/loading/profile-header-loading";
 import { ProfileSectionLoading } from "@/modules/profile/loading/profile-section-loading";
@@ -47,7 +47,7 @@ export function ProfileLoading({
           </div>
 
           <div className='min-w-0'>
-            <Heading4 className='leading-6'>Profile</Heading4>
+            <Heading3 className='leading-6'>Profile</Heading3>
             <Muted className='mt-0.5'>{loadingMessage}</Muted>
           </div>
         </div>
