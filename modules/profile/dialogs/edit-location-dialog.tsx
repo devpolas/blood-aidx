@@ -10,8 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-import { LocationForm } from "@/components/forms/location";
+import { LocationForm } from "@/components/forms/location/location.form";
 
 interface EditLocationDialogProps {
   location?: Location;
@@ -26,10 +25,10 @@ export function EditLocationDialog({
 }: EditLocationDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[90dvh] overflow-y-auto">
+      <DialogContent className='sm:max-w-lg max-h-[90dvh] overflow-y-auto'>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <MapPin className="size-5 text-brand" />
+          <DialogTitle className='flex items-center gap-2'>
+            <MapPin className='size-5 text-brand' />
             Edit Location
           </DialogTitle>
 
