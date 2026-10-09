@@ -64,10 +64,8 @@ export default function CreateOrganizationForm() {
       onSubmit: CreateOrganizationSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
       try {
         const savedLocation = await locationFormRef.current?.submit();
-        console.log(savedLocation);
 
         if (!savedLocation?.id) {
           toast.add({
@@ -315,7 +313,12 @@ export default function CreateOrganizationForm() {
           className='w-full sm:w-auto min-w-44 hover:cursor-pointer'
         >
           {isCreating ? (
-            <LoadingSpinner text='Creating organization' shimmer />
+            <LoadingSpinner
+              text='Creating organization'
+              spinnerClassName='text-brand'
+              textClassName='text-brand'
+              shimmer
+            />
           ) : (
             <>
               <Save className='size-4' />
