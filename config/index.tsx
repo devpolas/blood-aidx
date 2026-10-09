@@ -123,7 +123,7 @@ const createSecondaryNavigation = (): SidebarItem[] => [
     icon: <Search />,
   },
   {
-    title: "Organizations",
+    title: "Find Organizations",
     url: "/find-organizations",
     icon: <FaBuilding />,
   },
