@@ -3,7 +3,12 @@ import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Heading3, Muted } from "@/components/typography/typography";
+import {
+  Heading3,
+  Heading4,
+  Heading5,
+  Muted,
+} from "@/components/typography/typography";
 import { cn } from "@/lib/utils";
 
 interface ProfileSectionProps {
@@ -29,11 +34,13 @@ export function ProfileSection({
     <Card className={cn("overflow-hidden", className)}>
       <CardHeader className='p-4 sm:p-5 border-brand/20 border-b'>
         <div className='flex justify-between items-start gap-4'>
-          <div className='flex gap-2 min-w-0'>
-            <Icon className='mt-0.5 size-5 text-brand shrink-0' />
+          <div className='flex items-start gap-2 min-w-0'>
+            <div className='flex justify-center items-center bg-brand/10 mt-0.5 rounded-lg size-8 text-brand shrink-0'>
+              <Icon className='mt-0.5 size-6 text-brand shrink-0' />
+            </div>
 
             <div className='min-w-0'>
-              <Heading3 className='text-lg sm:text-xl'>{title}</Heading3>
+              <Heading4 className='text-lg sm:text-xl'>{title}</Heading4>
 
               <Muted className='mt-1'>{description}</Muted>
             </div>

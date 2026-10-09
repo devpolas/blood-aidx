@@ -18,8 +18,8 @@ export function ProfileInfoItem({
   className,
 }: ProfileInfoItemProps) {
   return (
-    <div className={cn("flex gap-3 min-w-0", className)}>
-      <div className='flex justify-center items-center bg-brand/10 mt-0.5 rounded-lg size-9 text-brand shrink-0'>
+    <div className={cn("flex items-start gap-3 min-w-0", className)}>
+      <div className='flex justify-center items-center bg-brand/10 mt-0.5 rounded-lg size-8 text-brand shrink-0'>
         <Icon className='size-4' />
       </div>
 
