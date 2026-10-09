@@ -32,6 +32,7 @@ import { LocationCreateSchema } from "@/validators/location.validator";
 import { LocationAddressFields } from "./location.address.fields";
 import { LocationDetect } from "./location.detect";
 import { LocationFields } from "./location.fields";
+import { toast } from "@/components/ui/toast";
 
 export type LocationFormHandle = {
   submit: () => Promise<LocationRecord | null>;
@@ -54,8 +55,8 @@ type LocationNames = {
 };
 
 const DEFAULT_VALUES: LocationFormValues = {
-  latitude: "",
-  longitude: "",
+  latitude: undefined,
+  longitude: undefined,
   country: "",
   division: "",
   city: "",
@@ -122,31 +123,56 @@ export const LocationForm = forwardRef<LocationFormHandle, LocationFormProps>(
         onSubmit: LocationCreateSchema,
       },
       onSubmit: async ({ value }) => {
-        console.log(value);
-        const payload: LocationFormValues = {
-          latitude: value.latitude?.trim() || "",
-          longitude: value.longitude?.trim() || "",
-          country: value.country.trim(),
-          division: value.division.trim(),
-          city: value.city.trim(),
-          village: value.village.trim(),
-          postalCode: value.postalCode.trim(),
-          addressLine: value.addressLine?.trim() || "",
-        };
+        try {
+          const payload: LocationFormValues = {
+            latitude: value.latitude?.trim() || undefined,
+            longitude: value.longitude?.trim() || undefined,
+            country: value.country.trim(),
+            division: value.division.trim(),
+            city: value.city.trim(),
+            village: value.village.trim(),
+            postalCode: value.postalCode.trim(),
+            addressLine: value.addressLine?.trim() || "",
+          };
 
-        const response =
-          mode === "update"
-            ? await updateLocation.mutateAsync(payload)
-            : await createLocation.mutateAsync(payload);
+          const response =
+            mode === "update"
+              ? await updateLocation.mutateAsync(payload)
+              : await createLocation.mutateAsync(payload);
 
-        if (!response.success || !response.data?.location) {
-          return;
+          if (!response.success || !response.data?.location) {
+            toast.add({
+              title: "Location creation failed",
+              description:
+                response.message ||
+                "Unable to create the location. Please try again.",
+              type: "error",
+            });
+            return;
+          }
+
+          const location = response.data.location as LocationRecord;
+
+          savedLocationRef.current = location;
+          onSuccess?.(location);
+
+          form.reset();
+
+          toast.add({
+            title: "Location created",
+            description: "Your location has been created successfully.",
+            type: "success",
+          });
+        } catch (error) {
+          toast.add({
+            title: "Location creation failed",
+            description:
+              error instanceof Error
+                ? error.message
+                : "Unable to create the location. Please try again.",
+            type: "error",
+          });
         }
-
-        const location = response.data.location as LocationRecord;
-
-        savedLocationRef.current = location;
-        onSuccess?.(location);
       },
     });
 
@@ -207,7 +233,13 @@ export const LocationForm = forwardRef<LocationFormHandle, LocationFormProps>(
       }
     }, [form]);
 
-    useImperativeHandle(ref, () => ({ submit }), [submit]);
+    useImperativeHandle(ref, () => ({
+      submit: async () => {
+        savedLocationRef.current = null;
+        await form.handleSubmit();
+        return savedLocationRef.current;
+      },
+    }));
 
     const handleWorldNamesChange = useCallback(
       (names: LocationNames | null) => {
