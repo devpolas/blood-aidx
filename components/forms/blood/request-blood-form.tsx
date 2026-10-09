@@ -68,7 +68,7 @@ const EMPTY_LOCATION: LocationState = {
   city: "",
 };
 
-export default function RequestBloodForm() {
+export default function CreateBloodRequestForm() {
   const [location, setLocation] = useState<LocationState>(EMPTY_LOCATION);
 
   const { mutateAsync: createBloodRequest, isPending: isCreating } =
