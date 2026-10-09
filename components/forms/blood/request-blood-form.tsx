@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { Building2, Droplets, MapPin, User } from "lucide-react";
+import { Building2, Droplets, HeartPlus, MapPin, User } from "lucide-react";
 import type { FormSelectOption } from "@/components/forms/components/form.select";
 import { LoadingSpinner } from "@/components/shared/loading/loading";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ import { FormInput } from "../components/form.input";
 import { FormSelect } from "../components/form.select";
 import { FormTextarea } from "../components/form.textarea";
 import { FormDatePicker } from "../components/form.date.picker";
+import { Heading4, Heading5, Muted } from "@/components/typography/typography";
 
 const DEFAULT_VALUES: BloodRequestFormValues = {
   organizationId: "",
@@ -190,6 +191,19 @@ export default function RequestBloodForm() {
       }}
       className='space-y-5 sm:space-y-6 w-full'
     >
+      <div className='flex items-start gap-3'>
+        <div className='flex justify-center items-center bg-primary/10 rounded-xl shrink-0'>
+          <HeartPlus className='size-8 text-primary' />
+        </div>
+
+        <div className='min-w-0'>
+          <Heading4 className='leading-6'>Create Blood Request</Heading4>
+          <Muted className='mt-0.5'>
+            Provide blood type, location, urgency, and other details to create a
+            blood request and find suitable donors.
+          </Muted>
+        </div>
+      </div>
       {/* Request Details */}
       <section className='bg-card shadow-sm p-4 sm:p-5 lg:p-6 border rounded-2xl'>
         <SectionHeader
@@ -494,7 +508,7 @@ function SectionHeader({
   title,
   description,
 }: {
-  icon: typeof Droplets;
+  icon: typeof Building2;
   title: string;
   description: string;
 }) {
@@ -505,10 +519,8 @@ function SectionHeader({
       </div>
 
       <div className='min-w-0'>
-        <h2 className='font-semibold leading-6'>{title}</h2>
-        <p className='mt-0.5 text-muted-foreground text-sm leading-5'>
-          {description}
-        </p>
+        <Heading5 className='leading-6'>{title}</Heading5>
+        <Muted className='mt-0.5'>{description}</Muted>
       </div>
     </div>
   );
