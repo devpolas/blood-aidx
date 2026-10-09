@@ -6,7 +6,6 @@ export interface Location {
   longitude: string | null;
   country: string;
   division: string;
-  district: string;
   city: string;
   village: string;
   postalCode: string;

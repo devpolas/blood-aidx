@@ -311,7 +311,6 @@ export const BloodRequestQuerySchema = z
 
     country: z.string().trim().min(1).max(100).optional(),
     division: z.string().trim().min(1).max(100).optional(),
-    district: z.string().trim().min(1).max(100).optional(),
     city: z.string().trim().min(1).max(100).optional(),
 
     requiredAtFrom: z.iso.datetime().optional(),
