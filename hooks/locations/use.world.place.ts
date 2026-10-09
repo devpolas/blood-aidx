@@ -1,30 +1,33 @@
-import { FormSelectOption } from "@/components/forms/components/form.select";
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import type { FormSelectOption } from "@/components/forms/components/form.select";
+
 import {
   getCountries,
   getRegions,
   getSettlements,
 } from "@/lib/actions/locations";
 
-import { useQuery } from "@tanstack/react-query";
-
 const locationKeys = {
   all: ["place-db-locations"] as const,
-
   countries: () => [...locationKeys.all, "countries"] as const,
-
   regions: (countryCode: string) =>
     [...locationKeys.all, "regions", countryCode] as const,
-
   settlements: (countryCode: string, regionId: number) =>
     [...locationKeys.all, "settlements", countryCode, regionId] as const,
+};
+
+const CACHE_OPTIONS = {
+  staleTime: 24 * 60 * 60 * 1000,
+  gcTime: 7 * 24 * 60 * 60 * 1000,
 };
 
 export function useCountries() {
   const query = useQuery({
     queryKey: locationKeys.countries(),
     queryFn: getCountries,
-    staleTime: 24 * 60 * 60 * 1000,
-    gcTime: 7 * 24 * 60 * 60 * 1000,
+    ...CACHE_OPTIONS,
   });
 
   const options: FormSelectOption[] =
@@ -33,19 +36,17 @@ export function useCountries() {
       value: country.code,
     })) ?? [];
 
-  return {
-    ...query,
-    options,
-  };
+  return { ...query, options };
 }
 
 export function useRegions(countryCode?: string) {
+  const validCountryCode = countryCode?.trim() || undefined;
+
   const query = useQuery({
-    queryKey: locationKeys.regions(countryCode ?? ""),
-    queryFn: () => getRegions(countryCode!),
-    enabled: Boolean(countryCode),
-    staleTime: 24 * 60 * 60 * 1000,
-    gcTime: 7 * 24 * 60 * 60 * 1000,
+    queryKey: locationKeys.regions(validCountryCode ?? ""),
+    queryFn: () => getRegions(validCountryCode!),
+    enabled: Boolean(validCountryCode),
+    ...CACHE_OPTIONS,
   });
 
   const options: FormSelectOption[] =
@@ -54,19 +55,25 @@ export function useRegions(countryCode?: string) {
       value: String(region.id),
     })) ?? [];
 
-  return {
-    ...query,
-    options,
-  };
+  return { ...query, options };
 }
 
 export function useSettlements(countryCode?: string, regionId?: number) {
+  const validCountryCode = countryCode?.trim() || undefined;
+
+  const validRegionId =
+    regionId !== undefined && Number.isSafeInteger(regionId) && regionId > 0
+      ? regionId
+      : undefined;
+
   const query = useQuery({
-    queryKey: locationKeys.settlements(countryCode ?? "", regionId ?? 0),
-    queryFn: () => getSettlements(countryCode!, regionId!),
-    enabled: Boolean(countryCode && regionId),
-    staleTime: 24 * 60 * 60 * 1000,
-    gcTime: 7 * 24 * 60 * 60 * 1000,
+    queryKey: locationKeys.settlements(
+      validCountryCode ?? "",
+      validRegionId ?? 0,
+    ),
+    queryFn: () => getSettlements(validCountryCode!, validRegionId!),
+    enabled: Boolean(validCountryCode && validRegionId !== undefined),
+    ...CACHE_OPTIONS,
   });
 
   const options: FormSelectOption[] =
@@ -75,8 +82,5 @@ export function useSettlements(countryCode?: string, regionId?: number) {
       value: String(settlement.id),
     })) ?? [];
 
-  return {
-    ...query,
-    options,
-  };
+  return { ...query, options };
 }

@@ -14,7 +14,6 @@ import {
 
 import type {
   AddOrganizationMemberInput,
-  CreateOrganizationInput,
   OrganizationQueryInput,
   UpdateOrganizationInput,
   UpdateOrganizationMemberInput,

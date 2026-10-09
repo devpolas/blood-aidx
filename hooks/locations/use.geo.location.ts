@@ -1,16 +1,15 @@
-import { useState } from "react";
+"use client";
 
+import { useCallback, useState } from "react";
 import { ofetch } from "ofetch";
-
-interface Coordinates {
+export type Coordinates = {
   lat: number;
   lng: number;
-}
+};
 
-interface NominatimAddress {
+type NominatimAddress = {
   country?: string;
   state?: string;
-  county?: string;
   city?: string;
   town?: string;
   municipality?: string;
@@ -21,57 +20,65 @@ interface NominatimAddress {
   quarter?: string;
   residential?: string;
   postcode?: string;
-}
+};
 
-interface NominatimResponse {
+type NominatimResponse = {
   lat: string;
   lon: string;
   display_name: string;
-  address: NominatimAddress;
-}
+  address?: NominatimAddress;
+};
 
-export interface PropertyLocationPayload {
+export type PropertyLocationPayload = {
   latitude: string;
   longitude: string;
   country: string;
   division: string;
-  district: string;
   city: string;
   village: string;
   postalCode: string;
   addressLine?: string;
-}
+};
 
-const LOCATION_API_BASE_URL = process.env.NEXT_PUBLIC_LOCATION_API_BASE_URL;
+const LOCATION_API_BASE_URL =
+  process.env.NEXT_PUBLIC_LOCATION_API_BASE_URL?.replace(/\/+$/, "");
 
-function getGeoErrorMessage(error: GeolocationPositionError) {
+function getGeoErrorMessage(error: GeolocationPositionError): string {
   switch (error.code) {
     case error.PERMISSION_DENIED:
-      return "Location permission denied";
+      return "Location permission denied. Allow access and try again.";
 
     case error.POSITION_UNAVAILABLE:
-      return "Unable to determine your location";
+      return "Unable to determine your current location.";
 
     case error.TIMEOUT:
-      return "Location request timed out";
+      return "Location request timed out. Please try again.";
 
     default:
-      return "Failed to get your location";
+      return "Failed to get your location.";
   }
+}
+
+function cleanAdministrativeName(
+  value: string | undefined,
+  suffix: string,
+): string {
+  if (!value) return "";
+
+  return value.replace(new RegExp(`\\s+${suffix}$`, "i"), "").trim();
 }
 
 function mapGeoAddressToLocation(
   coordinates: Coordinates,
   data: NominatimResponse,
 ): PropertyLocationPayload {
-  const { address } = data;
+  const address = data.address ?? {};
 
   return {
-    latitude: coordinates.lat.toString(),
-    longitude: coordinates.lng.toString(),
+    latitude: String(coordinates.lat),
+    longitude: String(coordinates.lng),
     country: address.country ?? "",
-    division: address.state?.replace(" Division", "") ?? "",
-    district: address.county?.replace(" District", "") ?? "",
+    division: cleanAdministrativeName(address.state, "Division"),
     city: address.city ?? address.town ?? address.municipality ?? "",
     village:
       address.village ??
@@ -82,7 +89,7 @@ function mapGeoAddressToLocation(
       address.residential ??
       "",
     postalCode: address.postcode ?? "",
-    addressLine: data.display_name,
+    addressLine: data.display_name ?? "",
   };
 }
 
@@ -96,19 +103,23 @@ export function useGeoLocation(defaultLocation: Coordinates | null = null) {
     useState<PropertyLocationPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const getPosition = () => {
+  const getPosition = useCallback(() => {
+    if (isLoading) return;
+
     if (!navigator.geolocation) {
-      setError("Geolocation is not supported by your browser");
+      setError("Geolocation is not supported by your browser.");
       return;
     }
 
     if (!LOCATION_API_BASE_URL) {
-      setError("Location service is not configured");
+      setError("Location service is not configured.");
       return;
     }
 
     setIsLoading(true);
     setError(null);
+    setAddress(null);
+    setLocationPayload(null);
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
@@ -120,7 +131,7 @@ export function useGeoLocation(defaultLocation: Coordinates | null = null) {
         setCoordinates(coords);
 
         try {
-          const geoAddress = await ofetch<NominatimResponse>(
+          const response = await ofetch<NominatimResponse>(
             `${LOCATION_API_BASE_URL}/reverse`,
             {
               query: {
@@ -133,29 +144,33 @@ export function useGeoLocation(defaultLocation: Coordinates | null = null) {
             },
           );
 
-          setAddress(geoAddress);
-          setLocationPayload(mapGeoAddressToLocation(coords, geoAddress));
-        } catch (error) {
-          setError(
-            error instanceof Error
-              ? error.message
-              : "Failed to reverse geocode location",
-          );
+          setAddress(response);
+          setLocationPayload(mapGeoAddressToLocation(coords, response));
+        } catch {
+          setError("Failed to find an address for your location.");
         } finally {
           setIsLoading(false);
         }
       },
-      (error) => {
-        setError(getGeoErrorMessage(error));
+      (positionError) => {
+        setError(getGeoErrorMessage(positionError));
         setIsLoading(false);
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
+        timeout: 15_000,
+        maximumAge: 60_000,
       },
     );
-  };
+  }, [isLoading]);
+
+  const reset = useCallback(() => {
+    setIsLoading(false);
+    setCoordinates(null);
+    setAddress(null);
+    setLocationPayload(null);
+    setError(null);
+  }, []);
 
   return {
     isLoading,
@@ -164,5 +179,6 @@ export function useGeoLocation(defaultLocation: Coordinates | null = null) {
     locationPayload,
     error,
     getPosition,
+    reset,
   };
 }
