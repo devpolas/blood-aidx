@@ -19,7 +19,7 @@ import {
 // GET /reports/me
 export async function getMyReports(
   query?: ReportQueryInput,
-): Promise<ApiResponse<Report[]>> {
+): Promise<ApiResponse<{ reports: Report[] }>> {
   try {
     const queryParse = ReportQuerySchema.safeParse(query ?? {});
 
@@ -29,7 +29,7 @@ export async function getMyReports(
       );
     }
 
-    return await apiClient<ApiResponse<Report[]>>("/reports/me", {
+    return await apiClient<ApiResponse<{ reports: Report[] }>>("/reports/me", {
       method: "GET",
       query: queryParse.data,
     });
@@ -89,7 +89,7 @@ export async function createReport(
 // GET /reports
 export async function getReports(
   query?: ReportQueryInput,
-): Promise<ApiResponse<Report[]>> {
+): Promise<ApiResponse<{ reports: Report[] }>> {
   try {
     const queryParse = ReportQuerySchema.safeParse(query ?? {});
 
@@ -99,7 +99,7 @@ export async function getReports(
       );
     }
 
-    return await apiClient<ApiResponse<Report[]>>("/reports", {
+    return await apiClient<ApiResponse<{ reports: Report[] }>>("/reports", {
       method: "GET",
       query: queryParse.data,
     });

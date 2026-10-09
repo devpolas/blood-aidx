@@ -46,7 +46,7 @@ export async function createCoffeePayment(
 // GET /payments/my
 export async function getMyPayments(
   query?: PaymentQueryInput,
-): Promise<ApiResponse<Payment[]>> {
+): Promise<ApiResponse<{ payments: Payment[] }>> {
   try {
     const queryParse = PaymentQuerySchema.safeParse(query ?? {});
 
@@ -56,10 +56,13 @@ export async function getMyPayments(
       );
     }
 
-    return await apiClient<ApiResponse<Payment[]>>("/payments/my", {
-      method: "GET",
-      query: queryParse.data,
-    });
+    return await apiClient<ApiResponse<{ payments: Payment[] }>>(
+      "/payments/my",
+      {
+        method: "GET",
+        query: queryParse.data,
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
@@ -71,7 +74,7 @@ export async function getMyPayments(
 export async function getDonorPayments(
   donorId: string,
   query?: PaymentQueryInput,
-): Promise<ApiResponse<Payment[]>> {
+): Promise<ApiResponse<{ payments: Payment[] }>> {
   try {
     if (!donorId.trim()) {
       return errorResponse("Donor ID is required");
@@ -85,7 +88,7 @@ export async function getDonorPayments(
       );
     }
 
-    return await apiClient<ApiResponse<Payment[]>>(
+    return await apiClient<ApiResponse<{ payments: Payment[] }>>(
       `/payments/donor/${donorId}`,
       {
         method: "GET",

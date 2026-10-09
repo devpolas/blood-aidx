@@ -19,7 +19,7 @@ import {
 // GET /blood-request-responses/me
 export async function getMyBloodRequestResponses(
   query?: BloodRequestResponseQueryInput,
-): Promise<ApiResponse<BloodRequestResponse[]>> {
+): Promise<ApiResponse<{ responses: BloodRequestResponse[] }>> {
   try {
     const queryParse = BloodRequestResponseQuerySchema.safeParse(query ?? {});
 
@@ -30,7 +30,7 @@ export async function getMyBloodRequestResponses(
       );
     }
 
-    return await apiClient<ApiResponse<BloodRequestResponse[]>>(
+    return await apiClient<ApiResponse<{ responses: BloodRequestResponse[] }>>(
       "/blood-request-responses/me",
       {
         method: "GET",
@@ -48,7 +48,7 @@ export async function getMyBloodRequestResponses(
 export async function getBloodRequestResponses(
   requestId: string,
   query?: BloodRequestResponseQueryInput,
-): Promise<ApiResponse<BloodRequestResponse[]>> {
+): Promise<ApiResponse<{ responses: BloodRequestResponse[] }>> {
   try {
     if (!requestId.trim()) {
       return errorResponse("Blood request ID is required");
@@ -63,7 +63,7 @@ export async function getBloodRequestResponses(
       );
     }
 
-    return await apiClient<ApiResponse<BloodRequestResponse[]>>(
+    return await apiClient<ApiResponse<{ responses: BloodRequestResponse[] }>>(
       `/blood-request-responses/requests/${requestId}`,
       {
         method: "GET",

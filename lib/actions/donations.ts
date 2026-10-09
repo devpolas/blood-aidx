@@ -19,7 +19,7 @@ import {
 // GET /donations/me
 export async function getMyDonations(
   query?: DonationQueryInput,
-): Promise<ApiResponse<BloodDonation[]>> {
+): Promise<ApiResponse<{ donations: BloodDonation[] }>> {
   try {
     const queryParse = DonationQuerySchema.safeParse(query ?? {});
 
@@ -29,10 +29,13 @@ export async function getMyDonations(
       );
     }
 
-    return await apiClient<ApiResponse<BloodDonation[]>>("/donations/me", {
-      method: "GET",
-      query: queryParse.data,
-    });
+    return await apiClient<ApiResponse<{ donations: BloodDonation[] }>>(
+      "/donations/me",
+      {
+        method: "GET",
+        query: queryParse.data,
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
@@ -43,7 +46,7 @@ export async function getMyDonations(
 // GET /donations
 export async function getDonations(
   query?: DonationQueryInput,
-): Promise<ApiResponse<BloodDonation[]>> {
+): Promise<ApiResponse<{ donations: BloodDonation[] }>> {
   try {
     const queryParse = DonationQuerySchema.safeParse(query ?? {});
 
@@ -53,10 +56,13 @@ export async function getDonations(
       );
     }
 
-    return await apiClient<ApiResponse<BloodDonation[]>>("/donations", {
-      method: "GET",
-      query: queryParse.data,
-    });
+    return await apiClient<ApiResponse<{ donations: BloodDonation[] }>>(
+      "/donations",
+      {
+        method: "GET",
+        query: queryParse.data,
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }

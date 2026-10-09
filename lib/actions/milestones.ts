@@ -19,7 +19,7 @@ import {
 // GET /milestones
 export async function getMilestones(
   query?: MilestoneQueryInput,
-): Promise<ApiResponse<UserMilestone[]>> {
+): Promise<ApiResponse<{ milestones: UserMilestone[] }>> {
   try {
     const queryParse = MilestoneQuerySchema.safeParse(query ?? {});
 
@@ -29,10 +29,13 @@ export async function getMilestones(
       );
     }
 
-    return await apiClient<ApiResponse<UserMilestone[]>>("/milestones", {
-      method: "GET",
-      query: queryParse.data,
-    });
+    return await apiClient<ApiResponse<{ milestones: UserMilestone[] }>>(
+      "/milestones",
+      {
+        method: "GET",
+        query: queryParse.data,
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
@@ -65,7 +68,7 @@ export async function getMilestone(
 // GET /milestones/my
 export async function getMyMilestones(
   query?: MilestoneQueryInput,
-): Promise<ApiResponse<UserMilestone[]>> {
+): Promise<ApiResponse<{ milestones: UserMilestone[] }>> {
   try {
     const queryParse = MilestoneQuerySchema.safeParse(query ?? {});
 
@@ -75,10 +78,13 @@ export async function getMyMilestones(
       );
     }
 
-    return await apiClient<ApiResponse<UserMilestone[]>>("/milestones/my", {
-      method: "GET",
-      query: queryParse.data,
-    });
+    return await apiClient<ApiResponse<{ milestones: UserMilestone[] }>>(
+      "/milestones/my",
+      {
+        method: "GET",
+        query: queryParse.data,
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
@@ -90,7 +96,7 @@ export async function getMyMilestones(
 export async function getUserMilestones(
   userId: string,
   query?: MilestoneQueryInput,
-): Promise<ApiResponse<UserMilestone[]>> {
+): Promise<ApiResponse<{ milestones: UserMilestone[] }>> {
   try {
     if (!userId.trim()) {
       return errorResponse("User ID is required");
@@ -104,7 +110,7 @@ export async function getUserMilestones(
       );
     }
 
-    return await apiClient<ApiResponse<UserMilestone[]>>(
+    return await apiClient<ApiResponse<{ milestones: UserMilestone[] }>>(
       `/milestones/user/${userId}`,
       {
         method: "GET",

@@ -73,7 +73,7 @@ export async function getOrganization(
 // GET /organizations/my
 export async function getMyOrganizations(
   query?: OrganizationQueryInput,
-): Promise<ApiResponse<Organization[]>> {
+): Promise<ApiResponse<{ organizations: Organization[] }>> {
   try {
     const queryParse = OrganizationQuerySchema.safeParse(query ?? {});
 
@@ -83,10 +83,13 @@ export async function getMyOrganizations(
       );
     }
 
-    return await apiClient<ApiResponse<Organization[]>>("/organizations/my", {
-      method: "GET",
-      query: queryParse.data,
-    });
+    return await apiClient<ApiResponse<{ organizations: Organization[] }>>(
+      "/organizations/my",
+      {
+        method: "GET",
+        query: queryParse.data,
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
@@ -204,18 +207,17 @@ export async function deleteOrganization(
 // GET /organizations/:organizationId/members
 export async function getOrganizationMembers(
   organizationId: string,
-): Promise<ApiResponse<OrganizationMember[]>> {
+): Promise<ApiResponse<{ organizationMembers :OrganizationMember[]}>> {
   try {
     if (!organizationId.trim()) {
       return errorResponse("Organization ID is required");
     }
 
-    return await apiClient<ApiResponse<OrganizationMember[]>>(
-      `/organizations/${organizationId}/members`,
-      {
-        method: "GET",
-      },
-    );
+    return await apiClient<
+      ApiResponse<{ organizationMembers: OrganizationMember[] }>
+    >(`/organizations/${organizationId}/members`, {
+      method: "GET",
+    });
   } catch (error) {
     return handleApiError(error);
   }

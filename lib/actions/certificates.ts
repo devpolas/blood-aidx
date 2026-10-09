@@ -8,15 +8,14 @@ import { errorResponse } from "@/utils/api.response";
 // Get My Certificates
 // GET /certificates/me
 export async function getCertificates(): Promise<
-  ApiResponse<DonationCertificate[]>
+  ApiResponse<{ certificates: DonationCertificate[] }>
 > {
   try {
-    return await apiClient<ApiResponse<DonationCertificate[]>>(
-      "/certificates/me",
-      {
-        method: "GET",
-      },
-    );
+    return await apiClient<
+      ApiResponse<{ certificates: DonationCertificate[] }>
+    >("/certificates/me", {
+      method: "GET",
+    });
   } catch (error) {
     return handleApiError(error);
   }

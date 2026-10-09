@@ -21,7 +21,7 @@ import {
 // GET /reviews
 export async function getMyReviews(
   query?: ReviewQueryInput,
-): Promise<ApiResponse<Review[]>> {
+): Promise<ApiResponse<{ reviews: Review[] }>> {
   try {
     const queryParse = ReviewQuerySchema.safeParse(query ?? {});
 
@@ -31,7 +31,7 @@ export async function getMyReviews(
       );
     }
 
-    return await apiClient<ApiResponse<Review[]>>("/reviews", {
+    return await apiClient<ApiResponse<{ reviews: Review[] }>>("/reviews", {
       method: "GET",
       query: queryParse.data,
     });
@@ -46,7 +46,7 @@ export async function getMyReviews(
 export async function getReviewsForUser(
   userId: string,
   query?: ReviewQueryInput,
-): Promise<ApiResponse<Review[]>> {
+): Promise<ApiResponse<{ reviews: Review[] }>> {
   try {
     if (!userId.trim()) {
       return errorResponse("User ID is required");
@@ -60,10 +60,13 @@ export async function getReviewsForUser(
       );
     }
 
-    return await apiClient<ApiResponse<Review[]>>(`/reviews/user/${userId}`, {
-      method: "GET",
-      query: queryParse.data,
-    });
+    return await apiClient<ApiResponse<{ reviews: Review[] }>>(
+      `/reviews/user/${userId}`,
+      {
+        method: "GET",
+        query: queryParse.data,
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
@@ -75,7 +78,7 @@ export async function getReviewsForUser(
 export async function getReviewsForOrganization(
   organizationId: string,
   query?: ReviewQueryInput,
-): Promise<ApiResponse<Review[]>> {
+): Promise<ApiResponse<{ reviews: Review[] }>> {
   try {
     if (!organizationId.trim()) {
       return errorResponse("Organization ID is required");
@@ -89,7 +92,7 @@ export async function getReviewsForOrganization(
       );
     }
 
-    return await apiClient<ApiResponse<Review[]>>(
+    return await apiClient<ApiResponse<{ reviews: Review[] }>>(
       `/reviews/organization/${organizationId}`,
       {
         method: "GET",

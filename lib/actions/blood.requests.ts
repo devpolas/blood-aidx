@@ -21,7 +21,7 @@ import {
 // GET /blood-requests/me
 export async function getMyBloodRequests(
   query?: BloodRequestQueryInput,
-): Promise<ApiResponse<BloodRequest[]>> {
+): Promise<ApiResponse<{ requests: BloodRequest[] }>> {
   try {
     const queryParse = BloodRequestQuerySchema.safeParse(query ?? {});
 
@@ -31,10 +31,13 @@ export async function getMyBloodRequests(
       );
     }
 
-    return await apiClient<ApiResponse<BloodRequest[]>>("/blood-requests/me", {
-      method: "GET",
-      query: queryParse.data,
-    });
+    return await apiClient<ApiResponse<{ requests: BloodRequest[] }>>(
+      "/blood-requests/me",
+      {
+        method: "GET",
+        query: queryParse.data,
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }
@@ -67,7 +70,7 @@ export async function cancelBloodRequest(
 // GET /blood-requests
 export async function getBloodRequests(
   query?: BloodRequestQueryInput,
-): Promise<ApiResponse<BloodRequest[]>> {
+): Promise<ApiResponse<{ requests: BloodRequest[] }>> {
   try {
     const queryParse = BloodRequestQuerySchema.safeParse(query ?? {});
 
@@ -77,10 +80,13 @@ export async function getBloodRequests(
       );
     }
 
-    return await apiClient<ApiResponse<BloodRequest[]>>("/blood-requests", {
-      method: "GET",
-      query: queryParse.data,
-    });
+    return await apiClient<ApiResponse<{ requests: BloodRequest[] }>>(
+      "/blood-requests",
+      {
+        method: "GET",
+        query: queryParse.data,
+      },
+    );
   } catch (error) {
     return handleApiError(error);
   }

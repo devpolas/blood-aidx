@@ -21,7 +21,6 @@ import {
 
 // Current User
 
-// GET /users
 export async function getMe(): Promise<ApiResponse<{ user: User }>> {
   try {
     return await apiClient<ApiResponse<{ user: User }>>("/users", {
@@ -94,7 +93,7 @@ export async function deleteMe(): Promise<ApiResponse<null>> {
 // GET /admin/users
 export async function getUsers(
   query?: AdminUserQueryInput,
-): Promise<ApiResponse<User[]>> {
+): Promise<ApiResponse<{ users: User[] }>> {
   try {
     const queryParse = AdminUserQuerySchema.safeParse(query ?? {});
 
@@ -104,7 +103,7 @@ export async function getUsers(
       );
     }
 
-    return await apiClient<ApiResponse<User[]>>("/admin/users", {
+    return await apiClient<ApiResponse<{ users: User[] }>>("/admin/users", {
       method: "GET",
       query: queryParse.data,
     });

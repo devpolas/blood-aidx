@@ -17,7 +17,7 @@ import {
 // GET /donors
 export async function getDonors(
   query?: DonorQueryInput,
-): Promise<ApiResponse<DonorProfile[]>> {
+): Promise<ApiResponse<{ donors: DonorProfile[] }>> {
   try {
     const queryParse = DonorQuerySchema.safeParse(query ?? {});
 
@@ -27,7 +27,7 @@ export async function getDonors(
       );
     }
 
-    return await apiClient<ApiResponse<DonorProfile[]>>("/donors", {
+    return await apiClient<ApiResponse<{ donors: DonorProfile[] }>>("/donors", {
       method: "GET",
       query: queryParse.data,
     });
