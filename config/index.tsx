@@ -22,41 +22,10 @@ import {
   FaFileCircleCheck,
   FaFlag,
 } from "react-icons/fa6";
+
 import { UserRole } from "@/types/enum";
 
-export const PUBLIC_NAVIGATION = [
-  {
-    title: "Home",
-    href: "/",
-  },
-  {
-    title: "Find Donors",
-    href: "/donors",
-  },
-  {
-    title: "Blood Requests",
-    href: "/blood-requests",
-  },
-  {
-    title: "Organizations",
-    href: "/organizations",
-  },
-] as const;
-
-export const GENDERS = [
-  {
-    label: "Male",
-    value: "male",
-  },
-  {
-    label: "Female",
-    value: "female",
-  },
-  {
-    label: "Other",
-    value: "other",
-  },
-] as const;
+// Types
 
 export interface SidebarItem {
   title: string;
@@ -69,7 +38,75 @@ export interface DashboardSidebar {
   navSecondary: SidebarItem[];
 }
 
-const commonSecondary = (): SidebarItem[] => [
+// Public Navigation
+
+export const PUBLIC_NAVIGATION = [
+  { title: "Home", href: "/" },
+  { title: "Find Donors", href: "/donors" },
+  { title: "Blood Requests", href: "/blood-requests" },
+  { title: "Organizations", href: "/organizations" },
+] as const;
+
+// Form Options
+
+export const GENDERS = [
+  { label: "Male", value: "male" },
+  { label: "Female", value: "female" },
+  { label: "Other", value: "other" },
+] as const;
+
+export const BLOOD_GROUP_OPTIONS = [
+  { label: "A+", value: "a_positive" },
+  { label: "A−", value: "a_negative" },
+  { label: "B+", value: "b_positive" },
+  { label: "B−", value: "b_negative" },
+  { label: "AB+", value: "ab_positive" },
+  { label: "AB−", value: "ab_negative" },
+  { label: "O+", value: "o_positive" },
+  { label: "O−", value: "o_negative" },
+] as const;
+
+export const AVAILABILITY_OPTIONS = [
+  {
+    label: "Available",
+    value: "available",
+    description: "I'm currently available to donate blood.",
+  },
+  {
+    label: "Temporarily unavailable",
+    value: "temporarily_unavailable",
+    description: "I'm temporarily unable to donate.",
+  },
+  {
+    label: "Unavailable",
+    value: "unavailable",
+    description: "I'm currently not available to donate.",
+  },
+] as const;
+
+export const PRIORITY_OPTIONS = [
+  { label: "Low", value: "low" },
+  { label: "High", value: "high" },
+  { label: "Urgent", value: "urgent" },
+] as const;
+
+// Dashboard Routes
+
+export const DASHBOARD_PATHS: Record<UserRole, string> = {
+  [UserRole.USER]: "/dashboard",
+  [UserRole.MODERATOR]: "/dashboard/moderator",
+  [UserRole.ADMIN]: "/dashboard/admin",
+};
+
+// Shared dashboard pages available to every authenticated role.
+export const SHARED_DASHBOARD_PATHS = [
+  "/dashboard/profile",
+  "/dashboard/settings",
+] as const;
+
+// Shared Sidebar Navigation
+
+const createSecondaryNavigation = (): SidebarItem[] => [
   {
     title: "Home",
     url: "/",
@@ -91,6 +128,8 @@ const commonSecondary = (): SidebarItem[] => [
     icon: <CircleHelp />,
   },
 ];
+
+// User Dashboard Navigation
 
 const userDashboard: DashboardSidebar = {
   navMain: [
@@ -155,9 +194,10 @@ const userDashboard: DashboardSidebar = {
       icon: <CreditCard />,
     },
   ],
-
-  navSecondary: commonSecondary(),
+  navSecondary: createSecondaryNavigation(),
 };
+
+// Moderator Dashboard Navigation
 
 const moderatorDashboard: DashboardSidebar = {
   navMain: [
@@ -207,9 +247,10 @@ const moderatorDashboard: DashboardSidebar = {
       icon: <Bell />,
     },
   ],
-
-  navSecondary: commonSecondary(),
+  navSecondary: createSecondaryNavigation(),
 };
+
+// Admin Dashboard Navigation
 
 const adminDashboard: DashboardSidebar = {
   navMain: [
@@ -218,7 +259,6 @@ const adminDashboard: DashboardSidebar = {
       url: "/dashboard/admin",
       icon: <LayoutDashboard />,
     },
-
     {
       title: "Donors",
       url: "/dashboard/admin/donors",
@@ -270,9 +310,10 @@ const adminDashboard: DashboardSidebar = {
       icon: <Bell />,
     },
   ],
-
-  navSecondary: commonSecondary(),
+  navSecondary: createSecondaryNavigation(),
 };
+
+// Dashboard Menu Registry
 
 export const dashboardMenu: Record<UserRole, DashboardSidebar> = {
   [UserRole.USER]: userDashboard,
@@ -280,43 +321,32 @@ export const dashboardMenu: Record<UserRole, DashboardSidebar> = {
   [UserRole.ADMIN]: adminDashboard,
 };
 
-export function getDashboardMenu(
-  role: keyof typeof dashboardMenu,
-): DashboardSidebar {
+// Dashboard Helpers
+
+export function getDashboardPath(role: UserRole): string {
+  return DASHBOARD_PATHS[role];
+}
+
+export function getDashboardMenu(role: UserRole): DashboardSidebar {
   return dashboardMenu[role];
 }
 
-export const BLOOD_GROUP_OPTIONS = [
-  { label: "A+", value: "a_positive" },
-  { label: "A−", value: "a_negative" },
-  { label: "B+", value: "b_positive" },
-  { label: "B−", value: "b_negative" },
-  { label: "AB+", value: "ab_positive" },
-  { label: "AB−", value: "ab_negative" },
-  { label: "O+", value: "o_positive" },
-  { label: "O−", value: "o_negative" },
-] as const;
+function isRouteMatch(pathname: string, route: string): boolean {
+  return pathname === route || pathname.startsWith(`${route}/`);
+}
 
-export const AVAILABILITY_OPTIONS = [
-  {
-    label: "Available",
-    value: "available",
-    description: "I'm currently available to donate blood.",
-  },
-  {
-    label: "Temporarily unavailable",
-    value: "temporarily_unavailable",
-    description: "I'm temporarily unable to donate.",
-  },
-  {
-    label: "Unavailable",
-    value: "unavailable",
-    description: "I'm currently not available to donate.",
-  },
-] as const;
+export function hasRouteAccess(role: UserRole, pathname: string): boolean {
+  const dashboardPath = DASHBOARD_PATHS[role];
 
-export const PRIORITY_OPTIONS = [
-  { label: "Low", value: "low" },
-  { label: "High", value: "high" },
-  { label: "Urgent", value: "urgent" },
-] as const;
+  if (!dashboardPath) {
+    return false;
+  }
+
+  // Allow the user's own dashboard and its nested pages.
+  if (isRouteMatch(pathname, dashboardPath)) {
+    return true;
+  }
+
+  // Allow shared profile and settings pages.
+  return SHARED_DASHBOARD_PATHS.some((route) => isRouteMatch(pathname, route));
+}
