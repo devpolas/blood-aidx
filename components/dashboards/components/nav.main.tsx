@@ -29,7 +29,7 @@ export function NavMain({
               className='bg-sidebar-primary data-[active=true]:bg-sidebar-primary hover:bg-sidebar-primary/90 active:bg-sidebar-primary/85 shadow-sm hover:shadow-md hover:shadow-sidebar-primary/20 border border-sidebar-primary/80 focus-visible:ring-2 focus-visible:ring-sidebar-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar text-sidebar-primary-foreground data-[active=true]:text-sidebar-primary-foreground hover:text-sidebar-primary-foreground active:text-sidebar-primary-foreground active:scale-[0.98] transition-[background-color,box-shadow,transform] duration-200 ease-out'
               render={
                 <Link
-                  href='/dashboard/blood-request'
+                  href='/dashboard/create-blood-request'
                   className='flex items-center gap-2 w-full'
                 >
                   <PlusCircleIcon className='size-4 shrink-0' />
