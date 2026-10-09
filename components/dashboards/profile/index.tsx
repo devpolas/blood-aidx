@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { UserCircle, XCircleIcon } from "lucide-react";
+import { ShieldUser, XCircleIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import {
@@ -12,12 +12,7 @@ import {
   useMyProfile,
 } from "@/hooks";
 
-import {
-  Heading2,
-  Heading3,
-  Muted,
-  Paragraph,
-} from "@/components/typography/typography";
+import { Heading3, Heading4, Muted } from "@/components/typography/typography";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { ProfileHeader } from "@/modules/profile/profile-header";
@@ -87,7 +82,7 @@ export default function ProfilePage() {
           <CardContent className='flex flex-col items-center gap-3 py-10 text-center'>
             <XCircleIcon className='size-10 text-destructive' />
 
-            <Heading3>Unable to load profile</Heading3>
+            <Heading4>Unable to load profile</Heading4>
 
             <Muted>Your account could not be loaded.</Muted>
           </CardContent>
@@ -115,15 +110,20 @@ export default function ProfilePage() {
   return (
     <section className='space-y-5 sm:space-y-6 mx-auto w-full'>
       <header>
-        <div className='flex items-center gap-2 text-xl'>
-          <UserCircle className='size-6 text-brand' />
-          <Heading3>Profile</Heading3>
-        </div>
+        <div className='flex items-start gap-3'>
+          <div className='flex justify-center items-center bg-primary/10 rounded-xl shrink-0'>
+            <ShieldUser className='size-8 text-primary' />
+          </div>
 
-        <Paragraph className='mt-1'>
-          Manage your personal information, location, donor profile, and account
-          details.
-        </Paragraph>
+          <div className='min-w-0'>
+            <Heading3 className='leading-6'>Profile</Heading3>
+
+            <Muted className='mt-0.5'>
+              Manage your personal information, location, donor profile, and
+              account details.
+            </Muted>
+          </div>
+        </div>
       </header>
 
       <ProfileHeader
