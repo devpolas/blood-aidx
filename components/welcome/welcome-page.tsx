@@ -19,6 +19,7 @@ import { DonorStep } from "./donor-step";
 import { LocationStep } from "./location-step";
 import { PersonalStep } from "./personal-step";
 import { WelcomeProgress } from "./welcome-progress";
+import { Button } from "../ui/button";
 
 export default function WelcomePage() {
   const router = useRouter();
@@ -104,6 +105,10 @@ export default function WelcomePage() {
     router.replace(callbackUrl || "/dashboard");
   }
 
+  function handleSkip() {
+    router.replace(callbackUrl || "/dashboard");
+  }
+
   if (
     isLoading ||
     !isAuthenticated ||
@@ -158,6 +163,11 @@ export default function WelcomePage() {
               <LocationStep location={location} onComplete={handleComplete} />
             )}
           </CardContent>
+          <div className='flex justify-center mt-4'>
+            <Button type='button' variant='ghost' onClick={handleSkip}>
+              Skip for now
+            </Button>
+          </div>
         </Card>
 
         <p className='mt-6 text-muted-foreground text-xs text-center leading-5'>
