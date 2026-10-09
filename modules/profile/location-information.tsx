@@ -38,13 +38,6 @@ export function LocationInformation({ location }: LocationInformationProps) {
             label='Division'
             value={location?.division || "—"}
           />
-
-          <ProfileInfoItem
-            icon={MapPinIcon}
-            label='District'
-            value={location?.district || "—"}
-          />
-
           <ProfileInfoItem
             icon={MapPinIcon}
             label='City'
