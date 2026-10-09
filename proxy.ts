@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-
 import { getDashboardPath, hasRouteAccess } from "./config";
 import type { UserRole } from "./types/enum";
-
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, "");
+const API_URL = process.env.API_BASE_URL?.replace(/\/+$/, "");
 
 const PUBLIC_ROUTES = [
   "/signin",
@@ -16,6 +14,8 @@ const PUBLIC_ROUTES = [
 ] as const;
 
 const PROTECTED_PREFIX = "/dashboard";
+
+const SHARED_ROUTES = ["/dashboard/profile", "/dashboard/settings"] as const;
 
 type AuthUser = {
   role?: UserRole;
@@ -35,6 +35,27 @@ function isRouteMatch(pathname: string, route: string): boolean {
 
 function getUserRole(user: AuthUser): UserRole | undefined {
   return user.role ?? user.roles?.[0];
+}
+
+function hasStrictRouteAccess(role: UserRole, pathname: string): boolean {
+  // Shared dashboard routes are available to every authenticated role.
+  if (SHARED_ROUTES.some((route) => isRouteMatch(pathname, route))) {
+    return true;
+  }
+
+  const dashboardPath = getDashboardPath(role);
+
+  // The user dashboard must not grant access to moderator/admin routes.
+  if (dashboardPath === PROTECTED_PREFIX) {
+    if (
+      isRouteMatch(pathname, "/dashboard/moderator") ||
+      isRouteMatch(pathname, "/dashboard/admin")
+    ) {
+      return false;
+    }
+  }
+
+  return hasRouteAccess(role, pathname);
 }
 
 function getCookieHeader(
@@ -142,7 +163,10 @@ function redirectToDashboard(
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
-  const isPublic = PUBLIC_ROUTES.some((route) => isRouteMatch(pathname, route));
+  // Authentication routes are public only at their exact paths.
+  const isPublic = PUBLIC_ROUTES.includes(
+    pathname as (typeof PUBLIC_ROUTES)[number],
+  );
 
   const isProtected = isRouteMatch(pathname, PROTECTED_PREFIX);
 
@@ -194,16 +218,19 @@ export async function proxy(request: NextRequest) {
       response.cookies.delete("accessToken");
       response.cookies.delete("refreshToken");
 
-      return response;
+      return applyCookies(response, refreshedCookies);
     }
 
-    // Redirect /dashboard to the role-specific dashboard.
-    if (pathname === PROTECTED_PREFIX) {
+    const dashboardPath = getDashboardPath(role);
+
+    // Redirect role-specific dashboard roots, but avoid redirecting
+    // regular users from /dashboard back to the same URL.
+    if (pathname === PROTECTED_PREFIX && dashboardPath !== pathname) {
       return redirectToDashboard(request, role, refreshedCookies);
     }
 
-    // Block access to another role's dashboard.
-    if (!hasRouteAccess(role, pathname)) {
+    // Reject routes belonging to another role.
+    if (!hasStrictRouteAccess(role, pathname)) {
       return redirectToDashboard(request, role, refreshedCookies);
     }
   }

@@ -424,8 +424,9 @@ export default function RequestBloodForm() {
 
         <Button
           type='submit'
+          variant={"destructive"}
           disabled={isCreating}
-          className='w-full sm:w-auto min-w-40 hover:cursor-pointer glass-brand'
+          className='w-full sm:w-auto min-w-40 hover:cursor-pointer'
         >
           {isCreating ? (
             <LoadingSpinner

@@ -42,9 +42,9 @@ export interface DashboardSidebar {
 
 export const PUBLIC_NAVIGATION = [
   { title: "Home", href: "/" },
-  { title: "Find Donors", href: "/donors" },
-  { title: "Blood Requests", href: "/blood-requests" },
-  { title: "Organizations", href: "/organizations" },
+  { title: "Blood Requests", href: "/find-requests" },
+  { title: "Find Donors", href: "/find-donors" },
+  { title: "Organizations", href: "/find-organizations" },
 ] as const;
 
 // Form Options
@@ -113,6 +113,21 @@ const createSecondaryNavigation = (): SidebarItem[] => [
     icon: <Home />,
   },
   {
+    title: "Find Requests",
+    url: "/find-requests",
+    icon: <FaDroplet />,
+  },
+  {
+    title: "Find Donors",
+    url: "/find-donors",
+    icon: <Search />,
+  },
+  {
+    title: "Organizations",
+    url: "/find-organizations",
+    icon: <FaBuilding />,
+  },
+  {
     title: "Profile",
     url: "/dashboard/profile",
     icon: <User />,
@@ -140,57 +155,54 @@ const userDashboard: DashboardSidebar = {
     },
     {
       title: "Blood Requests",
-      url: "/dashboard/user/blood-requests",
+      url: "/dashboard/blood-requests",
       icon: <FaDroplet />,
     },
     {
-      title: "My Responses",
-      url: "/dashboard/user/responses",
+      title: "Responses",
+      url: "/dashboard/responses",
       icon: <FileText />,
     },
+
     {
-      title: "Find Donors",
-      url: "/donors",
-      icon: <Search />,
-    },
-    {
-      title: "My Donations",
-      url: "/dashboard/user/donations",
+      title: "Donations",
+      url: "/dashboard/donations",
       icon: <Heart />,
     },
     {
       title: "Certificates",
-      url: "/dashboard/user/certificates",
+      url: "/dashboard/certificates",
       icon: <FaFileCircleCheck />,
     },
     {
       title: "Milestones",
-      url: "/dashboard/user/milestones",
+      url: "/dashboard/milestones",
       icon: <FaAward />,
     },
+
     {
       title: "Organizations",
-      url: "/organizations",
+      url: "/dashboard/organizations",
       icon: <FaBuilding />,
     },
     {
       title: "Messages",
-      url: "/dashboard/user/messages",
+      url: "/dashboard/messages",
       icon: <MessageCircle />,
     },
     {
       title: "Reviews",
-      url: "/dashboard/user/reviews",
+      url: "/dashboard/reviews",
       icon: <Star />,
     },
     {
       title: "Notifications",
-      url: "/dashboard/user/notifications",
+      url: "/dashboard/notifications",
       icon: <Bell />,
     },
     {
       title: "Payments",
-      url: "/dashboard/user/payments",
+      url: "/dashboard/payments",
       icon: <CreditCard />,
     },
   ],
