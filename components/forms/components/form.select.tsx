@@ -39,6 +39,7 @@ type FormSelectProps = {
   onCreateNew?: () => void;
   disabled?: boolean;
   className?: string;
+  onValueChange?: (value: string) => void;
 };
 
 export function FormSelect({
@@ -47,47 +48,57 @@ export function FormSelect({
   options,
   isRequired,
   id,
-  placeholder = "Select an option",
-  createNew = false,
+  placeholder,
+  createNew,
   onCreateNew,
-  disabled = false,
+  disabled,
   className,
+  onValueChange,
 }: FormSelectProps) {
   const selectId = getFieldId(field, id);
   const invalid = isFieldInvalid(field);
+  const value = String(field.state.value ?? "");
+
+  const selectedOption = options.find((option) => option.value === value);
+
   return (
     <Field data-invalid={invalid}>
       <div className='flex justify-between items-center gap-3'>
         <div className='flex items-center gap-0.5'>
           <FormFieldLabel field={field} label={label} id={selectId} />
+
           {isRequired && (
             <span className='text-destructive' aria-hidden='true'>
               *
             </span>
           )}
         </div>
+
         {createNew && onCreateNew && (
           <Badge
             variant='outline'
             onClick={onCreateNew}
             className={cn(
               "gap-1 cursor-pointer",
-              "border-brand/30",
-              "text-brand",
-              "hover:bg-brand/10",
+              "border-brand/30 text-brand hover:bg-brand/10",
             )}
           >
-            <PlusCircle className='size-4' /> Create New
+            <PlusCircle className='size-4' />
+            Create New
           </Badge>
         )}
       </div>
+
       <Select
-        value={field.state.value ?? ""}
-        onValueChange={(value) => field.handleChange(value)}
+        value={value}
+        onValueChange={(nextValue) => {
+          const value = nextValue ?? "";
+
+          field.handleChange(value);
+          onValueChange?.(value);
+        }}
         onOpenChange={(open) => {
-          if (!open) {
-            field.handleBlur();
-          }
+          if (!open) field.handleBlur();
         }}
         disabled={disabled}
       >
@@ -96,13 +107,15 @@ export function FormSelect({
           aria-invalid={invalid}
           className={cn(
             "transition-colors",
-            "focus-visible:ring-brand",
-            "focus-visible:border-brand",
+            "focus-visible:ring-brand focus-visible:border-brand",
             className,
           )}
         >
-          <SelectValue placeholder={placeholder} />
+          <SelectValue placeholder={placeholder}>
+            {selectedOption ? namePerfect(selectedOption.label) : undefined}
+          </SelectValue>
         </SelectTrigger>
+
         <SelectContent>
           <SelectGroup>
             {options.map((option) => (
@@ -114,6 +127,7 @@ export function FormSelect({
           </SelectGroup>
         </SelectContent>
       </Select>
+
       <FormFieldError field={field} />
     </Field>
   );
