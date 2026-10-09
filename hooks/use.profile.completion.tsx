@@ -33,7 +33,6 @@ export function useProfileCompletion() {
   const isLocationComplete = Boolean(
     location?.country &&
     location?.division &&
-    location?.district &&
     location?.city &&
     location?.village &&
     location?.postalCode,
