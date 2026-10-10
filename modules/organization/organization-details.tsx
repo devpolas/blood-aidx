@@ -145,6 +145,8 @@ function OrganizationDetailsContent({
       <Card className='py-0 border-border/70 overflow-hidden'>
         <div className='bg-brand h-2' />
 
+        <BackButton />
+
         <CardContent className='p-5 sm:p-8'>
           <div className='flex sm:flex-row flex-col sm:items-start gap-5'>
             <div className='flex justify-center items-center bg-brand/5 border border-brand/15 rounded-2xl size-16 sm:size-20 text-brand shrink-0'>
@@ -352,8 +354,6 @@ export function OrganizationDetails({
 
   return (
     <div className='space-y-6 mx-auto py-4 w-full'>
-      <BackButton />
-
       <OrganizationDetailsContent organization={organization} />
     </div>
   );

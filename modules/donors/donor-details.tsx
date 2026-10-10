@@ -298,7 +298,7 @@ export function DonorDetails({ donorId }: { donorId: string }) {
       </Card>
 
       <div className='gap-6 grid md:grid-cols-2'>
-        <Card className='py-0'>
+        <Card>
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
               <Droplets className='size-5 text-primary' />
@@ -333,7 +333,7 @@ export function DonorDetails({ donorId }: { donorId: string }) {
           </CardContent>
         </Card>
 
-        <Card className='py-0'>
+        <Card>
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
               <MapPin className='size-5 text-primary' />
