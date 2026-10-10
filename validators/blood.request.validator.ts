@@ -56,9 +56,9 @@ export const CreateBloodRequestSchema = z
       .max(150, "Patient age must be at most 150")
       .optional(),
 
-    requiredAt: z.string().trim(),
+    requiredAt: z.date().optional(),
 
-    expiresAt: z.string().trim(),
+    expiresAt: z.date().optional(),
 
     description: z
       .string()
@@ -145,68 +145,40 @@ export const CreateBloodRequestSchema = z
     }
 
     // Required date
-    const requiredAtResult = z.iso.datetime().safeParse(data.requiredAt);
-
     if (!data.requiredAt) {
       ctx.addIssue({
         code: "custom",
         path: ["requiredAt"],
         message: "Please select when the blood is required",
       });
-    } else if (!requiredAtResult.success) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["requiredAt"],
-        message: "Please select a valid required date",
-      });
+    } else {
+      // Required date cannot be in the past
+      if (data.requiredAt < new Date()) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["requiredAt"],
+          message: "Required date and time cannot be in the past",
+        });
+      }
     }
 
     // Expiration date
-    const expiresAtResult = z.iso.datetime().safeParse(data.expiresAt);
-
     if (!data.expiresAt) {
       ctx.addIssue({
         code: "custom",
         path: ["expiresAt"],
         message: "Please select when this request expires",
       });
-    } else if (!expiresAtResult.success) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["expiresAt"],
-        message: "Please select a valid expiration date",
-      });
-    }
-
-    // Required date cannot be in the past
-    if (requiredAtResult.success) {
-      const today = new Date();
-
-      today.setHours(0, 0, 0, 0);
-
-      const requiredAt = new Date(data.requiredAt);
-
-      requiredAt.setHours(0, 0, 0, 0);
-
-      if (requiredAt < today) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["requiredAt"],
-          message: "Required date cannot be in the past",
-        });
-      }
     }
 
     // Expiration must be after required date
-    if (requiredAtResult.success && expiresAtResult.success) {
-      const requiredAt = new Date(data.requiredAt);
-      const expiresAt = new Date(data.expiresAt);
-
-      if (expiresAt <= requiredAt) {
+    if (data.requiredAt && data.expiresAt) {
+      if (data.expiresAt <= data.requiredAt) {
         ctx.addIssue({
           code: "custom",
           path: ["expiresAt"],
-          message: "Expiration date must be after the required date",
+          message:
+            "Expiration date and time must be after the required date and time",
         });
       }
     }
