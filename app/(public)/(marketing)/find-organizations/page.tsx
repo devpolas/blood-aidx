@@ -1,3 +1,5 @@
+import { OrganizationList } from "@/components/organizations";
+
 export default function page() {
-  return <section>Organizations</section>;
+  return <OrganizationList />;
 }
