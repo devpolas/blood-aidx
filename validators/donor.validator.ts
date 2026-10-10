@@ -124,4 +124,5 @@ export const DonorQuerySchema = z
     }
   });
 
-export type DonorQueryInput = z.infer<typeof DonorQuerySchema>;
+export type DonorQueryInput = z.input<typeof DonorQuerySchema>;
+export type DonorQuery = z.output<typeof DonorQuerySchema>;

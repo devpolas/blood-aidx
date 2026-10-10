@@ -232,7 +232,7 @@ export const OrganizationQuerySchema = z
     limit: z.coerce.number().int().positive().max(100).default(20),
     search: z.string().trim().min(1).max(100).optional(),
 
-    types: OrganizationTypesQuerySchema,
+    types: OrganizationTypesQuerySchema.optional(),
     status: OrganizationStatusSchema.optional(),
     locationId: z.uuid().optional(),
 
@@ -304,4 +304,5 @@ export type UpdateOrganizationMemberInput = z.input<
   typeof UpdateOrganizationMemberSchema
 >;
 export type OrganizationQueryInput = z.input<typeof OrganizationQuerySchema>;
+export type OrganizationQuery = z.output<typeof OrganizationQuerySchema>;
 export type OrganizationResponse = z.input<typeof OrganizationSchema>;

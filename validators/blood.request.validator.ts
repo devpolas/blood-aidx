@@ -324,3 +324,4 @@ export const BloodRequestQuerySchema = z
   });
 
 export type BloodRequestQueryInput = z.input<typeof BloodRequestQuerySchema>;
+export type BloodRequestQuery = z.output<typeof BloodRequestQuerySchema>;
