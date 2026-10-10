@@ -1,16 +1,21 @@
-import { BloodRequestDetailsPage } from "@/components/blood-request/blood-request-details-page";
 import { Suspense } from "react";
 
-export default async function page({
-  params,
-}: {
+import { BloodRequestDetailsPage } from "@/components/blood-request/blood-request-details-page";
+
+interface PageProps {
   params: Promise<{ id: string }>;
-}) {
-  const paramsResolve = await params;
-  const id = paramsResolve.id;
+}
+
+async function BloodRequestDetailsContent({ params }: PageProps) {
+  const { id } = await params;
+
+  return <BloodRequestDetailsPage id={id} />;
+}
+
+export default function Page({ params }: PageProps) {
   return (
     <Suspense fallback={null}>
-      <BloodRequestDetailsPage id={id} />
+      <BloodRequestDetailsContent params={params} />
     </Suspense>
   );
 }

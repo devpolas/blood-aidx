@@ -6,8 +6,6 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Heading3, Muted, Small } from "@/components/typography/typography";
 import type { BloodRequest } from "@/types/blood.request";
 import { normalizeBloodGroup } from "@/utils/blood.group.normalize";
-
-import { BloodRequestActions } from "./blood-request-actions";
 import { BloodRequestPriorityBadge } from "./blood-request-priority-badge";
 import { BloodRequestProgress } from "./blood-request-progress";
 import { BloodRequestStatusBadge } from "./blood-request-status-badge";
@@ -48,7 +46,7 @@ export function BloodRequestCard({
 
           <div className='flex-1 space-y-1 min-w-0'>
             <Link
-              href={`/blood-requests/${request.id}`}
+              href={`/find-requests/${request.id}`}
               className='block rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring min-w-0 hover:text-brand transition-colors'
             >
               <Heading3 className='wrap-break-words line-clamp-2 leading-snug'>
@@ -134,14 +132,6 @@ export function BloodRequestCard({
             <HandHeart className='size-4 text-brand' />
             <Small className='font-medium'>Make a difference</Small>
           </div>
-
-          <BloodRequestActions
-            request={request}
-            onRespond={onRespond}
-            onEdit={onEdit}
-            onCancel={onCancel}
-            showManageActions={showManageActions}
-          />
         </div>
       </CardContent>
     </Card>

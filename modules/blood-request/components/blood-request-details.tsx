@@ -1,32 +1,44 @@
 "use client";
 
-import Link from "next/link";
-
 import {
+  ArrowRight,
+  Building2,
   CalendarClock,
+  Edit2,
   ExternalLink,
   Globe,
+  HandHelping,
+  Info,
   MapPin,
   Phone,
   UserRound,
 } from "lucide-react";
 
+import BackButton from "@/components/shared/back";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Heading2,
   Heading3,
+  Heading5,
   Muted,
   Small,
 } from "@/components/typography/typography";
-import { useLocation, useOrganization, useUserById } from "@/hooks";
+import {
+  useIsMobile,
+  useLocation,
+  useOrganization,
+  useUserById,
+} from "@/hooks";
 import type { BloodRequest } from "@/types/blood.request";
 import { normalizeBloodGroup } from "@/utils/blood.group.normalize";
 
-import { BloodRequestActions } from "./blood-request-actions";
 import { BloodRequestPriorityBadge } from "./blood-request-priority-badge";
 import { BloodRequestProgress } from "./blood-request-progress";
 import { BloodRequestStatusBadge } from "./blood-request-status-badge";
+
+import type { ComponentType, ReactNode } from "react";
+import { LoadingSpinner } from "@/components/shared/loading/loading";
 
 interface BloodRequestDetailsProps {
   request: BloodRequest;
@@ -34,6 +46,7 @@ interface BloodRequestDetailsProps {
   onEdit?: (request: BloodRequest) => void;
   onCancel?: (request: BloodRequest) => void;
   showManageActions?: boolean;
+  isCancelPending?: boolean;
 }
 
 function formatDate(value: string | null) {
@@ -74,19 +87,29 @@ function getWebsiteUrl(website: string) {
 }
 
 function SectionCard({
+  icon: Icon,
   title,
   description,
   children,
 }: {
+  icon: ComponentType<{ className?: string }>;
   title: string;
   description?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
-    <Card className='gap-0 py-0 border-border/70 min-w-0'>
+    <Card className='gap-0 py-0 border-border/70 min-w-0 overflow-hidden'>
       <CardHeader className='gap-1 p-4 sm:p-5'>
-        <Heading3>{title}</Heading3>
-        {description && <Muted className='text-sm'>{description}</Muted>}
+        <div className='flex items-start gap-3 min-w-0'>
+          <div className='flex justify-center items-center bg-primary/10 rounded-xl size-10 shrink-0'>
+            <Icon className='size-5 text-primary' />
+          </div>
+
+          <div className='flex-1 space-y-0.5 min-w-0'>
+            <Heading5 className='leading-6'>{title}</Heading5>
+            {description && <Muted>{description}</Muted>}
+          </div>
+        </div>
       </CardHeader>
 
       <CardContent className='px-4 sm:px-5 pb-4 sm:pb-5 min-w-0'>
@@ -111,7 +134,9 @@ export function BloodRequestDetails({
   onEdit,
   onCancel,
   showManageActions = false,
+  isCancelPending = false,
 }: BloodRequestDetailsProps) {
+  const isMobile = useIsMobile();
   const { data: requesterResponse, isPending: isRequesterPending } =
     useUserById(request.requesterId);
 
@@ -144,7 +169,7 @@ export function BloodRequestDetails({
   const longitude = location?.longitude;
 
   const mapUrl =
-    latitude && longitude
+    latitude != null && longitude != null
       ? `https://www.google.com/maps?q=${encodeURIComponent(
           `${latitude},${longitude}`,
         )}`
@@ -160,48 +185,110 @@ export function BloodRequestDetails({
       <Card className='gap-0 py-0 border-brand/20 min-w-0 overflow-hidden'>
         <div className='bg-brand h-1.5' />
 
-        <CardHeader className='gap-4 p-4 sm:p-6'>
+        {/* Header actions */}
+        <div className='flex justify-between items-center gap-2 px-4 sm:px-6 py-3 w-full'>
+          <BackButton />
+
+          {showManageActions && (
+            <div className='flex flex-wrap justify-end items-center gap-2'>
+              {onEdit && (
+                <Button
+                  type='button'
+                  variant='outline'
+                  className='gap-2 text-xs sm:text-sm'
+                  size={isMobile ? "xs" : "sm"}
+                  onClick={() => onEdit(request)}
+                >
+                  <Edit2 className='size-4 text-brand' />
+                  <span>Edit</span>
+                </Button>
+              )}
+
+              {onCancel && (
+                <Button
+                  type='button'
+                  variant='destructive'
+                  size={isMobile ? "xs" : "sm"}
+                  disabled={isCancelPending}
+                  onClick={() => onCancel?.(request)}
+                >
+                  {isCancelPending ? (
+                    <LoadingSpinner
+                      shimmer
+                      text='Cancelling request...'
+                      spinnerClassName='text-brand'
+                      textClassName='text-brand'
+                    />
+                  ) : (
+                    "Cancel request"
+                  )}
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+
+        <CardHeader className='gap-5 px-4 sm:px-6 lg:px-8 pb-5 sm:pb-6 lg:pb-8'>
+          {/* Status and request ID */}
           <div className='flex flex-wrap justify-between items-center gap-2'>
             <div className='flex flex-wrap items-center gap-2'>
               <BloodRequestStatusBadge status={request.status} />
               <BloodRequestPriorityBadge priority={request.priority} />
             </div>
 
-            <Small className='text-muted-foreground'>
+            <Small className='text-muted-foreground break-all'>
               Request #{request.id.slice(0, 8)}
             </Small>
           </div>
 
-          <div className='flex sm:flex-row flex-col sm:items-center gap-4 min-w-0'>
-            <div className='flex justify-center items-center bg-brand/5 border border-brand/15 rounded-2xl size-16 sm:size-20 font-bold text-brand sm:text-2xl shrink-0'>
-              <span className='text-lg sm:text-2xl text-center'>
-                {normalizeBloodGroup(request.bloodGroup)}
-              </span>
-            </div>
+          {/* Blood group and patient information */}
+          <div className='flex sm:flex-row flex-col sm:justify-between sm:items-center gap-4 min-w-0'>
+            <div className='flex sm:flex-row flex-col sm:items-center gap-4 min-w-0'>
+              <div className='flex justify-center items-center bg-brand/5 border border-brand/15 rounded-2xl size-16 sm:size-20 font-bold text-brand shrink-0'>
+                <span className='text-lg sm:text-2xl text-center'>
+                  {normalizeBloodGroup(request.bloodGroup)}
+                </span>
+              </div>
 
-            <div className='flex-1 space-y-2 min-w-0'>
-              <Heading2 className='wrap-break-words leading-tight'>
-                {request.patientName || "Blood donation needed"}
-              </Heading2>
+              <div className='flex-1 space-y-2 min-w-0'>
+                <Heading2 className='break-words leading-tight'>
+                  {request.patientName || "Blood donation needed"}
+                </Heading2>
 
-              <div className='flex flex-wrap items-center gap-x-3 gap-y-1'>
-                <Muted>
-                  {request.unitsRequired}{" "}
-                  {request.unitsRequired === 1 ? "unit" : "units"} required
-                </Muted>
+                <div className='flex flex-wrap items-center gap-x-3 gap-y-1'>
+                  <Muted>
+                    {request.unitsRequired}{" "}
+                    {request.unitsRequired === 1 ? "unit" : "units"} required
+                  </Muted>
 
-                {request.patientAge != null && (
-                  <Muted>Patient age: {request.patientAge}</Muted>
-                )}
+                  {request.patientAge != null && (
+                    <Muted>Patient age: {request.patientAge}</Muted>
+                  )}
+                </div>
               </div>
             </div>
+
+            {!showManageActions && onRespond && (
+              <Button
+                type='button'
+                className='gap-2 w-full sm:w-auto shrink-0'
+                size={isMobile ? "sm" : "default"}
+                onClick={() => onRespond(request)}
+              >
+                <HandHelping className='size-4 shrink-0' />
+                <span>Respond to request</span>
+                <ArrowRight className='size-4 shrink-0' />
+              </Button>
+            )}
           </div>
         </CardHeader>
 
-        <CardContent className='space-y-5 px-4 sm:px-6 pb-5 sm:pb-6'>
+        <CardContent className='space-y-5 px-4 sm:px-6 pb-5 sm:pb-6 min-w-0'>
+          {/* Donation progress */}
           <div className='bg-muted/20 p-3 sm:p-4 border border-border/60 rounded-xl'>
             <div className='flex flex-wrap justify-between items-center gap-2 mb-4'>
               <Heading3>Donation progress</Heading3>
+
               <Small className='text-muted-foreground'>
                 {request.unitsFulfilled} of {request.unitsRequired} units
                 fulfilled
@@ -214,25 +301,30 @@ export function BloodRequestDetails({
             />
           </div>
 
+          {/* Request description */}
           {request.description && (
             <div className='space-y-2 pt-4 border-border/60 border-t'>
               <Heading3>Description</Heading3>
-              <p className='text-muted-foreground text-sm wrap-break-words leading-7 whitespace-pre-line'>
+
+              <p className='text-muted-foreground text-sm break-words leading-7 whitespace-pre-line'>
                 {request.description}
               </p>
             </div>
           )}
         </CardContent>
       </Card>
+
       {/* Requester and organization */}
       <div className='items-stretch gap-5 grid grid-cols-1 lg:grid-cols-2 min-w-0'>
         <SectionCard
+          icon={HandHelping}
           title='Requester'
           description='Person who created this blood request'
         >
           {isRequesterPending ? (
             <div className='flex items-center gap-3'>
               <LoadingPlaceholder className='rounded-full size-12 shrink-0' />
+
               <div className='flex-1 space-y-2 min-w-0'>
                 <LoadingPlaceholder className='w-32 max-w-full h-4' />
                 <LoadingPlaceholder className='w-48 max-w-full h-3' />
@@ -253,7 +345,7 @@ export function BloodRequestDetails({
               )}
 
               <div className='flex-1 space-y-1 min-w-0'>
-                <p className='font-medium wrap-break-words'>{requester.name}</p>
+                <p className='font-medium break-words'>{requester.name}</p>
                 <p className='text-muted-foreground text-sm break-all'>
                   {requester.email}
                 </p>
@@ -265,6 +357,7 @@ export function BloodRequestDetails({
         </SectionCard>
 
         <SectionCard
+          icon={Building2}
           title='Organization'
           description='Hospital or blood bank associated with this request'
         >
@@ -277,9 +370,8 @@ export function BloodRequestDetails({
           ) : organization ? (
             <div className='flex flex-col gap-3 min-w-0'>
               <div className='space-y-1 min-w-0'>
-                <p className='font-semibold wrap-break-words'>
-                  {organization.name}
-                </p>
+                <p className='font-semibold break-words'>{organization.name}</p>
+
                 <Small className='capitalize'>
                   {organization.type.replaceAll("_", " ")}
                 </Small>
@@ -323,8 +415,10 @@ export function BloodRequestDetails({
           )}
         </SectionCard>
       </div>
+
       {/* Donation location */}
       <SectionCard
+        icon={MapPin}
         title='Donation location'
         description='Location associated with the organization'
       >
@@ -343,21 +437,23 @@ export function BloodRequestDetails({
                 <MapPin className='size-5' />
               </div>
 
-              <p className='min-w-0 text-sm wrap-break-words leading-7'>
+              <p className='min-w-0 text-sm break-words leading-7'>
                 {locationAddress || "No address information available."}
               </p>
             </div>
 
             {mapUrl && (
               <Button
+                type='button'
                 variant='outline'
                 className='gap-2 w-full sm:w-auto shrink-0'
+                onClick={() =>
+                  window.open(mapUrl, "_blank", "noopener,noreferrer")
+                }
               >
-                <a href={mapUrl} target='_blank' rel='noopener noreferrer'>
-                  <MapPin className='size-4' />
-                  View on Maps
-                  <ExternalLink className='size-3.5' />
-                </a>
+                <MapPin className='size-4 shrink-0' />
+                <span>View on Maps</span>
+                <ExternalLink className='size-3.5 shrink-0' />
               </Button>
             )}
           </div>
@@ -365,8 +461,13 @@ export function BloodRequestDetails({
           <Muted>Location information is unavailable.</Muted>
         )}
       </SectionCard>
+
       {/* Request dates */}
-      <SectionCard title='Request information'>
+      <SectionCard
+        icon={Info}
+        title='Request information'
+        description='Review the important dates and timeline associated with this blood request.'
+      >
         <dl className='gap-x-6 gap-y-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 min-w-0'>
           {[
             { label: "Required by", value: formatDate(request.requiredAt) },
@@ -376,7 +477,8 @@ export function BloodRequestDetails({
           ].map(({ label, value }) => (
             <div key={label} className='space-y-1 min-w-0'>
               <dt className='text-muted-foreground text-sm'>{label}</dt>
-              <dd className='flex items-start gap-2 min-w-0 font-medium text-sm wrap-break-words leading-6'>
+
+              <dd className='flex items-start gap-2 min-w-0 font-medium text-sm break-words leading-6'>
                 <CalendarClock className='mt-1 size-4 text-muted-foreground shrink-0' />
                 <span>{value}</span>
               </dd>
@@ -384,23 +486,6 @@ export function BloodRequestDetails({
           ))}
         </dl>
       </SectionCard>
-
-      <div className='flex sm:flex-row flex-col sm:justify-between sm:items-start gap-3 pt-5 border-border/60 border-t min-w-0'>
-        {/* <Button variant='outline' className='w-full sm:w-auto'>
-          <Link href='/find-requests'>Back to blood requests</Link>
-        </Button> */}
-
-        <div className='flex-1 min-w-0 sm:max-w-2xl'>
-          <BloodRequestActions
-            request={request}
-            onRespond={onRespond}
-            onEdit={onEdit}
-            onCancel={onCancel}
-            showManageActions={showManageActions}
-            showDetailsButton={false}
-          />
-        </div>
-      </div>
     </div>
   );
 }
