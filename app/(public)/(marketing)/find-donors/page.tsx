@@ -1,3 +1,5 @@
+import { DonorList } from "@/components/donors";
+
 export default function page() {
-  return <section>Donors</section>;
+  return <DonorList />;
 }
