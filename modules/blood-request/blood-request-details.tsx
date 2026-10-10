@@ -12,6 +12,7 @@ import {
   MapPin,
   Phone,
   UserRound,
+  X,
 } from "lucide-react";
 
 import BackButton from "@/components/shared/back";
@@ -47,6 +48,9 @@ interface BloodRequestDetailsProps {
   onCancel?: (request: BloodRequest) => void;
   showManageActions?: boolean;
   isCancelPending?: boolean;
+  hasResponded: boolean;
+  isCancelResponsePending: boolean;
+  onCancelResponse: () => void;
 }
 
 function formatDate(value: string | null) {
@@ -135,6 +139,9 @@ export function BloodRequestDetails({
   onCancel,
   showManageActions = false,
   isCancelPending = false,
+  hasResponded,
+  isCancelResponsePending,
+  onCancelResponse,
 }: BloodRequestDetailsProps) {
   const isMobile = useIsMobile();
   const { data: requesterResponse, isPending: isRequesterPending } =
@@ -273,11 +280,33 @@ export function BloodRequestDetails({
                 type='button'
                 className='gap-2 w-full sm:w-auto shrink-0'
                 size={isMobile ? "sm" : "default"}
-                onClick={() => onRespond(request)}
+                variant={hasResponded ? "destructive" : "default"}
+                disabled={hasResponded && isCancelResponsePending}
+                onClick={() => {
+                  if (hasResponded) {
+                    onCancelResponse();
+                    return;
+                  }
+
+                  onRespond(request);
+                }}
               >
-                <HandHelping className='size-4 shrink-0' />
-                <span>Respond to request</span>
-                <ArrowRight className='size-4 shrink-0' />
+                {hasResponded ? (
+                  <>
+                    <X className='size-4 shrink-0' />
+                    <span>
+                      {isCancelResponsePending
+                        ? "Cancelling response..."
+                        : "Cancel my response"}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <HandHelping className='size-4 shrink-0' />
+                    <span>Respond to request</span>
+                    <ArrowRight className='size-4 shrink-0' />
+                  </>
+                )}
               </Button>
             )}
           </div>

@@ -2,7 +2,7 @@
 
 import { SyntheticEvent, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { LoadingSpinner } from "@/components/shared/loading/loading";
 import { Button } from "@/components/ui/button";
@@ -19,11 +19,15 @@ import {
   useAuth,
   useBloodRequest,
   useCancelBloodRequest,
+  useCancelBloodRequestResponse,
   useCreateBloodRequestResponse,
+  useMyBloodRequestResponses,
+  useProfileCompletion,
 } from "@/hooks";
 import { BloodRequestDetails } from "@/modules/blood-request/blood-request-details";
 
 import { BloodRequestDetailsSkeleton } from "./blood-request-details-skeleton";
+import { toast } from "@/components/ui/toast";
 
 interface BloodRequestDetailsPageProps {
   id: string;
@@ -31,6 +35,7 @@ interface BloodRequestDetailsPageProps {
 
 export function BloodRequestDetailsPage({ id }: BloodRequestDetailsPageProps) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showResponseDialog, setShowResponseDialog] = useState(false);
@@ -38,7 +43,18 @@ export function BloodRequestDetailsPage({ id }: BloodRequestDetailsPageProps) {
   const [cancelError, setCancelError] = useState<string | null>(null);
 
   const { data, isPending, isError, refetch } = useBloodRequest(id);
-  const { user, isLoading } = useAuth();
+
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const { data: requestResponses, isLoading: requestResponseLoading } =
+    useMyBloodRequestResponses();
+  const { mutateAsync: cancelResponse, isPending: isCanceling } =
+    useCancelBloodRequestResponse();
+
+  const {
+    requiresProfileSetup,
+    isComplete,
+    isLoading: isProfileCompletionLoading,
+  } = useProfileCompletion();
 
   const { mutateAsync: cancelRequest, isPending: isCancelPending } =
     useCancelBloodRequest();
@@ -50,6 +66,15 @@ export function BloodRequestDetailsPage({ id }: BloodRequestDetailsPageProps) {
   } = useCreateBloodRequestResponse();
 
   const request = data?.data?.request;
+
+  const responses = requestResponses?.data?.responses ?? [];
+
+  const myResponse = responses.find(
+    (response) =>
+      response.requestId === request?.id && response.status !== "cancelled",
+  );
+
+  const hasResponded = Boolean(myResponse);
 
   // Cancel Blood Request
   const handleCancel = async () => {
@@ -70,6 +95,39 @@ export function BloodRequestDetailsPage({ id }: BloodRequestDetailsPageProps) {
     }
   };
 
+  async function handleCancelResponse() {
+    if (!myResponse || isCanceling) return;
+
+    try {
+      const res = await cancelResponse(myResponse.id);
+
+      if (!res.success) {
+        toast.add({
+          title: "Failed to cancel response",
+          description: res.message ?? "Unable to cancel your response.",
+          type: "error",
+        });
+
+        return;
+      }
+
+      toast.add({
+        title: "Response cancelled",
+        description: "Your response has been cancelled successfully.",
+        type: "success",
+      });
+    } catch (error) {
+      toast.add({
+        title: "Failed to cancel response",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Unable to cancel your response. Please try again.",
+        type: "error",
+      });
+    }
+  }
+
   // Respond to Blood Request
   const handleResponseSubmit = async (
     event: SyntheticEvent<HTMLFormElement>,
@@ -79,21 +137,49 @@ export function BloodRequestDetailsPage({ id }: BloodRequestDetailsPageProps) {
     if (!request || isResponsePending) return;
 
     try {
-      await createResponse({
+      const res = await createResponse({
         requestId: request.id,
         payload: {
           message: message.trim() || undefined,
         },
       });
 
+      if (!res.success) {
+        toast.add({
+          title: "Failed to response",
+          description: res.message ?? "Unable to make response! Try again",
+          type: "error",
+        });
+      }
+
+      toast.add({
+        title: "Successfully make a response",
+        description:
+          res.message ?? `You make a response to ${request.patientName}`,
+        type: "success",
+      });
+
       setMessage("");
       setShowResponseDialog(false);
-    } catch {
+    } catch (error) {
+      toast.add({
+        title: "Failed to response",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Unable to make response! Try again",
+        type: "error",
+      });
       // The mutation error is displayed in the response dialog.
     }
   };
 
-  if (isPending || isLoading) {
+  if (
+    isPending ||
+    isAuthLoading ||
+    requestResponseLoading ||
+    isProfileCompletionLoading
+  ) {
     return (
       <section className='mx-auto px-4 sm:px-6 py-6 sm:py-8 w-full'>
         <BloodRequestDetailsSkeleton />
@@ -129,18 +215,35 @@ export function BloodRequestDetailsPage({ id }: BloodRequestDetailsPageProps) {
 
   const showManageActions = request.requesterId === user?.id;
 
+  function handleRespond() {
+    if (!user) {
+      const callbackUrl = `${pathname}`;
+      router.push(`/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+      return;
+    }
+    if (requiresProfileSetup && !isComplete) {
+      router.push(`/welcome?callbackUrl=${encodeURIComponent(pathname)}`);
+      return;
+    }
+
+    setShowResponseDialog(true);
+  }
+
   return (
     <section className='flex flex-col gap-5 sm:gap-6 mx-auto py-4 w-full'>
       <BloodRequestDetails
         request={request}
         showManageActions={showManageActions}
+        hasResponded={hasResponded}
+        isCancelResponsePending={isCanceling}
+        onCancelResponse={handleCancelResponse}
         onEdit={() => router.push(`/find-requests/${request.id}/edit`)}
         onCancel={() => {
           setCancelError(null);
           setShowCancelDialog(true);
         }}
         isCancelPending={isCancelPending}
-        onRespond={() => setShowResponseDialog(true)}
+        onRespond={handleRespond}
       />
 
       {/* Cancel Blood Request Dialog */}
