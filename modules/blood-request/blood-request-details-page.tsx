@@ -21,7 +21,7 @@ import {
   useCancelBloodRequest,
   useCreateBloodRequestResponse,
 } from "@/hooks";
-import { BloodRequestDetails } from "@/modules/blood-request/components/blood-request-details";
+import { BloodRequestDetails } from "@/modules/blood-request/blood-request-details";
 
 import { BloodRequestDetailsSkeleton } from "./blood-request-details-skeleton";
 

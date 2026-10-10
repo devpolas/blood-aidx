@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import { BloodRequestDetailsPage } from "@/components/blood-request/blood-request-details-page";
+import { BloodRequestDetailsPage } from "@/modules/blood-request/blood-request-details-page";
 
 interface PageProps {
   params: Promise<{ id: string }>;
