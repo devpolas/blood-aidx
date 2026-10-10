@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Heading2, Muted } from "@/components/typography/typography";
 import { useAuth, useBloodRequest } from "@/hooks";
 import { BloodRequestDetails } from "@/modules/blood-request/components/blood-request-details";
+import { BloodRequestDetailsSkeleton } from "./blood-request-details-skeleton";
 
 interface BloodRequestDetailsPageProps {
   id: string;
@@ -19,16 +20,15 @@ export function BloodRequestDetailsPage({ id }: BloodRequestDetailsPageProps) {
 
   if (isPending || isLoading) {
     return (
-      <main className='mx-auto px-4 py-8 w-full'>
-        <div className='bg-muted rounded w-56 h-8 animate-pulse' />
-        <div className='bg-muted/50 mt-6 rounded-xl h-64 animate-pulse' />
-      </main>
+      <div className='mx-auto px-4 sm:px-6 py-6 sm:py-8 w-full max-w-6xl'>
+        <BloodRequestDetailsSkeleton />
+      </div>
     );
   }
 
   if (isError || !request) {
     return (
-      <main className='mx-auto px-4 py-8 w-full'>
+      <section className='mx-auto px-4 py-8 w-full'>
         <Heading2>Blood request not found</Heading2>
 
         <Muted className='mt-2'>
@@ -44,18 +44,18 @@ export function BloodRequestDetailsPage({ id }: BloodRequestDetailsPageProps) {
             <Link href='/blood-requests'>All blood requests</Link>
           </Button>
         </div>
-      </main>
+      </section>
     );
   }
 
   const showManageActions = request?.requesterId === user?.id;
 
   return (
-    <main className='mx-auto px-4 py-8 w-full'>
+    <section className='mx-auto px-4 py-8 w-full'>
       <BloodRequestDetails
         request={request}
         showManageActions={showManageActions}
       />
-    </main>
+    </section>
   );
 }
