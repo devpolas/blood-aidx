@@ -144,8 +144,9 @@ function OrganizationDetailsContent({
     <div className='space-y-6'>
       <Card className='py-0 border-border/70 overflow-hidden'>
         <div className='bg-brand h-2' />
-
-        <BackButton />
+        <div>
+          <BackButton />
+        </div>
 
         <CardContent className='p-5 sm:p-8'>
           <div className='flex sm:flex-row flex-col sm:items-start gap-5'>
