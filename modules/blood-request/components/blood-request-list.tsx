@@ -11,10 +11,6 @@ interface BloodRequestListProps {
   isLoading?: boolean;
   error?: string | null;
   onRetry?: () => void;
-  onRespond?: (request: BloodRequest) => void;
-  onEdit?: (request: BloodRequest) => void;
-  onCancel?: (request: BloodRequest) => void;
-  showManageActions?: boolean;
 }
 
 export function BloodRequestList({
@@ -22,15 +18,11 @@ export function BloodRequestList({
   isLoading = false,
   error,
   onRetry,
-  onRespond,
-  onEdit,
-  onCancel,
-  showManageActions = false,
 }: BloodRequestListProps) {
   if (isLoading) {
     return (
       <div
-        className='gap-5 grid sm:grid-cols-2 lg:grid-cols-3'
+        className='gap-5 grid sm:grid-cols-2 lg:grid-cols-3 py-4'
         aria-label='Loading blood requests'
       >
         {Array.from({ length: 9 }, (_, index) => (
@@ -45,7 +37,7 @@ export function BloodRequestList({
 
   if (error) {
     return (
-      <div className='p-8 border rounded-xl text-center'>
+      <div className='py-10 border rounded-xl text-center'>
         <Heading2>Unable to load requests</Heading2>
         <Muted className='mt-2'>{error}</Muted>
 
@@ -60,7 +52,7 @@ export function BloodRequestList({
 
   if (requests.length === 0) {
     return (
-      <div className='p-10 border border-dashed rounded-xl text-center'>
+      <div className='py-10 border border-dashed rounded-xl text-center'>
         <Heading2>No blood requests found</Heading2>
         <Muted className='mt-2'>
           There are no blood requests to display right now.
@@ -70,16 +62,9 @@ export function BloodRequestList({
   }
 
   return (
-    <div className='gap-5 grid sm:grid-cols-2 lg:grid-cols-3'>
+    <div className='gap-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 py-4'>
       {requests.map((request) => (
-        <BloodRequestCard
-          key={request.id}
-          request={request}
-          onRespond={onRespond}
-          onEdit={onEdit}
-          onCancel={onCancel}
-          showManageActions={showManageActions}
-        />
+        <BloodRequestCard key={request.id} request={request} />
       ))}
     </div>
   );

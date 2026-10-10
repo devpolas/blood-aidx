@@ -130,7 +130,7 @@ export function BloodRequestDetailsPage({ id }: BloodRequestDetailsPageProps) {
   const showManageActions = request.requesterId === user?.id;
 
   return (
-    <section className='flex flex-col gap-5 sm:gap-6 mx-auto py-6 sm:py-8 w-full'>
+    <section className='flex flex-col gap-5 sm:gap-6 mx-auto py-4 w-full'>
       <BloodRequestDetails
         request={request}
         showManageActions={showManageActions}
