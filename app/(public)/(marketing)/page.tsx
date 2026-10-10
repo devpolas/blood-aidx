@@ -1,7 +1,17 @@
-export default function page() {
+import Hero from "@/components/home/hero";
+import Services from "@/components/home/services";
+import HowItWorks from "@/components/home/how-it-works";
+import CTA from "@/components/home/cta";
+import Benefits from "@/components/home/benefits";
+
+export default function HomePage() {
   return (
-    <section>
-      <h1>Blood AidX</h1>
-    </section>
+    <main className='overflow-hidden'>
+      <Hero />
+      <Services />
+      <HowItWorks />
+      <Benefits />
+      <CTA />
+    </main>
   );
 }
