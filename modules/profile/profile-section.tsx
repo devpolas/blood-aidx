@@ -31,7 +31,7 @@ export function ProfileSection({
   contentClassName,
 }: ProfileSectionProps) {
   return (
-    <Card className={cn("overflow-hidden", className)}>
+    <Card className={cn("py-0 overflow-hidden", className)}>
       <CardHeader className='p-4 sm:p-5 border-brand/20 border-b'>
         <div className='flex justify-between items-start gap-4'>
           <div className='flex items-start gap-2 min-w-0'>

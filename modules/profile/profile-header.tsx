@@ -32,7 +32,7 @@ export function ProfileHeader({
   isLogoutPending,
 }: ProfileHeaderProps) {
   return (
-    <Card className='border-brand/20 overflow-hidden'>
+    <Card className='py-0 border-brand/20 overflow-hidden'>
       <div className='relative p-4 sm:p-6 lg:p-8'>
         <div className='flex sm:flex-row flex-col sm:justify-between sm:items-center gap-6'>
           {/* Profile identity */}
