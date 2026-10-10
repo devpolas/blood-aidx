@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { Building2, Droplets, HeartPlus, MapPin, User } from "lucide-react";
+
 import type { FormSelectOption } from "@/components/forms/components/form.select";
 import { LoadingSpinner } from "@/components/shared/loading/loading";
 import { Button } from "@/components/ui/button";
@@ -34,8 +35,8 @@ const DEFAULT_VALUES: BloodRequestFormValues = {
   priority: "low",
   patientName: "",
   patientAge: undefined,
-  requiredAt: "",
-  expiresAt: "",
+  requiredAt: undefined,
+  expiresAt: undefined,
   description: "",
 };
 
@@ -57,14 +58,20 @@ const priorityOptions: FormSelectOption[] = [
 ];
 
 type LocationState = {
+  countryValue: string;
   country: string;
+  divisionId: string;
   division: string;
+  cityValue: string;
   city: string;
 };
 
 const EMPTY_LOCATION: LocationState = {
+  countryValue: "",
   country: "",
+  divisionId: "",
   division: "",
+  cityValue: "",
   city: "",
 };
 
@@ -75,12 +82,22 @@ export default function CreateBloodRequestForm() {
     useCreateBloodRequest();
 
   const countries = useCountries();
-  const regions = useRegions(location.country || undefined);
 
-  const regionId = location.division ? Number(location.division) : undefined;
+  // Keep the selected country identifier for location lookups.
+  const regions = useRegions(location.countryValue || undefined);
 
-  const settlements = useSettlements(location.country || undefined, regionId);
+  const parsedRegionId = Number(location.divisionId);
+  const regionId =
+    Number.isSafeInteger(parsedRegionId) && parsedRegionId > 0
+      ? parsedRegionId
+      : undefined;
 
+  const settlements = useSettlements(
+    location.countryValue || undefined,
+    regionId,
+  );
+
+  // Use readable location labels for organization database filters.
   const organizations = useOrganizations({
     page: 1,
     limit: 100,
@@ -151,30 +168,48 @@ export default function CreateBloodRequestForm() {
     },
   });
 
-  const handleCountryChange = (country: string) => {
+  const handleCountryChange = (countryValue: string) => {
+    const selectedCountry = countries.options.find(
+      (option) => option.value === countryValue,
+    );
+
     setLocation({
-      country,
+      countryValue,
+      country: selectedCountry?.label ?? "",
+      divisionId: "",
       division: "",
+      cityValue: "",
       city: "",
     });
 
     form.setFieldValue("organizationId", "");
   };
 
-  const handleDivisionChange = (division: string) => {
+  const handleDivisionChange = (divisionId: string) => {
+    const selectedDivision = regions.options.find(
+      (option) => option.value === divisionId,
+    );
+
     setLocation((current) => ({
       ...current,
-      division,
+      divisionId,
+      division: selectedDivision?.label ?? "",
+      cityValue: "",
       city: "",
     }));
 
     form.setFieldValue("organizationId", "");
   };
 
-  const handleCityChange = (city: string) => {
+  const handleCityChange = (cityValue: string) => {
+    const selectedCity = settlements.options.find(
+      (option) => option.value === cityValue,
+    );
+
     setLocation((current) => ({
       ...current,
-      city,
+      cityValue,
+      city: selectedCity?.label ?? "",
     }));
 
     form.setFieldValue("organizationId", "");
@@ -204,6 +239,7 @@ export default function CreateBloodRequestForm() {
           </Muted>
         </div>
       </div>
+
       {/* Request Details */}
       <section className='bg-card shadow-sm p-4 sm:p-5 lg:p-6 border rounded-2xl'>
         <SectionHeader
@@ -268,35 +304,73 @@ export default function CreateBloodRequestForm() {
         <FieldGroup className='gap-4 lg:gap-5 grid md:grid-cols-3 mt-5'>
           <LocationSelect
             label='Country'
-            value={location.country}
+            value={location.countryValue}
             options={countries.options}
-            placeholder='Select country'
-            disabled={isCreating || countries.isLoading}
+            placeholder={
+              countries.isLoading ? "Loading countries..." : "Select country"
+            }
+            disabled={isCreating || countries.isLoading || countries.isError}
             onChange={handleCountryChange}
           />
 
           <LocationSelect
             label='Division'
-            value={location.division}
+            value={location.divisionId}
             options={regions.options}
             placeholder={
-              location.country ? "Select division" : "Select country first"
+              !location.countryValue
+                ? "Select country first"
+                : regions.isLoading
+                  ? "Loading divisions..."
+                  : "Select division"
             }
-            disabled={isCreating || !location.country || regions.isLoading}
+            disabled={
+              isCreating ||
+              !location.countryValue ||
+              regions.isLoading ||
+              regions.isError
+            }
             onChange={handleDivisionChange}
           />
 
           <LocationSelect
             label='City'
-            value={location.city}
+            value={location.cityValue}
             options={settlements.options}
             placeholder={
-              location.division ? "Select city" : "Select division first"
+              !location.divisionId
+                ? "Select division first"
+                : settlements.isLoading
+                  ? "Loading cities..."
+                  : "Select city"
             }
-            disabled={isCreating || !location.division || settlements.isLoading}
+            disabled={
+              isCreating ||
+              !location.divisionId ||
+              settlements.isLoading ||
+              settlements.isError
+            }
             onChange={handleCityChange}
           />
         </FieldGroup>
+
+        {countries.isError && (
+          <p className='mt-3 text-destructive text-sm'>
+            Unable to load countries. Please try again.
+          </p>
+        )}
+
+        {location.countryValue && regions.isError && (
+          <p className='mt-3 text-destructive text-sm'>
+            Unable to load divisions for this country.
+          </p>
+        )}
+
+        {location.divisionId && settlements.isError && (
+          <p className='mt-3 text-destructive text-sm'>
+            Unable to load cities for this division.
+          </p>
+        )}
 
         {/* Organization */}
         <div className='bg-muted/20 mt-5 p-4 sm:p-5 border rounded-xl'>
@@ -327,20 +401,39 @@ export default function CreateBloodRequestForm() {
                       ? "Select location first"
                       : organizations.isLoading
                         ? "Loading organizations..."
-                        : organizationOptions.length === 0
-                          ? "No organizations found"
-                          : "Select organization"
+                        : organizations.isError
+                          ? "Unable to load organizations"
+                          : organizationOptions.length === 0
+                            ? "No organizations found"
+                            : "Select organization"
                   }
                   isRequired
                   disabled={
                     isCreating ||
                     !location.city ||
                     organizations.isLoading ||
+                    organizations.isError ||
                     organizationOptions.length === 0
                   }
                 />
               )}
             </form.Field>
+
+            {location.city && organizations.isError && (
+              <p className='mt-2 text-destructive text-sm'>
+                Unable to load organizations for this location.
+              </p>
+            )}
+
+            {location.city &&
+              !organizations.isLoading &&
+              !organizations.isError &&
+              organizationOptions.length === 0 && (
+                <p className='mt-2 text-muted-foreground text-sm'>
+                  No organizations found for this location. Try selecting
+                  another city.
+                </p>
+              )}
           </div>
         </div>
       </section>
@@ -438,7 +531,7 @@ export default function CreateBloodRequestForm() {
 
         <Button
           type='submit'
-          variant={"destructive"}
+          variant='destructive'
           disabled={isCreating}
           className='w-full sm:w-auto min-w-40 hover:cursor-pointer'
         >
@@ -476,30 +569,30 @@ function LocationSelect({
   disabled?: boolean;
   onChange: (value: string) => void;
 }) {
+  const selectForm = useForm({
+    defaultValues: { value },
+  });
+
+  useEffect(() => {
+    if (selectForm.getFieldValue("value") !== value) {
+      selectForm.setFieldValue("value", value);
+    }
+  }, [selectForm, value]);
+
   return (
-    <FormSelect
-      field={
-        {
-          state: {
-            value,
-            meta: {
-              errors: [],
-              isTouched: false,
-              isDirty: false,
-              isValidating: false,
-              isValid: true,
-            },
-          },
-          handleChange: onChange,
-          handleBlur: () => undefined,
-        } as never
-      }
-      label={label}
-      options={options}
-      placeholder={placeholder}
-      isRequired
-      disabled={disabled}
-    />
+    <selectForm.Field name='value'>
+      {(field) => (
+        <FormSelect
+          field={field}
+          label={label}
+          options={options}
+          placeholder={placeholder}
+          isRequired
+          disabled={disabled}
+          onValueChange={onChange}
+        />
+      )}
+    </selectForm.Field>
   );
 }
 
