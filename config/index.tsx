@@ -132,16 +132,16 @@ const createSecondaryNavigation = (): SidebarItem[] => [
     url: "/dashboard/profile",
     icon: <User />,
   },
-  {
-    title: "Settings",
-    url: "/dashboard/settings",
-    icon: <Settings />,
-  },
-  {
-    title: "Help Center",
-    url: "/help",
-    icon: <CircleHelp />,
-  },
+  // {
+  //   title: "Settings",
+  //   url: "/dashboard/settings",
+  //   icon: <Settings />,
+  // },
+  // {
+  //   title: "Help Center",
+  //   url: "/help",
+  //   icon: <CircleHelp />,
+  // },
 ];
 
 // User Dashboard Navigation
@@ -169,37 +169,37 @@ const userDashboard: DashboardSidebar = {
       url: "/dashboard/donations",
       icon: <Heart />,
     },
-    {
-      title: "Certificates",
-      url: "/dashboard/certificates",
-      icon: <FaFileCircleCheck />,
-    },
-    {
-      title: "Milestones",
-      url: "/dashboard/milestones",
-      icon: <FaAward />,
-    },
+    // {
+    //   title: "Certificates",
+    //   url: "/dashboard/certificates",
+    //   icon: <FaFileCircleCheck />,
+    // },
+    // {
+    //   title: "Milestones",
+    //   url: "/dashboard/milestones",
+    //   icon: <FaAward />,
+    // },
 
     {
       title: "Organizations",
       url: "/dashboard/organizations",
       icon: <FaBuilding />,
     },
-    {
-      title: "Messages",
-      url: "/dashboard/messages",
-      icon: <MessageCircle />,
-    },
-    {
-      title: "Reviews",
-      url: "/dashboard/reviews",
-      icon: <Star />,
-    },
-    {
-      title: "Notifications",
-      url: "/dashboard/notifications",
-      icon: <Bell />,
-    },
+    // {
+    //   title: "Messages",
+    //   url: "/dashboard/messages",
+    //   icon: <MessageCircle />,
+    // },
+    // {
+    //   title: "Reviews",
+    //   url: "/dashboard/reviews",
+    //   icon: <Star />,
+    // },
+    // {
+    //   title: "Notifications",
+    //   url: "/dashboard/notifications",
+    //   icon: <Bell />,
+    // },
     {
       title: "Payments",
       url: "/dashboard/payments",
@@ -238,26 +238,26 @@ const moderatorDashboard: DashboardSidebar = {
       url: "/dashboard/moderator/organizations",
       icon: <FaBuilding />,
     },
-    {
-      title: "Reports",
-      url: "/dashboard/moderator/reports",
-      icon: <FaFlag />,
-    },
+    // {
+    //   title: "Reports",
+    //   url: "/dashboard/moderator/reports",
+    //   icon: <FaFlag />,
+    // },
     {
       title: "Reviews",
       url: "/dashboard/moderator/reviews",
       icon: <Star />,
     },
-    {
-      title: "Messages",
-      url: "/dashboard/moderator/messages",
-      icon: <MessageCircle />,
-    },
-    {
-      title: "Notifications",
-      url: "/dashboard/moderator/notifications",
-      icon: <Bell />,
-    },
+    // {
+    //   title: "Messages",
+    //   url: "/dashboard/moderator/messages",
+    //   icon: <MessageCircle />,
+    // },
+    // {
+    //   title: "Notifications",
+    //   url: "/dashboard/moderator/notifications",
+    //   icon: <Bell />,
+    // },
   ],
   navSecondary: createSecondaryNavigation(),
 };
@@ -291,16 +291,16 @@ const adminDashboard: DashboardSidebar = {
       url: "/dashboard/admin/organizations",
       icon: <FaBuilding />,
     },
-    {
-      title: "Milestones",
-      url: "/dashboard/admin/milestones",
-      icon: <FaAward />,
-    },
-    {
-      title: "Reports",
-      url: "/dashboard/admin/reports",
-      icon: <FaFlag />,
-    },
+    // {
+    //   title: "Milestones",
+    //   url: "/dashboard/admin/milestones",
+    //   icon: <FaAward />,
+    // },
+    // {
+    //   title: "Reports",
+    //   url: "/dashboard/admin/reports",
+    //   icon: <FaFlag />,
+    // },
     {
       title: "Reviews",
       url: "/dashboard/admin/reviews",
@@ -311,16 +311,16 @@ const adminDashboard: DashboardSidebar = {
       url: "/dashboard/admin/payments",
       icon: <CreditCard />,
     },
-    {
-      title: "Messages",
-      url: "/dashboard/admin/messages",
-      icon: <MessageCircle />,
-    },
-    {
-      title: "Notifications",
-      url: "/dashboard/admin/notifications",
-      icon: <Bell />,
-    },
+    // {
+    //   title: "Messages",
+    //   url: "/dashboard/admin/messages",
+    //   icon: <MessageCircle />,
+    // },
+    // {
+    //   title: "Notifications",
+    //   url: "/dashboard/admin/notifications",
+    //   icon: <Bell />,
+    // },
   ],
   navSecondary: createSecondaryNavigation(),
 };

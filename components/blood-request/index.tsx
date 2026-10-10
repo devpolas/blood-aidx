@@ -12,8 +12,6 @@ export function PublicBloodRequestList() {
     <BloodRequestList
       requests={requests}
       isLoading={query.isPending}
-      isFetching={query.isFetching && !query.isPending}
-      error={query.error}
       onRetry={() => void query.refetch()}
     />
   );
