@@ -1,31 +1,35 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthMe } from "@/hooks/auths";
 
+import { useAuthMe } from "@/hooks/auths";
 import { clearCallbackUrl, getCallbackUrl } from "@/utils/callback.url";
 
 export default function AuthCallback() {
   const router = useRouter();
-  const { isLoading, isError } = useAuthMe();
+  const hasRedirected = useRef(false);
+
+  const { isLoading, isError, isSuccess } = useAuthMe();
 
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading || hasRedirected.current) {
       return;
     }
 
-    if (isError) {
+    hasRedirected.current = true;
+
+    if (isError || !isSuccess) {
       clearCallbackUrl();
       router.replace("/signin");
       return;
     }
 
     const callbackUrl = getCallbackUrl() ?? "/";
-    clearCallbackUrl();
 
+    clearCallbackUrl();
     router.replace(callbackUrl);
-  }, [isLoading, isError, router]);
+  }, [isLoading, isError, isSuccess, router]);
 
   return null;
 }
