@@ -2,58 +2,100 @@ import { NextRequest } from "next/server";
 
 const API_URL = process.env.API_BASE_URL?.replace(/\/+$/, "");
 
+type RouteContext = {
+  params: Promise<{
+    path: string[];
+  }>;
+};
+
+const REQUEST_HEADERS_TO_REMOVE = [
+  "host",
+  "connection",
+  "content-length",
+  "transfer-encoding",
+  "accept-encoding",
+];
+
+const RESPONSE_HEADERS_TO_REMOVE = [
+  "connection",
+  "content-encoding",
+  "content-length",
+  "transfer-encoding",
+  "set-cookie",
+];
+
 async function handler(
   request: NextRequest,
-  context: { params: Promise<{ path: string[] }> },
-) {
+  context: RouteContext,
+): Promise<Response> {
   if (!API_URL) {
     return Response.json(
-      { success: false, message: "API URL is not configured" },
+      {
+        success: false,
+        message: "API URL is not configured",
+      },
       { status: 500 },
     );
   }
 
-  const { path } = await context.params;
-  const url = `${API_URL}/${path.join("/")}${request.nextUrl.search}`;
-
-  const headers = new Headers(request.headers);
-  headers.delete("host");
-  headers.delete("connection");
-  headers.delete("content-length");
-
   try {
+    const { path } = await context.params;
+
+    const pathname = path.map(encodeURIComponent).join("/");
+    const url = `${API_URL}/${pathname}${request.nextUrl.search}`;
+
+    // Forward incoming headers while removing transport-specific headers.
+    const requestHeaders = new Headers(request.headers);
+
+    for (const header of REQUEST_HEADERS_TO_REMOVE) {
+      requestHeaders.delete(header);
+    }
+
+    // Forward the request body for methods that support one.
+    const body =
+      request.method === "GET" || request.method === "HEAD"
+        ? undefined
+        : await request.arrayBuffer();
+
     const upstream = await fetch(url, {
       method: request.method,
-      headers,
-      body:
-        request.method === "GET" || request.method === "HEAD"
-          ? undefined
-          : await request.arrayBuffer(),
+      headers: requestHeaders,
+      body,
       cache: "no-store",
       redirect: "manual",
     });
 
+    // Prepare response headers.
+    // Fetch may automatically decompress the upstream response body.
     const responseHeaders = new Headers(upstream.headers);
-    responseHeaders.delete("set-cookie");
 
-    const response = new Response(upstream.body, {
-      status: upstream.status,
-      statusText: upstream.statusText,
-      headers: responseHeaders,
-    });
+    for (const header of RESPONSE_HEADERS_TO_REMOVE) {
+      responseHeaders.delete(header);
+    }
 
-    for (const cookie of upstream.headers.getSetCookie()) {
-      // Make backend cookies available to the frontend's own domain.
-      response.headers.append(
+    // Preserve backend cookies on the frontend domain.
+    const cookies = upstream.headers.getSetCookie();
+
+    for (const cookie of cookies) {
+      responseHeaders.append(
         "Set-Cookie",
         cookie.replace(/;\s*domain=[^;]*/gi, ""),
       );
     }
 
-    return response;
-  } catch {
+    return new Response(upstream.body, {
+      status: upstream.status,
+      statusText: upstream.statusText,
+      headers: responseHeaders,
+    });
+  } catch (error) {
+    console.error("[Backend Proxy Error]", error);
+
     return Response.json(
-      { success: false, message: "Backend API unavailable" },
+      {
+        success: false,
+        message: "Backend API unavailable",
+      },
       { status: 502 },
     );
   }
