@@ -33,6 +33,7 @@ import { LocationAddressFields } from "./location.address.fields";
 import { LocationDetect } from "./location.detect";
 import { LocationFields } from "./location.fields";
 import { toast } from "@/components/ui/toast";
+import { normalizeLocationName } from "@/utils/location.normalization";
 
 export type LocationFormHandle = {
   submit: () => Promise<LocationRecord | null>;
@@ -127,10 +128,12 @@ export const LocationForm = forwardRef<LocationFormHandle, LocationFormProps>(
           const payload: LocationFormValues = {
             latitude: value.latitude?.trim() || undefined,
             longitude: value.longitude?.trim() || undefined,
-            country: value.country.trim(),
-            division: value.division.trim(),
-            city: value.city.trim(),
-            village: value.village.trim(),
+
+            country: normalizeLocationName(value.country, "country"),
+            division: normalizeLocationName(value.division, "division"),
+            city: normalizeLocationName(value.city, "city"),
+            village: normalizeLocationName(value.village, "village"),
+
             postalCode: value.postalCode.trim(),
             addressLine: value.addressLine?.trim() || "",
           };
@@ -142,10 +145,13 @@ export const LocationForm = forwardRef<LocationFormHandle, LocationFormProps>(
 
           if (!response.success || !response.data?.location) {
             toast.add({
-              title: "Location creation failed",
+              title:
+                mode === "update"
+                  ? "Location update failed"
+                  : "Location creation failed",
               description:
                 response.message ||
-                "Unable to create the location. Please try again.",
+                "Unable to save the location. Please try again.",
               type: "error",
             });
             return;
@@ -159,17 +165,22 @@ export const LocationForm = forwardRef<LocationFormHandle, LocationFormProps>(
           form.reset();
 
           toast.add({
-            title: "Location created",
-            description: "Your location has been created successfully.",
+            title: mode === "update" ? "Location updated" : "Location created",
+            description: `Your location has been ${
+              mode === "update" ? "updated" : "created"
+            } successfully.`,
             type: "success",
           });
         } catch (error) {
           toast.add({
-            title: "Location creation failed",
+            title:
+              mode === "update"
+                ? "Location update failed"
+                : "Location creation failed",
             description:
               error instanceof Error
                 ? error.message
-                : "Unable to create the location. Please try again.",
+                : "Unable to save the location. Please try again.",
             type: "error",
           });
         }
